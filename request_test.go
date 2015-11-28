@@ -82,10 +82,40 @@ func TestParseRequestUrl(t *testing.T) {
 
 func TestQueryOptions(t *testing.T) {
 	var opts QueryOptions
+	var err error
 
-	opts = CreateQueryOptions("$expand=Datastreams")
-
+	opts, err = CreateQueryOptions("$expand=Datastreams")
+	assert.Nil(t, err)
 	assert.True(t, opts.ExpandSet())
+	assert.Equal(t,1, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, "Datastreams", opts.GetExpandOption().GetValue()[0])
+
+	opts, err = CreateQueryOptions("$expand=Observations,ObservedProperty")
+	assert.Nil(t, err)
+	assert.True(t, opts.ExpandSet())
+	assert.Equal(t,2, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, "Observations", opts.GetExpandOption().GetValue()[0])
+	assert.Equal(t, "ObservedProperty", opts.GetExpandOption().GetValue()[1])
+
+	opts, err = CreateQueryOptions("$expand=Observations($select=result)")
+	assert.Nil(t, err)
+	assert.True(t, opts.ExpandSet())
+	assert.Equal(t, 1, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, opts.GetExpandOption().GetValue()[0], "Observations($select=result)")
+
+	opts, err = CreateQueryOptions("$select=id,Observations&$expand=Observations/FeatureOfInterest")
+	assert.Nil(t, err)
+	assert.True(t, opts.SelectSet())
+	assert.Equal(t, 2, len(opts.GetSelectOption().GetValue()))
+	assert.Equal(t, opts.GetSelectOption().GetValue()[0], "id")
+	assert.Equal(t, opts.GetSelectOption().GetValue()[1], "Observations")
+	assert.True(t, opts.ExpandSet())
+	assert.Equal(t, 1, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, opts.GetExpandOption().GetValue()[0], "Observations/FeatureOfInterest")
+
+
+//	opts, err = CreateQueryOptions("$expand=Datastream&$orderby=Datastreams/id desc, phenomenonTime")
+// 	opts, err = CreateQueryOptions("$expand=Datastreams/Observations/FeatureOfInterest&$filter=Datastreams/Observations/FeatureOfInterest/id eq 'FOI_1' and Datastreams/Observations/resultTime ge 2010-06-01T00:00:00Z and Datastreams/Observations/resultTime le 2010-07-01T00:00:00Z")
 }
 
 

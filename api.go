@@ -38,6 +38,57 @@ type QueryOptions interface {
 	SkipSet() bool
 	CountSet() bool
 	FilterSet() bool
+
+	GetExpandOption() ExpandOption
+	GetSelectOption() SelectOption
+	GetOrderByOption() OrderByOption
+	GetTopOption() TopOption
+	GetSkipOption() SkipOption
+	GetCountOption() CountOption
+	GetFilterOption() FilterOption
+}
+
+type QueryOption interface {
+	GetType() QueryOptionType
+}
+
+type ExpandOption interface {
+	QueryOption
+	GetValue() []string
+}
+
+type SelectOption interface {
+	QueryOption
+	GetValue() []string
+}
+
+type OrderByOption interface {
+	QueryOption
+	GetValue() []OrderByOptionValue
+}
+
+// asc, desc
+type OrderByOptionValue interface {
+
+}
+
+type TopOption interface {
+	QueryOption
+	GetValue() uint
+}
+
+type SkipOption interface {
+	QueryOption
+	GetValue() uint
+}
+
+type CountOption interface {
+	QueryOption
+	GetValue() bool
+}
+
+type FilterOption interface {
+	QueryOption
 }
 
 type Server interface {

@@ -1,8 +1,10 @@
 package main
-import "github.com/zubairhamed/lab/ogcsensorthings"
+import (
+	"github.com/zubairhamed/gossamer"
+)
 
 func main() {
-	server := ogcsensorthings.NewServer()
+	server := gossamer.NewServer()
 
 	server.UseSensingProfile(&DefaultSensingProfileHandler{})
 	server.UseTaskingProfile(&DefaultTaskingProfileHandler{})
