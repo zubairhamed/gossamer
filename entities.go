@@ -24,7 +24,7 @@ type ObservationType string
 	}
 }
 */
-type Thing struct {
+type ThingEntity struct {
 	description 		string
 	properties			map[string]string
 	// location 			*Location
@@ -41,7 +41,7 @@ type Thing struct {
 "coordinates": [-114.06,51.05] }
 }
  */
-type Location struct {
+type LocationEntity struct {
 	description 		string
 	encodingType 		EncodingType
 	// location 		??
@@ -62,7 +62,7 @@ type Location struct {
 	}
 }
  */
-type HistoricalLocation struct {
+type HistoricalLocationEntity struct {
 	time 		time.Time
 	// thing 		*Thing
 	// locations 	[]*Location
@@ -96,7 +96,7 @@ type UCUM struct {
 
 }
 
-type Datastream struct {
+type DatastreamEntity struct {
 	description 		string
 	unitOfMeasurement	*UCUM
 	observationType 	ObservationType
@@ -116,7 +116,7 @@ type Datastream struct {
 "metadata": "http://example.org/TMP35_36_37.pdf"
 }
  */
-type Sensor struct {
+type SensorEntity struct {
 	description 	string
 	encodingType 	EncodingType
 	metadata 		string
@@ -133,7 +133,7 @@ type Sensor struct {
 	"definition": "http://dbpedia.org/page/Dew_point"
 }
  */
-type ObservedProperty struct {
+type ObservedPropertyEntity struct {
 	name 			string
 	definition 		string
 	description		string
@@ -151,7 +151,7 @@ type ObservedProperty struct {
 	"result": 70.4
 }￼￼￼
  */
-type Observation struct {
+type ObservationEntity struct {
 
 }
 
@@ -167,6 +167,6 @@ type Observation struct {
 		"coordinates": [-114.06,51.05] }
 	}
  */
-type FeatureOfInterest struct {
+type FeatureOfInterestEntity struct {
 
 }

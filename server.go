@@ -15,6 +15,7 @@ func NewServer() Server {
 type DefaultServer struct {
 	sensingHandler 	SensingProfileHandler
 	taskingHandler 	TaskingProfileHandler
+	dataStore 		Datastore
 }
 
 func (s *DefaultServer) handleNotImplemented(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -65,13 +66,10 @@ func IsEntity(e string) bool {
 var ERR_INVALID_ENTITY = errors.New("Invalid Entity")
 
 func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.Request) {
-	log.Println("=====================")
-	CreateRequest(r.URL)
+
 }
 
-
 func (s *DefaultServer) Start() {
-
 	goji.Get("/v1.0", s.handleRootResource)
 	goji.Get("/v1.0/*", s.handleGetEntity)
 
