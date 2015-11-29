@@ -3,16 +3,13 @@ import (
 	"strings"
 	"log"
 	"errors"
+	"strconv"
 )
 
 func IsQueryOption(s string) bool {
-	if strings.HasPrefix(s, "$expand") ||
-	strings.HasPrefix(s, "$select") ||
-	strings.HasPrefix(s, "$orderby") ||
-	strings.HasPrefix(s, "$top") ||
-	strings.HasPrefix(s, "$skip") ||
-	strings.HasPrefix(s, "$count") ||
-	strings.HasPrefix(s, "$filter") {
+	if 	strings.HasPrefix(s, "$expand") || strings.HasPrefix(s, "$select") ||  strings.HasPrefix(s, "$orderby") ||
+		strings.HasPrefix(s, "$top") || strings.HasPrefix(s, "$skip") || strings.HasPrefix(s, "$count") ||
+		strings.HasPrefix(s, "$filter") {
 		return true
 	}
 	return false
@@ -53,8 +50,6 @@ func CreateQueryOptions(q string) (QueryOptions, error) {
 	}
 	optsSplit := strings.Split(q, "&")
 	for _, optItem := range optsSplit {
-
-		// TODO: Split by index
 		firstEq := strings.Index(optItem, "=")
 		opt := optItem[0:firstEq]
 		if IsQueryOption(opt) {
@@ -107,11 +102,25 @@ func CreateExpandOption (s string) (ExpandOption, error) {
 }
 
 func CreateTopOption (s string) (TopOption, error) {
-	return &DefaultTopOption{}, nil
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DefaultTopOption{
+		value: i,
+	}, nil
 }
 
 func CreateCountOption (s string) (CountOption, error) {
-	return &DefaultCountOption{}, nil
+	i, err := strconv.ParseBool(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DefaultCountOption{
+		value: i,
+	}, nil
 }
 
 func CreateFilterOption (s string) (FilterOption, error) {
@@ -119,7 +128,14 @@ func CreateFilterOption (s string) (FilterOption, error) {
 }
 
 func CreateSkipOption(s string) (SkipOption, error) {
-	return &DefaultSkipOption{}, nil
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DefaultSkipOption{
+		value: i,
+	}, nil
 }
 
 func CreateOrderByOption(s string) (OrderByOption, error) {
@@ -175,10 +191,10 @@ type DefaultOrderByOptionValue struct {
 }
 
 type DefaultTopOption struct {
-	value 	uint
+	value 	int
 }
 
-func (o *DefaultTopOption) GetValue() uint {
+func (o *DefaultTopOption) GetValue() int {
 	return o.value
 }
 
@@ -187,14 +203,14 @@ func (o *DefaultTopOption) GetType() QueryOptionType {
 }
 
 type DefaultSkipOption struct {
-	value 	uint
+	value 	int
 }
 
 func (o *DefaultSkipOption) GetType() QueryOptionType {
 	return QUERYOPT_SKIP
 }
 
-func (o *DefaultSkipOption) GetValue() uint {
+func (o *DefaultSkipOption) GetValue() int {
 	return o.value
 }
 

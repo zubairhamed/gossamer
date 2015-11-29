@@ -9,8 +9,20 @@ func TestParseRequestUrl(t *testing.T) {
 	cases1 := []struct {
 		in 	string
 	}{
-		{ "http://example.org/v1.0/ObservedProperties" },
+		/*
+			EntityType
+			ID
+			Query Opt Values
+				expand
+				top
+				skip
+				count
+				filter
+			property
+			propertyValue
 
+		 */
+		{ "http://example.org/v1.0/ObservedProperties" },
 		{ "http://example.org/v1.0/Things(1)" },
 		{ "http://example.org/v1.0/Things?$expand=Datastreams" },
 		{ "http://example.org/v1.0/Things?$top=5" },
@@ -24,7 +36,6 @@ func TestParseRequestUrl(t *testing.T) {
 		{ "http://example.org/v1.0/Observations?$expand=Datastream&$orderby=Datastreams/id desc, phenomenonTime" },
 		{ "http://example.org/v1.0/Observations(1)/resultTime" },
 		{ "http://example.org/v1.0/Observations(1)/resultTime/$value" },
-
 		{ "http://example.org/v1.0/Datastreams(1)/Observations" },
 		{ "http://example.org/v1.0/Datastreams(1)/Observations/$ref" },
 		{ "http://example.org/v1.0/Datastreams(1)/Observations(1)" },
@@ -34,7 +45,6 @@ func TestParseRequestUrl(t *testing.T) {
 		{ "http://example.org/v1.0/Datastreams(1)?$expand=Observations($filter=result eq 1)" },
 		{ "http://example.org/v1.0/Datastreams(1)?$select=id,Observations&$expand=Observations/FeatureOfInterest" },
 		{ "http://example.org/v1.0/Datastreams(1)?$expand=Observations($select=result)" },
-
 		{ "http://example.org/v1.0/Observations?$top=5&$orderby=phenomenonTime desc" },
 		{ "http://example.org/v1.0/Observations?$skip=2&$top=2&$orderby=resultTime" },
 		{ "http://example.org/v1.0/Observations?$filter=result lt 10.00" },
@@ -79,43 +89,4 @@ func TestParseRequestUrl(t *testing.T) {
 	assert.Equal(t, ENTITY_THINGS, req.GetNavigation().GetItems()[0].GetEntity())
 	assert.Empty(t, req.GetNavigation().GetItems()[0].GetId())
 }
-
-func TestQueryOptions(t *testing.T) {
-	var opts QueryOptions
-	var err error
-
-	opts, err = CreateQueryOptions("$expand=Datastreams")
-	assert.Nil(t, err)
-	assert.True(t, opts.ExpandSet())
-	assert.Equal(t,1, len(opts.GetExpandOption().GetValue()))
-	assert.Equal(t, "Datastreams", opts.GetExpandOption().GetValue()[0])
-
-	opts, err = CreateQueryOptions("$expand=Observations,ObservedProperty")
-	assert.Nil(t, err)
-	assert.True(t, opts.ExpandSet())
-	assert.Equal(t,2, len(opts.GetExpandOption().GetValue()))
-	assert.Equal(t, "Observations", opts.GetExpandOption().GetValue()[0])
-	assert.Equal(t, "ObservedProperty", opts.GetExpandOption().GetValue()[1])
-
-	opts, err = CreateQueryOptions("$expand=Observations($select=result)")
-	assert.Nil(t, err)
-	assert.True(t, opts.ExpandSet())
-	assert.Equal(t, 1, len(opts.GetExpandOption().GetValue()))
-	assert.Equal(t, opts.GetExpandOption().GetValue()[0], "Observations($select=result)")
-
-	opts, err = CreateQueryOptions("$select=id,Observations&$expand=Observations/FeatureOfInterest")
-	assert.Nil(t, err)
-	assert.True(t, opts.SelectSet())
-	assert.Equal(t, 2, len(opts.GetSelectOption().GetValue()))
-	assert.Equal(t, opts.GetSelectOption().GetValue()[0], "id")
-	assert.Equal(t, opts.GetSelectOption().GetValue()[1], "Observations")
-	assert.True(t, opts.ExpandSet())
-	assert.Equal(t, 1, len(opts.GetExpandOption().GetValue()))
-	assert.Equal(t, opts.GetExpandOption().GetValue()[0], "Observations/FeatureOfInterest")
-
-
-//	opts, err = CreateQueryOptions("$expand=Datastream&$orderby=Datastreams/id desc, phenomenonTime")
-// 	opts, err = CreateQueryOptions("$expand=Datastreams/Observations/FeatureOfInterest&$filter=Datastreams/Observations/FeatureOfInterest/id eq 'FOI_1' and Datastreams/Observations/resultTime ge 2010-06-01T00:00:00Z and Datastreams/Observations/resultTime le 2010-07-01T00:00:00Z")
-}
-
 
