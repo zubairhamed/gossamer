@@ -74,12 +74,12 @@ type OrderByOptionValue interface {
 
 type TopOption interface {
 	QueryOption
-	GetValue() uint
+	GetValue() int
 }
 
 type SkipOption interface {
 	QueryOption
-	GetValue() uint
+	GetValue() int
 }
 
 type CountOption interface {
@@ -143,3 +143,18 @@ type SensingProfileHandler interface {
 type TaskingProfileHandler interface {
 
 }
+
+type Datastore interface {
+	GetThings() []Thing
+	GetThing(string) Thing
+}
+
+// Entities
+type Thing interface {}
+type Location interface {}
+type HistoricalLocation interface {}
+type Datastream interface {}
+type Sensor interface {}
+type ObservedProperty interface {}
+type Observation interface {}
+type FeatureOfInterest interface {}
