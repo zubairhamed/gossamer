@@ -1,4 +1,5 @@
 package gossamer
+import "time"
 
 type ProtocolType int
 const (
@@ -14,7 +15,8 @@ const (
 	ENTITY_DATASTREAMS			EntityType = "Datastreams"
 	ENTITY_SENSORS				EntityType = "Sensors"
 	ENTITY_OBSERVATIONS			EntityType = "Observations"
-	ENTITY_FEATURESOFINTEREST	EntityType = "FeaturesOfInterest"
+	ENTITY_FEATURESOFINTERESTS	EntityType = "FeaturesOfInterest"
+	ENTITY_HISTORICALLOCATIONS	EntityType = "HistoricalLocations"
 	ENTITY_UNKNOWN				EntityType = "UNKNOWN"
 )
 
@@ -147,14 +149,117 @@ type TaskingProfileHandler interface {
 type Datastore interface {
 	GetThings() []Thing
 	GetThing(string) Thing
+
+//	GetObservedProperties() []ObservedProperty
+//	GetObservedProperty(string)
+//
+//	GetLocations() []Location
+//	GetLocation(string) Location
+//
+//	GetDatastreams() []Datastream
+//	GetDatastream(string) Datastream
+//
+//	GetSensors() []Sensor
+//	GetSensor(string) Sensor
+//
+//	GetObservations() []Observation
+//	GetObservation(string) Observation
+//
+//	GetFeatureOfInterests() []FeatureOfInterest
+//	GetFeatureOfInterest(string) FeatureOfInterest
 }
 
 // Entities
-type Thing interface {}
-type Location interface {}
-type HistoricalLocation interface {}
-type Datastream interface {}
-type Sensor interface {}
-type ObservedProperty interface {}
-type Observation interface {}
-type FeatureOfInterest interface {}
+type SensorThing interface {
+	GetId() string
+	GetSelfLink() string
+	GetNavigationLink() string
+	GetType() EntityType
+}
+
+type Thing interface {
+	SensorThing
+	GetDescription() string
+	GetProperties() map[string] string
+
+	GetLocations() []Location
+	GetHistoricalLocations() []HistoricalLocation
+	GetDatastreams() []Datastream
+}
+
+type Location interface {
+	SensorThing
+	GetDescription() string
+	GetEncodingType()	// !!
+	GetLocationType()	// !!
+
+	GetThings() []Thing
+	GetHistoricalLocations() []HistoricalLocation
+}
+
+type HistoricalLocation interface {
+	SensorThing
+	GetTime() time.Time
+
+	GetLocations() []Location
+	GetThing() Thing
+}
+
+type Datastream interface {
+	SensorThing
+
+	GetDescription() string
+	GetUnitOfMeasurement() // UnitOfMeasure !!
+	GetObservationType()	// !!
+	GetObservedArea() 	// !!
+	GetPhenomenonTime() time.Time
+	GetResultTime() time.Time
+
+	GetThing() Thing
+	GetSensor() Sensor
+	GetObservedProperty() ObservedProperty
+	GetObservations() []Observation
+}
+
+type Sensor interface {
+	SensorThing
+	GetDescription() string
+	GetEncodingType() 	// !!
+	GetMetadata() 	// !!
+
+	GetDatastreams() []Datastream
+}
+
+type ObservedProperty interface {
+	SensorThing
+
+	GetName() string
+	GetDefinition() // !!
+	GetDescription() string
+
+	GetDatastreams() []Datastream
+}
+
+type Observation interface {
+	SensorThing
+
+	GetPhenomenonTime() // !!
+	GetResultTime() // !!
+	GetResult() // !!
+	GetResultQuality() // !!
+	GetValidTime() // !!
+	GetParameters() // !!
+
+	GetFeatureOfInterest() FeatureOfInterest
+	GetDatastream() Datastream
+}
+
+type FeatureOfInterest interface {
+	SensorThing
+
+	GetDescription() string
+	GetEncodingType() // !!
+	GetFeature() // !!
+
+	GetObservations() []Observation
+}

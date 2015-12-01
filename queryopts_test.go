@@ -55,7 +55,27 @@ func TestQueryOptions(t *testing.T) {
 	opts, err = CreateQueryOptions("$expand=Datastreams/Observations/FeatureOfInterest&$filter=Datastreams/Observations/FeatureOfInterest/id eq 'FOI_1' and Datastreams/Observations/resultTime ge 2010-06-01T00:00:00Z and Datastreams/Observations/resultTime le 2010-07-01T00:00:00Z")
 	assert.Nil(t, err)
 	assert.True(t, opts.ExpandSet())
+	assert.Equal(t, 1, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, "Datastreams/Observations/FeatureOfInterest", opts.GetExpandOption().GetValue()[0])
 	assert.True(t, opts.FilterSet())
+
+
+	/*
+	$filter=
+		Datastreams/Observations/FeatureOfInterest/id eq 'FOI_1'
+		and
+		Datastreams/Observations/resultTime ge 2010-06-01T00:00:00Z
+		and
+		Datastreams/Observations/resultTime le 2010-07-01T00:00:00Z
+
+		- Target
+		- Operation
+		- OpValue
+
+	- Operand
+	-
+
+	 */
 
 	opts, err = CreateQueryOptions("$count=true")
 	assert.Nil(t, err)

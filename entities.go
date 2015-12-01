@@ -10,6 +10,25 @@ const (
 
 type ObservationType string
 
+type SensorThingEntity struct {
+	id 		string
+	selfLink 	string
+	navigationLink	string
+}
+
+func (s *SensorThingEntity) GetId() string {
+	return s.id
+}
+
+func (s *SensorThingEntity) GetSelfLink() string {
+	return s.selfLink
+}
+
+func (s *SensorThingEntity) GetNavigationLink() string {
+	return s.navigationLink
+}
+
+
 /*
 {
 	"@iot.id": 1,
@@ -25,11 +44,16 @@ type ObservationType string
 }
 */
 type ThingEntity struct {
+	SensorThingEntity
 	description 		string
 	properties			map[string]string
 	// location 			*Location
 	// historicalLocations	[]*HistoricalLocation
 	// datastreams			[]*Datastream
+}
+
+func (e *LocationEntity) GetType() EntityType {
+	return ENTITY_THINGS
 }
 
 /*
@@ -42,12 +66,18 @@ type ThingEntity struct {
 }
  */
 type LocationEntity struct {
+	SensorThingEntity
 	description 		string
 	encodingType 		EncodingType
 	// location 		??
 	// things 				[]*Thing
 	// HistoricalLocation	[]*HistoricalLocation
 }
+
+func (e *ThingEntity) GetType() EntityType {
+	return ENTITY_LOCATIONS
+}
+
 
 /*
 {
@@ -63,10 +93,16 @@ type LocationEntity struct {
 }
  */
 type HistoricalLocationEntity struct {
+	SensorThingEntity
 	time 		time.Time
 	// thing 		*Thing
 	// locations 	[]*Location
 }
+
+func (e *HistoricalLocationEntity) GetType() EntityType {
+	return ENTITY_HISTORICALLOCATIONS
+}
+
 
 /*
 {
@@ -97,6 +133,7 @@ type UCUM struct {
 }
 
 type DatastreamEntity struct {
+	SensorThingEntity
 	description 		string
 	unitOfMeasurement	*UCUM
 	observationType 	ObservationType
@@ -109,6 +146,10 @@ type DatastreamEntity struct {
 	// Observation
 }
 
+func (e *DatastreamEntity) GetType() EntityType {
+	return ENTITY_DATASTREAMS
+}
+
 /*
 {
 "@iot.id": 1,
@@ -117,10 +158,15 @@ type DatastreamEntity struct {
 }
  */
 type SensorEntity struct {
+	SensorThingEntity
 	description 	string
 	encodingType 	EncodingType
 	metadata 		string
 	datastream 		[]*Datastream
+}
+
+func (e *SensorEntity) GetType() EntityType {
+	return ENTITY_SENSORS
 }
 
 /*
@@ -134,11 +180,17 @@ type SensorEntity struct {
 }
  */
 type ObservedPropertyEntity struct {
+	SensorThingEntity
 	name 			string
 	definition 		string
 	description		string
 	// Datastream
 }
+
+func (e *ObservedPropertyEntity) GetType() EntityType {
+	return ENTITY_OBSERVEDPROPERTIES
+}
+
 
 /*
 {
@@ -152,7 +204,11 @@ type ObservedPropertyEntity struct {
 }￼￼￼
  */
 type ObservationEntity struct {
+	SensorThingEntity
+}
 
+func (e *ObservationEntity) GetType() EntityType {
+	return ENTITY_OBSERVATIONS
 }
 
 /*
@@ -168,5 +224,9 @@ type ObservationEntity struct {
 	}
  */
 type FeatureOfInterestEntity struct {
+	SensorThingEntity
+}
 
+func (e *FeatureOfInterestEntity) GetType() EntityType {
+	return ENTITY_FEATURESOFINTERESTS
 }
