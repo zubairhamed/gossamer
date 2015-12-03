@@ -1,11 +1,12 @@
 package gossamer
+
 import (
-	"log"
+	"errors"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
+	"log"
 	"net/http"
 	"strings"
-	"errors"
 )
 
 func NewServer() Server {
@@ -13,13 +14,17 @@ func NewServer() Server {
 }
 
 type DefaultServer struct {
-	sensingHandler 	SensingProfileHandler
-	taskingHandler 	TaskingProfileHandler
-	dataStore 		Datastore
+	sensingHandler SensingProfileHandler
+	taskingHandler TaskingProfileHandler
+	dataStore      Datastore
 }
 
 func (s *DefaultServer) handleNotImplemented(c web.C, w http.ResponseWriter, r *http.Request) {
 	log.Println("Not implemented")
+}
+
+func (s *DefaultServer) UseStore(ds Datastore) {
+	s.dataStore = ds
 }
 
 func DiscoverEntityType(e string) EntityType {
@@ -54,7 +59,7 @@ func DiscoverEntityType(e string) EntityType {
 }
 
 func IsEntity(e string) bool {
-	if 	strings.HasPrefix(e, "Things") ||
+	if strings.HasPrefix(e, "Things") ||
 		strings.HasPrefix(e, "Locations") ||
 		strings.HasPrefix(e, "HistoricalLocations") ||
 		strings.HasPrefix(e, "Datastreams") ||
@@ -84,48 +89,79 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 	}
 
 	c1 := make(chan bool)
-
-	// /Things(1)/Observations
-	entities := []SensorThingEntity{}
+	var lastEntity EntityType
 	go func() {
-		for idx, v := range navPath {
-			switch v.GetEntity() {
-			case ENTITY_THINGS:
-				if v.GetId() == "" {
-					s.dataStore.GetThings()
-				} else {
-					s.dataStore.GetThing(v.GetId())
-				}
-				break
-			}
+		for _, v := range navPath {
 
-			if (idx+1) < l {
-				log.Println("Has more items..:")
-				if v.GetId() != "" {
-
-				}
-			} else {
-				log.Println("Is last item..:")
-			}
-			log.Println(idx, v)
+			c2 := make(chan bool)
+			go func() {
+				log.Println(s.dataStore, v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity)
+				s.dataStore.Get(v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity)
+				lastEntity = v.GetEntity()
+				c2 <- true
+			}()
+			<- c2
 		}
 		c1 <- true
 	}()
-
+	<- c1
 	/*
+		/Things(1)/Observations
+		query(navItem, lastQueryVal) {
+			if lastQueryVal == nil {
+				switch navItem {
+					case navItem.type && id not set:
+					case navItem.type && id set:
+				}
+			} else {
+
+			}
+		}
+
+		var lastQueryVal interface{}
+		for navItem := range navItems
+			lastQueryVal = query(navItem, lastQueryVal)
+			if !hasNextNav {
+
+			}
+
+
+		query(navEntity, lastQueryVal) {
+			switch navEntity.type
+				case Entity:
+					if
+		}
+
+
+		var lastQueryVal interface{}
+		var valueOut interface{}
+		for navEntity in navigationItems
+			lastQueryVal = query(navEntity, lastQueryVal)
+
+			if lastItem
+				if hasProperty
+				if hasValue
+
+
 		for navigationItems
 			fetch
 				- all
 				- one with id
 
 			if lasItem
-				if has property
-				if has value
-				write out
+				if has property || has value {
+					writeOut property or Value
+				} else {
+					writeOut lastQueryVal
+				}
 			else
 				continue
 
-	 */
+	*/
+}
+
+func (s *DefaultServer) query() {
+
 }
 
 func (s *DefaultServer) Start() {

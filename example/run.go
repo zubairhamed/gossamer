@@ -1,4 +1,5 @@
 package main
+
 import (
 	"github.com/zubairhamed/gossamer"
 )
@@ -9,13 +10,13 @@ func main() {
 	server.UseSensingProfile(&DefaultSensingProfileHandler{})
 	server.UseTaskingProfile(&DefaultTaskingProfileHandler{})
 
+	server.UseStore(gossamer.NewMongoStore("localhost"))
+
 	server.Start()
 }
 
 type DefaultSensingProfileHandler struct {
-
 }
 
 type DefaultTaskingProfileHandler struct {
-
 }

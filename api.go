@@ -1,35 +1,39 @@
 package gossamer
+
 import "time"
 
 type ProtocolType int
+
 const (
-	HTTP 	ProtocolType = 0
-	COAP	ProtocolType = 1
+	HTTP ProtocolType = 0
+	COAP ProtocolType = 1
 )
 
 type EntityType string
+
 const (
-	ENTITY_THINGS 				EntityType = "Things"
-	ENTITY_OBSERVEDPROPERTIES 	EntityType = "ObservedProperties"
-	ENTITY_LOCATIONS			EntityType = "Locations"
-	ENTITY_DATASTREAMS			EntityType = "Datastreams"
-	ENTITY_SENSORS				EntityType = "Sensors"
-	ENTITY_OBSERVATIONS			EntityType = "Observations"
-	ENTITY_FEATURESOFINTERESTS	EntityType = "FeaturesOfInterest"
-	ENTITY_HISTORICALLOCATIONS	EntityType = "HistoricalLocations"
-	ENTITY_UNKNOWN				EntityType = "UNKNOWN"
+	ENTITY_THINGS              EntityType = "Things"
+	ENTITY_OBSERVEDPROPERTIES  EntityType = "ObservedProperties"
+	ENTITY_LOCATIONS           EntityType = "Locations"
+	ENTITY_DATASTREAMS         EntityType = "Datastreams"
+	ENTITY_SENSORS             EntityType = "Sensors"
+	ENTITY_OBSERVATIONS        EntityType = "Observations"
+	ENTITY_FEATURESOFINTERESTS EntityType = "FeaturesOfInterest"
+	ENTITY_HISTORICALLOCATIONS EntityType = "HistoricalLocations"
+	ENTITY_UNKNOWN             EntityType = "UNKNOWN"
 )
 
 type QueryOptionType string
+
 const (
-	QUERYOPT_EXPAND		QueryOptionType = "$expand"
-	QUERYOPT_SELECT		QueryOptionType = "$select"
-	QUERYOPT_ORDERBY	QueryOptionType = "$orderby"
-	QUERYOPT_TOP		QueryOptionType = "$top"
-	QUERYOPT_SKIP		QueryOptionType = "$skip"
-	QUERYOPT_COUNT		QueryOptionType = "$count"
-	QUERYOPT_FILTER		QueryOptionType = "$filter"
-	QUERYOPT_UNKNOWN 	QueryOptionType = "UNKNOWN"
+	QUERYOPT_EXPAND  QueryOptionType = "$expand"
+	QUERYOPT_SELECT  QueryOptionType = "$select"
+	QUERYOPT_ORDERBY QueryOptionType = "$orderby"
+	QUERYOPT_TOP     QueryOptionType = "$top"
+	QUERYOPT_SKIP    QueryOptionType = "$skip"
+	QUERYOPT_COUNT   QueryOptionType = "$count"
+	QUERYOPT_FILTER  QueryOptionType = "$filter"
+	QUERYOPT_UNKNOWN QueryOptionType = "UNKNOWN"
 )
 
 type QueryOptions interface {
@@ -71,7 +75,6 @@ type OrderByOption interface {
 
 // asc, desc
 type OrderByOptionValue interface {
-
 }
 
 type TopOption interface {
@@ -98,6 +101,7 @@ type Server interface {
 	Start()
 	UseSensingProfile(SensingProfileHandler)
 	UseTaskingProfile(TaskingProfileHandler)
+	UseStore(Datastore)
 }
 
 type NavigationItem interface {
@@ -107,10 +111,10 @@ type NavigationItem interface {
 }
 
 type Navigation interface {
-//	String()
+	//	String()
 	GetItems() []NavigationItem
-//	GetProperty() string
-//	GetPropertyValue() string
+	//	GetProperty() string
+	//	GetPropertyValue() string
 }
 
 type Request interface {
@@ -120,53 +124,56 @@ type Request interface {
 }
 
 type SensingProfileHandler interface {
-//	GetThings(Request)
-//	GetThing(string, Request)
-//
-//	GetLocations(Request)
-//	GetLocation(string, Request)
-//
-//	GetDatastreams(Request)
-//	GetDatastream(string, Request)
-//
-//	GetSensors(Request)
-//	GetSensor(string, Request)
-//
-//	GetObservations(Request)
-//	GetObservation(string, Request)
-//
-//	GetObservedProperties(Request)
-//	GetObservedProperty(string, Request)
-//
-//	GetFeaturesOfInterests(Request)
-//	GetFeaturesOfInterest(string, Request)
+	//	GetThings(Request)
+	//	GetThing(string, Request)
+	//
+	//	GetLocations(Request)
+	//	GetLocation(string, Request)
+	//
+	//	GetDatastreams(Request)
+	//	GetDatastream(string, Request)
+	//
+	//	GetSensors(Request)
+	//	GetSensor(string, Request)
+	//
+	//	GetObservations(Request)
+	//	GetObservation(string, Request)
+	//
+	//	GetObservedProperties(Request)
+	//	GetObservedProperty(string, Request)
+	//
+	//	GetFeaturesOfInterests(Request)
+	//	GetFeaturesOfInterest(string, Request)
 }
 
 type TaskingProfileHandler interface {
-
 }
 
 type Datastore interface {
-	GetThings() []Thing
-	GetThing(string) Thing
+	//	GetThings() []Thing
+	//	GetThing(string) Thing
 
-//	GetObservedProperties() []ObservedProperty
-//	GetObservedProperty(string)
-//
-//	GetLocations() []Location
-//	GetLocation(string) Location
-//
-//	GetDatastreams() []Datastream
-//	GetDatastream(string) Datastream
-//
-//	GetSensors() []Sensor
-//	GetSensor(string) Sensor
-//
-//	GetObservations() []Observation
-//	GetObservation(string) Observation
-//
-//	GetFeatureOfInterests() []FeatureOfInterest
-//	GetFeatureOfInterest(string) FeatureOfInterest
+	//	GetObservedProperties() []ObservedProperty
+	//	GetObservedProperty(string)
+	//
+	//	GetLocations() []Location
+	//	GetLocation(string) Location
+	//
+	//	GetDatastreams() []Datastream
+	//	GetDatastream(string) Datastream
+	//
+	//	GetSensors() []Sensor
+	//	GetSensor(string) Sensor
+	//
+	//	GetObservations() []Observation
+	//	GetObservation(string) Observation
+	//
+	//	GetFeatureOfInterests() []FeatureOfInterest
+	//	GetFeatureOfInterest(string) FeatureOfInterest
+	Get(EntityType, string, QueryOptions, EntityType)
+
+	Init()
+	Shutdown()
 }
 
 // Entities
@@ -180,18 +187,24 @@ type SensorThing interface {
 type Thing interface {
 	SensorThing
 	GetDescription() string
-	GetProperties() map[string] string
+	GetProperties() map[string]string
 
 	GetLocations() []Location
 	GetHistoricalLocations() []HistoricalLocation
 	GetDatastreams() []Datastream
 }
 
+type LocationEncodingType string
+
+const (
+	LOCATION_ENCTYPE_GEOJSON LocationEncodingType = "application/vnd.geo+json"
+)
+
 type Location interface {
 	SensorThing
 	GetDescription() string
-	GetEncodingType()	// !!
-	GetLocationType()	// !!
+	GetEncodingType() LocationEncodingType
+	GetLocationType() // !! depending on GetEncodingType()
 
 	GetThings() []Thing
 	GetHistoricalLocations() []HistoricalLocation
@@ -205,13 +218,38 @@ type HistoricalLocation interface {
 	GetThing() Thing
 }
 
+type DatastreamObservationType string
+
+const (
+	DATASTREAM_OBSTYPE_CATEGORY DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_CategoryObservation"
+	// IRI
+
+	/*
+		OM_CountObservation
+		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_CountObservation
+		integer
+
+		OM_Measurement
+		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_Measurement
+		double
+
+		OM_Observation
+		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_Observation
+		Any
+
+		OM_TruthObservation
+		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_TruthObservation
+		boolean
+	*/
+)
+
 type Datastream interface {
 	SensorThing
 
 	GetDescription() string
 	GetUnitOfMeasurement() // UnitOfMeasure !!
-	GetObservationType()	// !!
-	GetObservedArea() 	// !!
+	GetObservationType()   // !!
+	GetObservedArea()      // !!
 	GetPhenomenonTime() time.Time
 	GetResultTime() time.Time
 
@@ -221,11 +259,18 @@ type Datastream interface {
 	GetObservations() []Observation
 }
 
+type SensorEncodingType string
+
+const (
+	SENSOR_ENCTYPE_PDF      SensorEncodingType = "application/pdf"
+	SENSOR_ENCTYPE_SENSORML SensorEncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
+)
+
 type Sensor interface {
 	SensorThing
 	GetDescription() string
-	GetEncodingType() 	// !!
-	GetMetadata() 	// !!
+	GetEncodingType() // !!
+	GetMetadata()     // !!
 
 	GetDatastreams() []Datastream
 }
@@ -243,12 +288,12 @@ type ObservedProperty interface {
 type Observation interface {
 	SensorThing
 
-	GetPhenomenonTime() // !!
-	GetResultTime() // !!
-	GetResult() // !!
+	GetPhenomenonTime() time.Time
+	GetResultTime() time.Time
+	GetResult()        // !!
 	GetResultQuality() // !!
-	GetValidTime() // !!
-	GetParameters() // !!
+	GetValidTime() time.Time
+	GetParameters() map[string]string
 
 	GetFeatureOfInterest() FeatureOfInterest
 	GetDatastream() Datastream
@@ -258,7 +303,7 @@ type FeatureOfInterest interface {
 	SensorThing
 
 	GetDescription() string
-	GetEncodingType() // !!
+	GetEncodingType() LocationEncodingType
 	GetFeature() // !!
 
 	GetObservations() []Observation

@@ -1,8 +1,9 @@
 package gossamer
+
 import (
+	"log"
 	"net/url"
 	"strings"
-	"log"
 )
 
 func CreateRequest(url *url.URL) (Request, error) {
@@ -23,7 +24,7 @@ func CreateRequest(url *url.URL) (Request, error) {
 			br2Index := strings.Index(val, ")")
 
 			if br1Index != -1 && br2Index != -1 {
-				parenthesisValue := val[br1Index+1: br2Index]
+				parenthesisValue := val[br1Index+1 : br2Index]
 
 				// Query Option
 				if strings.HasPrefix(parenthesisValue, "$") {
@@ -35,10 +36,10 @@ func CreateRequest(url *url.URL) (Request, error) {
 			navItems = append(navItems, navItem)
 		} else {
 
-			if strings.HasPrefix(val, "$") && idx == pathSplitItems -1 {
+			if strings.HasPrefix(val, "$") && idx == pathSplitItems-1 {
 				nav.property = val
 			} else {
-				if idx == pathSplitItems -1 || idx == pathSplitItems -2 {
+				if idx == pathSplitItems-1 || idx == pathSplitItems-2 {
 					nav.propertyValue = val
 				} else {
 					return nil, ERR_INVALID_ENTITY
@@ -51,34 +52,34 @@ func CreateRequest(url *url.URL) (Request, error) {
 
 	queryOpts, _ := CreateQueryOptions(url.RawQuery)
 	req := &DefaultRequest{
-		navigation: nav,
+		navigation:   nav,
 		queryOptions: queryOpts,
 	}
 	return req, nil
 }
 
 type DefaultRequest struct {
-	navigation 		Navigation
-	queryOptions 	QueryOptions
+	navigation   Navigation
+	queryOptions QueryOptions
 }
 
-func (r *DefaultRequest) GetProtocol() ProtocolType { return 0 }
+func (r *DefaultRequest) GetProtocol() ProtocolType     { return 0 }
 func (r *DefaultRequest) GetQueryOptions() QueryOptions { return nil }
 func (r *DefaultRequest) GetNavigation() Navigation {
 	return r.navigation
 }
 
 type DefaultQueryOption struct {
-	expandOption 	QueryOption
-	selectOption	QueryOption
-	orderByOption	QueryOption
-	topOption		QueryOption
-	skipOption		QueryOption
-	countOption 	QueryOption
-	filterOption	QueryOption
+	expandOption  QueryOption
+	selectOption  QueryOption
+	orderByOption QueryOption
+	topOption     QueryOption
+	skipOption    QueryOption
+	countOption   QueryOption
+	filterOption  QueryOption
 }
 
-func (o *DefaultQueryOption) Set(optType QueryOptionType, value QueryOption)  {
+func (o *DefaultQueryOption) Set(optType QueryOptionType, value QueryOption) {
 	switch optType {
 	case QUERYOPT_EXPAND:
 		o.expandOption = value

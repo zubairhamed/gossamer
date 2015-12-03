@@ -1,9 +1,9 @@
 package gossamer
 
 type DefaultNavigation struct {
-	property 		string
-	propertyValue 	string
-	items 			[]NavigationItem
+	property      string
+	propertyValue string
+	items         []NavigationItem
 }
 
 func (n *DefaultNavigation) GetItems() []NavigationItem {
@@ -11,9 +11,9 @@ func (n *DefaultNavigation) GetItems() []NavigationItem {
 }
 
 type DefaultNavigationItem struct {
-	entityType 		EntityType
-	entityId 		string
-	queryOptions	QueryOptions
+	entityType   EntityType
+	entityId     string
+	queryOptions QueryOptions
 }
 
 func (n *DefaultNavigationItem) GetQueryOptions() QueryOptions {
@@ -27,5 +27,3 @@ func (n *DefaultNavigationItem) GetEntity() EntityType {
 func (n *DefaultNavigationItem) GetId() string {
 	return n.entityId
 }
-
-

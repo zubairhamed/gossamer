@@ -6,5 +6,5 @@ package gossamer
 //}
 
 type RootResourceResponse struct {
-	value 	[]ResourceUrlType 	`json: "value"`
+	value []ResourceUrlType `json: "value"`
 }
