@@ -25,7 +25,7 @@ func TestParseRequestUrl(t *testing.T) {
 		*/
 		{"http://example.org/v1.0/ObservedProperties"},
 		{"http://example.org/v1.0/Things(1)"},
-		{"http://example.org/v1.0/Things(1)/Observations"},
+		{"http://example.org/v1.0/Things(1)/Locations"},
 		{"http://example.org/v1.0/Things?$expand=Datastreams"},
 		{"http://example.org/v1.0/Things?$top=5"},
 		{"http://example.org/v1.0/Things?$skip=5"},
@@ -96,5 +96,5 @@ func TestParseRequestUrl(t *testing.T) {
 	assert.NotNil(t, req)
 	assert.NotNil(t, req.GetNavigation())
 	assert.Equal(t, 2, len(req.GetNavigation().GetItems()))
-	assert.Equal(t, ENTITY_THINGS, req.GetNavigation().GetItems()[0].GetEntity())s
+	assert.Equal(t, ENTITY_THINGS, req.GetNavigation().GetItems()[0].GetEntity())
 }

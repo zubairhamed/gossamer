@@ -90,17 +90,21 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 
 	c1 := make(chan bool)
 	var lastEntity EntityType
+	var lastEntityId string
 	go func() {
-		for _, v := range navPath {
 
+		for _, v := range navPath {
 			c2 := make(chan bool)
 			go func() {
-				log.Println(s.dataStore, v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity)
-				s.dataStore.Get(v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity)
+				// log.Println(s.dataStore, v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity)
+				s.dataStore.Get(v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity, lastEntityId)
 				lastEntity = v.GetEntity()
+				lastEntityId = v.GetId()
 				c2 <- true
 			}()
 			<- c2
+
+
 		}
 		c1 <- true
 	}()

@@ -33,9 +33,7 @@ func (m *MongoStore) Shutdown() {
 	m.session.Close()
 }
 
-func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEnt EntityType) {
-	// var c mgo.Collection
-
+func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEnt EntityType, lastEntityId string) {
 	/*
 		Apply Order
 			# server-driven pagination
@@ -64,31 +62,20 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 			$select
 	 */
 
-	var c *mgo.Collection
-	var result []interface{}
+	c := m.session.DB("sensorthings").C(string(ent))
 	entityIdIsEmpty := entityId == ""
-	switch {
-	case ent == ENTITY_THINGS:
-		c = m.session.DB("sensorthings").C("things")
-		if entityIdIsEmpty {
-			log.Println("Get Things")
-			c.Find(nil).All(&result)
-		} else {
-			c.Find(bson.M{"id": entityId}).One(result)
-		}
+	bsonMap := bson.M{}
+	query := c.Find(bsonMap)
+	var results interface{}
 
-		log.Println("Result:", result)
-		break
-
-	case ent == ENTITY_OBSERVATIONS && !entityIdIsEmpty:
-		log.Println("Get Observation for ID")
-		break
-
-	case ent == ENTITY_OBSERVATIONS && entityIdIsEmpty:
-		log.Println("Get Observations")
-		break
+	// Find one
+	if !entityIdIsEmpty {
+		bsonMap["@iot_id"] = entityId
+		query.One(&results)
+	} else {	// Find all
+		var r []interface{}
+		query.All(&r)
+		results = r
 	}
-
-
-
+	log.Println(results)
 }

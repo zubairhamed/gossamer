@@ -12,22 +12,22 @@ const (
 
 type ObservationType string
 
-type SensorThingEntity struct {
-	id             string
-	selfLink       string
-	navigationLink string
+type SensorThingsEntity struct {
+	Id             string	`bson:"@iot_id"`
+	SelfLink       string
+	NavigationLink string
 }
 
-func (s *SensorThingEntity) GetId() string {
-	return s.id
+func (s *SensorThingsEntity) GetId() string {
+	return s.Id
 }
 
-func (s *SensorThingEntity) GetSelfLink() string {
-	return s.selfLink
+func (s *SensorThingsEntity) GetSelfLink() string {
+	return s.SelfLink
 }
 
-func (s *SensorThingEntity) GetNavigationLink() string {
-	return s.navigationLink
+func (s *SensorThingsEntity) GetNavigationLink() string {
+	return s.NavigationLink
 }
 
 /*
@@ -45,9 +45,9 @@ func (s *SensorThingEntity) GetNavigationLink() string {
 }
 */
 type ThingEntity struct {
-	SensorThingEntity
-	description string
-	properties  map[string]string
+	SensorThingsEntity	`bson:",inline"`
+	Description string
+	Properties  map[string]string
 	// location 			*Location
 	// historicalLocations	[]*HistoricalLocation
 	// datastreams			[]*Datastream
@@ -67,7 +67,7 @@ func (e *LocationEntity) GetType() EntityType {
 }
 */
 type LocationEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 	description  string
 	encodingType EncodingType
 	// location 		??
@@ -93,7 +93,7 @@ func (e *ThingEntity) GetType() EntityType {
 }
 */
 type HistoricalLocationEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 	time time.Time
 	// thing 		*Thing
 	// locations 	[]*Location
@@ -131,7 +131,7 @@ type UCUM struct {
 }
 
 type DatastreamEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 	description       string
 	unitOfMeasurement *UCUM
 	observationType   ObservationType
@@ -156,7 +156,7 @@ func (e *DatastreamEntity) GetType() EntityType {
 }
 */
 type SensorEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 	description  string
 	encodingType EncodingType
 	metadata     string
@@ -178,7 +178,7 @@ func (e *SensorEntity) GetType() EntityType {
 }
 */
 type ObservedPropertyEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 	name        string
 	definition  string
 	description string
@@ -201,7 +201,7 @@ func (e *ObservedPropertyEntity) GetType() EntityType {
 }￼￼￼
 */
 type ObservationEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 }
 
 func (e *ObservationEntity) GetType() EntityType {
@@ -221,7 +221,7 @@ func (e *ObservationEntity) GetType() EntityType {
 	}
 */
 type FeatureOfInterestEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 }
 
 func (e *FeatureOfInterestEntity) GetType() EntityType {
