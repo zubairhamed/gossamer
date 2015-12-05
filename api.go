@@ -170,7 +170,7 @@ type Datastore interface {
 	//
 	//	GetFeatureOfInterests() []FeatureOfInterest
 	//	GetFeatureOfInterest(string) FeatureOfInterest
-	Get(EntityType, string, QueryOptions, EntityType, string)
+	Get(EntityType, string, QueryOptions, EntityType, string) interface{}
 
 	Init()
 	Shutdown()

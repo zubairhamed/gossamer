@@ -33,7 +33,8 @@ func (m *MongoStore) Shutdown() {
 	m.session.Close()
 }
 
-func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEnt EntityType, lastEntityId string) {
+func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEntity EntityType, lastEntityId string) interface{} {
+
 	/*
 		Apply Order
 			# server-driven pagination
@@ -64,18 +65,27 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 
 	c := m.session.DB("sensorthings").C(string(ent))
 	entityIdIsEmpty := entityId == ""
+	lastEntityIdIsEmpty := lastEntityId == ""
 	bsonMap := bson.M{}
-	query := c.Find(bsonMap)
 	var results interface{}
+
+	if !entityIdIsEmpty {
+		bsonMap["@iot_id"] = entityId
+	}
+
+	if !lastEntityIdIsEmpty {
+		bsonMap["@iot_" + string(lastEntity) + "_id"] = lastEntityId
+	}
+	query := c.Find(bsonMap)
 
 	// Find one
 	if !entityIdIsEmpty {
-		bsonMap["@iot_id"] = entityId
 		query.One(&results)
 	} else {	// Find all
 		var r []interface{}
 		query.All(&r)
 		results = r
 	}
-	log.Println(results)
+
+	return results
 }
