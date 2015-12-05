@@ -1,13 +1,14 @@
 package gossamer
+
 import (
-	"strings"
-	"log"
 	"errors"
+	"log"
 	"strconv"
+	"strings"
 )
 
 func IsQueryOption(s string) bool {
-	if 	strings.HasPrefix(s, "$expand") || strings.HasPrefix(s, "$select") ||  strings.HasPrefix(s, "$orderby") ||
+	if strings.HasPrefix(s, "$expand") || strings.HasPrefix(s, "$select") || strings.HasPrefix(s, "$orderby") ||
 		strings.HasPrefix(s, "$top") || strings.HasPrefix(s, "$skip") || strings.HasPrefix(s, "$count") ||
 		strings.HasPrefix(s, "$filter") {
 		return true
@@ -93,7 +94,7 @@ func CreateQueryOption(o QueryOptionType, s string) (QueryOption, error) {
 }
 
 // Creates an Expand QueryOption given a string value
-func CreateExpandOption (s string) (ExpandOption, error) {
+func CreateExpandOption(s string) (ExpandOption, error) {
 	splitValues := strings.Split(s, ",")
 
 	return &DefaultExpandOption{
@@ -101,7 +102,7 @@ func CreateExpandOption (s string) (ExpandOption, error) {
 	}, nil
 }
 
-func CreateTopOption (s string) (TopOption, error) {
+func CreateTopOption(s string) (TopOption, error) {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		return nil, err
@@ -112,7 +113,7 @@ func CreateTopOption (s string) (TopOption, error) {
 	}, nil
 }
 
-func CreateCountOption (s string) (CountOption, error) {
+func CreateCountOption(s string) (CountOption, error) {
 	i, err := strconv.ParseBool(s)
 	if err != nil {
 		return nil, err
@@ -123,7 +124,7 @@ func CreateCountOption (s string) (CountOption, error) {
 	}, nil
 }
 
-func CreateFilterOption (s string) (FilterOption, error) {
+func CreateFilterOption(s string) (FilterOption, error) {
 	return &DefaultFilterOption{}, nil
 }
 
@@ -151,7 +152,7 @@ func CreateSelectOption(s string) (SelectOption, error) {
 }
 
 type DefaultExpandOption struct {
-	values 	[]string
+	values []string
 }
 
 func (o *DefaultExpandOption) GetType() QueryOptionType {
@@ -175,7 +176,7 @@ func (o *DefaultSelectOption) GetValue() []string {
 }
 
 type DefaultOrderByOption struct {
-	values 	[]OrderByOptionValue
+	values []OrderByOptionValue
 }
 
 func (o *DefaultOrderByOption) GetType() QueryOptionType {
@@ -187,11 +188,10 @@ func (o *DefaultOrderByOption) GetValue() []OrderByOptionValue {
 }
 
 type DefaultOrderByOptionValue struct {
-
 }
 
 type DefaultTopOption struct {
-	value 	int
+	value int
 }
 
 func (o *DefaultTopOption) GetValue() int {
@@ -203,7 +203,7 @@ func (o *DefaultTopOption) GetType() QueryOptionType {
 }
 
 type DefaultSkipOption struct {
-	value 	int
+	value int
 }
 
 func (o *DefaultSkipOption) GetType() QueryOptionType {
@@ -215,7 +215,7 @@ func (o *DefaultSkipOption) GetValue() int {
 }
 
 type DefaultCountOption struct {
-	value 	bool
+	value bool
 }
 
 func (o *DefaultCountOption) GetType() QueryOptionType {
@@ -227,11 +227,8 @@ func (o *DefaultCountOption) GetValue() bool {
 }
 
 type DefaultFilterOption struct {
-
 }
 
 func (o *DefaultFilterOption) GetType() QueryOptionType {
 	return QUERYOPT_FILTER
 }
-
-

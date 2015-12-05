@@ -1,33 +1,34 @@
 package gossamer
+
 import "time"
 
 type EncodingType string
+
 const (
-	ENCODINGTYPE_PDF		EncodingType = "application/pdf"
-	ENCODINGTYPE_SENSORML	EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
-	ENCODINGTYPE_GEO		EncodingType = "application/vnd.geo+json"
+	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
+	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
+	ENCODINGTYPE_GEO      EncodingType = "application/vnd.geo+json"
 )
 
 type ObservationType string
 
-type SensorThingEntity struct {
-	id 		string
-	selfLink 	string
-	navigationLink	string
+type SensorThingsEntity struct {
+	Id             string	`bson:"@iot_id"`
+	SelfLink       string
+	NavigationLink string
 }
 
-func (s *SensorThingEntity) GetId() string {
-	return s.id
+func (s *SensorThingsEntity) GetId() string {
+	return s.Id
 }
 
-func (s *SensorThingEntity) GetSelfLink() string {
-	return s.selfLink
+func (s *SensorThingsEntity) GetSelfLink() string {
+	return s.SelfLink
 }
 
-func (s *SensorThingEntity) GetNavigationLink() string {
-	return s.navigationLink
+func (s *SensorThingsEntity) GetNavigationLink() string {
+	return s.NavigationLink
 }
-
 
 /*
 {
@@ -44,9 +45,9 @@ func (s *SensorThingEntity) GetNavigationLink() string {
 }
 */
 type ThingEntity struct {
-	SensorThingEntity
-	description 		string
-	properties			map[string]string
+	SensorThingsEntity	`bson:",inline"`
+	Description string
+	Properties  map[string]string
 	// location 			*Location
 	// historicalLocations	[]*HistoricalLocation
 	// datastreams			[]*Datastream
@@ -64,11 +65,11 @@ func (e *LocationEntity) GetType() EntityType {
 "type": "Point",
 "coordinates": [-114.06,51.05] }
 }
- */
+*/
 type LocationEntity struct {
-	SensorThingEntity
-	description 		string
-	encodingType 		EncodingType
+	SensorThingsEntity
+	description  string
+	encodingType EncodingType
 	// location 		??
 	// things 				[]*Thing
 	// HistoricalLocation	[]*HistoricalLocation
@@ -77,7 +78,6 @@ type LocationEntity struct {
 func (e *ThingEntity) GetType() EntityType {
 	return ENTITY_LOCATIONS
 }
-
 
 /*
 {
@@ -91,10 +91,10 @@ func (e *ThingEntity) GetType() EntityType {
 		"coordinates": [-114.06,51.05]
 	}
 }
- */
+*/
 type HistoricalLocationEntity struct {
-	SensorThingEntity
-	time 		time.Time
+	SensorThingsEntity
+	time time.Time
 	// thing 		*Thing
 	// locations 	[]*Location
 }
@@ -102,7 +102,6 @@ type HistoricalLocationEntity struct {
 func (e *HistoricalLocationEntity) GetType() EntityType {
 	return ENTITY_HISTORICALLOCATIONS
 }
-
 
 /*
 {
@@ -126,17 +125,16 @@ func (e *HistoricalLocationEntity) GetType() EntityType {
 	"phenomenonTime": "2014-03-01T13:00:00Z/2015-05-11T15:30:00Z",
 	"resultTime": "2014-03-01T13:00:00Z/2015-05-11T15:30:00Z"
 }
- */
+*/
 
 type UCUM struct {
-
 }
 
 type DatastreamEntity struct {
-	SensorThingEntity
-	description 		string
-	unitOfMeasurement	*UCUM
-	observationType 	ObservationType
+	SensorThingsEntity
+	description       string
+	unitOfMeasurement *UCUM
+	observationType   ObservationType
 	// observedArea		??
 	// phenomenonTime 	??
 	// resultTime 			??
@@ -156,13 +154,13 @@ func (e *DatastreamEntity) GetType() EntityType {
 "@iot.selfLink": "http://example.org/v1.0/Sensors(1)", "Datastreams@iot.navigationLink": "Sensors(1)/Datastreams", "description": "TMP36 - Analog Temperature sensor", "encodingType": "application/pdf",
 "metadata": "http://example.org/TMP35_36_37.pdf"
 }
- */
+*/
 type SensorEntity struct {
-	SensorThingEntity
-	description 	string
-	encodingType 	EncodingType
-	metadata 		string
-	datastream 		[]*Datastream
+	SensorThingsEntity
+	description  string
+	encodingType EncodingType
+	metadata     string
+	datastream   []*Datastream
 }
 
 func (e *SensorEntity) GetType() EntityType {
@@ -178,19 +176,18 @@ func (e *SensorEntity) GetType() EntityType {
 	"name": "DewPoint Temperature",
 	"definition": "http://dbpedia.org/page/Dew_point"
 }
- */
+*/
 type ObservedPropertyEntity struct {
-	SensorThingEntity
-	name 			string
-	definition 		string
-	description		string
+	SensorThingsEntity
+	name        string
+	definition  string
+	description string
 	// Datastream
 }
 
 func (e *ObservedPropertyEntity) GetType() EntityType {
 	return ENTITY_OBSERVEDPROPERTIES
 }
-
 
 /*
 {
@@ -202,9 +199,9 @@ func (e *ObservedPropertyEntity) GetType() EntityType {
 	"resultTime": "2014-12-31T11:59:59.00+08:00",
 	"result": 70.4
 }￼￼￼
- */
+*/
 type ObservationEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 }
 
 func (e *ObservationEntity) GetType() EntityType {
@@ -222,9 +219,9 @@ func (e *ObservationEntity) GetType() EntityType {
 		"type": "Point",
 		"coordinates": [-114.06,51.05] }
 	}
- */
+*/
 type FeatureOfInterestEntity struct {
-	SensorThingEntity
+	SensorThingsEntity
 }
 
 func (e *FeatureOfInterestEntity) GetType() EntityType {

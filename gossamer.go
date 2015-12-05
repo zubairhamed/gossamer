@@ -1,4 +1,5 @@
 package gossamer
+
 import "errors"
 
 var ERR_QUERYOPTION_INVALID_LENGTH = errors.New("Invalid Query Option. Query Options must have a key and value.")

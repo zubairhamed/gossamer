@@ -1,7 +1,8 @@
 package gossamer
+
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestQueryOptions(t *testing.T) {
@@ -11,13 +12,13 @@ func TestQueryOptions(t *testing.T) {
 	opts, err = CreateQueryOptions("$expand=Datastreams")
 	assert.Nil(t, err)
 	assert.True(t, opts.ExpandSet())
-	assert.Equal(t,1, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, 1, len(opts.GetExpandOption().GetValue()))
 	assert.Equal(t, "Datastreams", opts.GetExpandOption().GetValue()[0])
 
 	opts, err = CreateQueryOptions("$expand=Observations,ObservedProperty")
 	assert.Nil(t, err)
 	assert.True(t, opts.ExpandSet())
-	assert.Equal(t,2, len(opts.GetExpandOption().GetValue()))
+	assert.Equal(t, 2, len(opts.GetExpandOption().GetValue()))
 	assert.Equal(t, "Observations", opts.GetExpandOption().GetValue()[0])
 	assert.Equal(t, "ObservedProperty", opts.GetExpandOption().GetValue()[1])
 
@@ -59,23 +60,22 @@ func TestQueryOptions(t *testing.T) {
 	assert.Equal(t, "Datastreams/Observations/FeatureOfInterest", opts.GetExpandOption().GetValue()[0])
 	assert.True(t, opts.FilterSet())
 
-
 	/*
-	$filter=
-		Datastreams/Observations/FeatureOfInterest/id eq 'FOI_1'
-		and
-		Datastreams/Observations/resultTime ge 2010-06-01T00:00:00Z
-		and
-		Datastreams/Observations/resultTime le 2010-07-01T00:00:00Z
+		$filter=
+			Datastreams/Observations/FeatureOfInterest/id eq 'FOI_1'
+			and
+			Datastreams/Observations/resultTime ge 2010-06-01T00:00:00Z
+			and
+			Datastreams/Observations/resultTime le 2010-07-01T00:00:00Z
 
-		- Target
-		- Operation
-		- OpValue
+			- Target
+			- Operation
+			- OpValue
 
-	- Operand
-	-
+		- Operand
+		-
 
-	 */
+	*/
 
 	opts, err = CreateQueryOptions("$count=true")
 	assert.Nil(t, err)
@@ -113,4 +113,3 @@ func TestQueryOptions(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, opts.FilterSet())
 }
-
