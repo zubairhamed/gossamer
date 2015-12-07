@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"encoding/json"
 )
 
 func NewServer() Server {
@@ -108,8 +109,18 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 	}()
 	<- c1
 
-	log.Println("Value to return to client:")
-	log.Println(lastValue)
+	switch lastEntity {
+	case ENTITY_THINGS:
+		writeVal := lastValue.(ThingEntity)
+		log.Println("Value to return to client:")
+		b, err := json.MarshalIndent(writeVal, "", "\t")
+		if err != nil {
+			log.Println("Error converting to JSON")
+		}
+		log.Println(string(b))
+	}
+
+
 	/*
 		/Things(1)/Observations
 		query(navItem, lastQueryVal) {
@@ -165,8 +176,18 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 	*/
 }
 
-func (s *DefaultServer) query() {
+func (s *DefaultServer) output(val interface{}, ent EntityType) {
 
+	switch ent {
+	case ENTITY_THINGS:
+		v := val.(ThingEntity)
+		b, err := json.Marshal(v)
+		if err != nil {
+			log.Println("Error converting to JSON")
+		}
+		log.Println(string(b))
+		break
+	}
 }
 
 func (s *DefaultServer) Start() {

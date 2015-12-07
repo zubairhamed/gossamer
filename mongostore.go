@@ -4,6 +4,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"log"
 	"gopkg.in/mgo.v2/bson"
+	"strings"
 )
 
 func NewMongoStore(hosts string) *MongoStore {
@@ -63,7 +64,7 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 			$select
 	 */
 
-	c := m.session.DB("sensorthings").C(string(ent))
+	c := m.session.DB("sensorthings").C(strings.ToLower(string(ent)))
 	entityIdIsEmpty := entityId == ""
 	lastEntityIdIsEmpty := lastEntityId == ""
 	bsonMap := bson.M{}
@@ -74,18 +75,30 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 	}
 
 	if !lastEntityIdIsEmpty {
-		bsonMap["@iot_" + string(lastEntity) + "_id"] = lastEntityId
+		bsonMap["@iot_" + strings.ToLower(string(lastEntity)) + "_id"] = lastEntityId
 	}
 	query := c.Find(bsonMap)
 
 	// Find one
 	if !entityIdIsEmpty {
-		query.One(&results)
+		switch ent {
+		case ENTITY_THINGS:
+			var r ThingEntity
+			query.One(&r)
+
+			results = r
+			break
+		}
 	} else {	// Find all
-		var r []interface{}
-		query.All(&r)
-		results = r
+		switch ent {
+		case ENTITY_THINGS:
+			var r []ThingEntity
+			query.All(&r)
+			results = r
+			break
+		}
 	}
 
+	log.Println("Retutning results", results)
 	return results
 }

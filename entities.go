@@ -13,9 +13,9 @@ const (
 type ObservationType string
 
 type SensorThingsEntity struct {
-	Id             string	`bson:"@iot_id"`
-	SelfLink       string
-	NavigationLink string
+	Id             string	`bson:"@iot_id" json:"@iot.id"`
+	SelfLink       string	`json: "@iot.selfLink"`
+	NavigationLink string	`json: "@iot.navigationLink"`
 }
 
 func (s *SensorThingsEntity) GetId() string {
@@ -46,8 +46,8 @@ func (s *SensorThingsEntity) GetNavigationLink() string {
 */
 type ThingEntity struct {
 	SensorThingsEntity	`bson:",inline"`
-	Description string
-	Properties  map[string]string
+	Description string	`json: "description"`
+	Properties  map[string]string `json: "properties"`
 	// location 			*Location
 	// historicalLocations	[]*HistoricalLocation
 	// datastreams			[]*Datastream
