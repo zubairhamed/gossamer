@@ -12,13 +12,21 @@ const (
 type EntityType string
 
 const (
+	ENTITY_THING               EntityType = "Thing"
 	ENTITY_THINGS              EntityType = "Things"
+	ENTITY_OBSERVEDPROPERTY    EntityType = "ObservedProperty"
 	ENTITY_OBSERVEDPROPERTIES  EntityType = "ObservedProperties"
+	ENTITY_LOCATION            EntityType = "Location"
 	ENTITY_LOCATIONS           EntityType = "Locations"
+	ENTITY_DATASTREAM          EntityType = "Datastream"
 	ENTITY_DATASTREAMS         EntityType = "Datastreams"
+	ENTITY_SENSOR              EntityType = "Sensor"
 	ENTITY_SENSORS             EntityType = "Sensors"
+	ENTITY_OBSERVATION         EntityType = "Observation"
 	ENTITY_OBSERVATIONS        EntityType = "Observations"
-	ENTITY_FEATURESOFINTERESTS EntityType = "FeaturesOfInterest"
+	ENTITY_FEATURESOFINTEREST  EntityType = "FeaturesOfInterest"
+	ENTITY_FEATURESOFINTERESTS EntityType = "FeaturesOfInterests"
+	ENTITY_HISTORICALLOCATION  EntityType = "HistoricalLocation"
 	ENTITY_HISTORICALLOCATIONS EntityType = "HistoricalLocations"
 	ENTITY_UNKNOWN             EntityType = "UNKNOWN"
 )
@@ -171,16 +179,15 @@ type Datastore interface {
 	//	GetFeatureOfInterests() []FeatureOfInterest
 	//	GetFeatureOfInterest(string) FeatureOfInterest
 	Get(EntityType, string, QueryOptions, EntityType, string) interface{}
-
 	Init()
 	Shutdown()
 }
 
 // Entities
 type SensorThing interface {
-	GetId() string
-	GetSelfLink() string
-	GetNavigationLink() string
+//	GetId() string
+//	GetSelfLink() string
+//	GetNavigationLink() string
 	GetType() EntityType
 }
 
@@ -308,3 +315,6 @@ type FeatureOfInterest interface {
 
 	GetObservations() []Observation
 }
+
+// Globals
+var GLOB_ENV_HOST = "localhost:8000"

@@ -35,7 +35,6 @@ func CreateRequest(url *url.URL) (Request, error) {
 			}
 			navItems = append(navItems, navItem)
 		} else {
-
 			if strings.HasPrefix(val, "$") && idx == pathSplitItems-1 {
 				nav.property = val
 			} else {
