@@ -31,13 +31,13 @@ type ThingEntity struct {
 	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink"`
 	Description                string            `json:"description"`
 	Properties                 map[string]string `json:"properties"`
-	LocationsId				   []string			 `json:"-"`
-	HistoricalLocationsId	   []string			 `json:"-"`
-	DatastreamsId 			   []string			 `json:"-"`
+	LocationsId                []string          `json:"-"`
+	HistoricalLocationsId      []string          `json:"-"`
+	DatastreamsId              []string          `json:"-"`
 
-	Locations 					[]Location				`json:",omitempty"`
-	HistoricalLocations 		[]HistoricalLocation	`json:",omitempty"`
-	Datastreams 				[]Datastream			`json:",omitempty"`
+	Locations           []Location           `json:",omitempty"`
+	HistoricalLocations []HistoricalLocation `json:",omitempty"`
+	Datastreams         []Datastream         `json:",omitempty"`
 }
 
 func (e *LocationEntity) GetType() EntityType {
@@ -46,13 +46,13 @@ func (e *LocationEntity) GetType() EntityType {
 
 type LocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink"`
-	NavLinkThings              string               `json:"Things@iot.navigationLink"`
-	Description                string               `json:"description"`
-	EncodingType               EncodingType  		`bson:"encodingType" json:"encodingType"`
+	NavLinkHistoricalLocations string       `json:"HistoricalLocations@iot.navigationLink"`
+	NavLinkThings              string       `json:"Things@iot.navigationLink"`
+	Description                string       `json:"description"`
+	EncodingType               EncodingType `bson:"encodingType" json:"encodingType"`
 
-	Things 						[]Thing				 `json:",omitempty"`
-	HistoricalLocations 		[]HistoricalLocation `json:",omitempty"`
+	Things              []Thing              `json:",omitempty"`
+	HistoricalLocations []HistoricalLocation `json:",omitempty"`
 }
 
 func (e *ThingEntity) GetType() EntityType {
@@ -66,8 +66,8 @@ type HistoricalLocationEntity struct {
 	Time                       time.Time
 	EncodingType               EncodingType `json:"encodingType"`
 
-	Thing 					   Thing		`json:",omitempty"`
-	Locations 				   []Location	`json:",omitempty"`
+	Thing     Thing      `json:",omitempty"`
+	Locations []Location `json:",omitempty"`
 }
 
 func (e *HistoricalLocationEntity) GetType() EntityType {
@@ -98,10 +98,10 @@ type DatastreamEntity struct {
 	ResultTime              time.Time `json:"resultTime"`
 	Description             string    `json:"description"`
 
-	ObservedProperty 		ObservedProperty	`json:",omitempty"`
-	Sensor 					Sensor 				`json:",omitempty"`
-	Thing 					Thing 				`json:",omitempty"`
-	Observations 			[]Observation		`json:",omitempty"`
+	ObservedProperty ObservedProperty `json:",omitempty"`
+	Sensor           Sensor           `json:",omitempty"`
+	Thing            Thing            `json:",omitempty"`
+	Observations     []Observation    `json:",omitempty"`
 }
 
 func (e *DatastreamEntity) GetType() EntityType {
@@ -115,7 +115,7 @@ type SensorEntity struct {
 	EncodingType       EncodingType `json:"encodingType"`
 	Metadata           string       `json:"metadata"`
 
-	Datastreams 	   []Datastream	`json:",omitempty"`
+	Datastreams []Datastream `json:",omitempty"`
 }
 
 func (e *SensorEntity) GetType() EntityType {
@@ -129,7 +129,7 @@ type ObservedPropertyEntity struct {
 	Name               string `json:"name"`
 	Definition         string `json:"definition"`
 
-	Datastreams 	   []Datastream 	`json:",omitempty"`
+	Datastreams []Datastream `json:",omitempty"`
 }
 
 func (e *ObservedPropertyEntity) GetType() EntityType {
@@ -148,8 +148,8 @@ type ObservationEntity struct {
 	PhenomenonTime           time.Time `json:"phenomenonTime"`
 	ResultTime               time.Time `json:"resultTime"`
 
-	Datastream 				Datastream 	`json:",omitempty"`
-	FeatureOfInterest		FeatureOfInterest 	`json:",omitempty"`
+	Datastream        Datastream        `json:",omitempty"`
+	FeatureOfInterest FeatureOfInterest `json:",omitempty"`
 }
 
 func (e *ObservationEntity) GetType() EntityType {
@@ -169,7 +169,7 @@ type FeatureOfInterestEntity struct {
 	Description         string       `json:"description"`
 	EncodingType        EncodingType `json:"encodingType"`
 
-	Observations 		[]Observation `json:",omitempty"`
+	Observations []Observation `json:",omitempty"`
 }
 
 func (e *FeatureOfInterestEntity) GetType() EntityType {
@@ -177,8 +177,8 @@ func (e *FeatureOfInterestEntity) GetType() EntityType {
 }
 
 type ValueList struct {
-	Count 	int			`json:"count,omitempty"`
-	Value 	interface{} `json:"value"`
+	Count int         `json:"count,omitempty"`
+	Value interface{} `json:"value"`
 }
 
 /*

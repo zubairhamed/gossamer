@@ -191,9 +191,16 @@ type SensorThing interface {
 	GetType() EntityType
 }
 
+// The OGC SensorThings API follows the ITU-T definition, i.e., with regard to the Internet of Things,
+// a thing is an object of the physical world (physical things) or the information world (virtual things)
+// that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
 type Thing interface {
 	SensorThing
+
+	// This is a short description of the corresponding Thing entity.
 	GetDescription() string
+
+	// An Object containing user-annotated properties as key-value pairs.
 	GetProperties() map[string]string
 
 	GetLocations() []Location
@@ -207,6 +214,14 @@ const (
 	LOCATION_ENCTYPE_GEOJSON LocationEncodingType = "application/vnd.geo+json"
 )
 
+// The Location entity locates the Thing or the Things it associated with. A Thing’s Location entity is
+// defined as the last known location of the Thing.
+// A Thing’s Location may be identical to the Thing’s Observations’ FeatureOfInterest. In the context of the IoT,
+// the principle location of interest is usually associated with the location of the Thing, especially for in-situ
+// sensing applications. For example, the location of interest of a wifi-connected thermostat should be the building
+// or the room in which the smart thermostat is located. And the FeatureOfInterest of the Observations made by the
+// thermostat (e.g., room temperature readings) should also be the building or the room. In this case, the content
+// of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type Location interface {
 	SensorThing
 	GetDescription() string
@@ -217,6 +232,8 @@ type Location interface {
 	GetHistoricalLocations() []HistoricalLocation
 }
 
+// A Thing’s HistoricalLocation entity set provides the current (i.e., last known) and previous locations of the
+// Thing with their time.
 type HistoricalLocation interface {
 	SensorThing
 	GetTime() time.Time
@@ -228,36 +245,37 @@ type HistoricalLocation interface {
 type DatastreamObservationType string
 
 const (
-	DATASTREAM_OBSTYPE_CATEGORY DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_CategoryObservation"
-	// IRI
-
-	/*
-		OM_CountObservation
-		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_CountObservation
-		integer
-
-		OM_Measurement
-		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_Measurement
-		double
-
-		OM_Observation
-		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_Observation
-		Any
-
-		OM_TruthObservation
-		http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_TruthObservation
-		boolean
-	*/
+	DATASTREAM_OBSTYPE_CATEGORY         DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_CategoryObservation"
+	DATASTREAM_OBSTYPE_COUNT            DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_CountObservation"
+	DATASTREAM_OBSTYPE_MEASUREMENT      DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_Measurement"
+	DATASTREAM_OBSTYPE_OBSERVATION      DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_Observation"
+	DATASTREAM_OBSTYPE_TRUTHOBSERVATION DatastreamObservationType = "http://www.opengis.net/def/observationType/ OGC-OM/2.0/OM_TruthObservation"
 )
 
+// A Datastream groups a collection of Observations and the Observations in a Datastream measure the
+// same ObservedProperty and are produced by the same Sensor.
 type Datastream interface {
 	SensorThing
 
 	GetDescription() string
+
+	// A JSON Object containing three key- value pairs. The name property presents the full name of the
+	// unitOfMeasurement; the symbol property shows the textual form of the unit symbol; and the definition
+	// contains the IRI defining the unitOfMeasurement.
+	// The values of these properties SHOULD follow the Unified Code for Unit of Measure (UCUM).
 	GetUnitOfMeasurement() // UnitOfMeasure !!
-	GetObservationType()   // !!
-	GetObservedArea()      // !!
+
+	// The type of Observation (with unique result type), which is used by the service to encode observations.
+	GetObservationType() // !!
+
+	// The spatial bounding box of the spatial extent of all FeaturesOfInterest that belong to the
+	// Observations associated with this Datastream.
+	GetObservedArea() // !!
+
+	// The temporal bounding box of the phenomenon times of all observations belonging to this Datastream.
 	GetPhenomenonTime() time.Time
+
+	// The temporal bounding box of the result times of all observations belonging to this Datastream.
 	GetResultTime() time.Time
 
 	GetThing() Thing
