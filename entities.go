@@ -149,6 +149,10 @@ func (e *FeatureOfInterestEntity) GetType() EntityType {
 	return ENTITY_FEATURESOFINTERESTS
 }
 
+type ValueList struct {
+	Value	interface{}	`json:"value"`
+}
+
 /*
 {
        "type": "FeatureCollection",

@@ -8,27 +8,32 @@ import (
 )
 
 type ResourceUrlType struct {
-	Name string `json: "name"`
-	Url  string `json: "url"`
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
 
 func (s *DefaultServer) handleRootResource(c web.C, w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Value []ResourceUrlType `json:"value"`
-	}{
+	/*
+	ResolveSelfLinkUrl("", )
+	 */
+
+	data :=
 		[]ResourceUrlType{
-			{"Things", "http://example.org/v1.0/Things"},
-			{"Locations", "http://example.org/v1.0/Locations"},
-			{"Datastreams", "http://example.org/v1.0/Datastreams"},
-			{"Sensors", "http://example.org/v1.0/Sensors"},
-			{"Observations", "http://example.org/v1.0/Observations"},
-			{"ObservedProperties", "http://example.org/v1.0/ObservedProperties"},
-			{"FeaturesOfInterest", "http://example.org/v1.0/FeaturesOfInterest"},
-		},
+			{"Things", ResolveSelfLinkUrl("", ENTITY_THINGS)},
+			{"Locations", ResolveSelfLinkUrl("", ENTITY_LOCATIONS)},
+			{"Datastreams", ResolveSelfLinkUrl("", ENTITY_DATASTREAMS)},
+			{"Sensors", ResolveSelfLinkUrl("", ENTITY_SENSORS)},
+			{"Observations", ResolveSelfLinkUrl("", ENTITY_OBSERVATIONS)},
+			{"ObservedProperties", ResolveSelfLinkUrl("", ENTITY_OBSERVEDPROPERTIES)},
+			{"FeaturesOfInterest", ResolveSelfLinkUrl("", ENTITY_FEATURESOFINTEREST)},
 	}
-	out, err := json.Marshal(data)
+
+	v := &ValueList{
+		Value: data,
+	}
+	out, err := json.MarshalIndent(v, "", "\t")
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(string(out))
+	w.Write(out)
 }

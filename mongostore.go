@@ -213,72 +213,59 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 }
 
 func (m *MongoStore) postHandleThing(e *ThingEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_THINGS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_THINGS)
 
-	e.NavLinkLocations = getEntityLink(e.Id, ENTITY_THINGS) + "/Locations"
-	e.NavLinkHistoricalLocations = getEntityLink(e.Id, ENTITY_THINGS) + "/HistoricalLocations"
-	e.NavLinkDatastreams = getEntityLink(e.Id, ENTITY_THINGS) + "/Datastreams"
+	e.NavLinkLocations = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/Locations"
+	e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/HistoricalLocations"
+	e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/Datastreams"
 }
 
 func (m *MongoStore) postHandleObservedProperty(e *ObservedPropertyEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_OBSERVEDPROPERTIES)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVEDPROPERTIES)
 
-	e.NavLinkDatastreams = getEntityLink(e.Id, ENTITY_OBSERVEDPROPERTIES) + "/Datastreams"
+	e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_OBSERVEDPROPERTIES) + "/Datastreams"
 }
 
 func (m *MongoStore) postHandleLocation(e *LocationEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_LOCATIONS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_LOCATIONS)
 
-	e.NavLinkHistoricalLocations = getEntityLink(e.Id, ENTITY_LOCATIONS) + "/HistoricalLocations"
-	e.NavLinkThings = getEntityLink(e.Id, ENTITY_LOCATIONS) + "/Things"
+	e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_LOCATIONS) + "/HistoricalLocations"
+	e.NavLinkThings = ResolveEntityLink(e.Id, ENTITY_LOCATIONS) + "/Things"
 }
 
 func (m *MongoStore) postHandleDatastream(e *DatastreamEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_DATASTREAMS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_DATASTREAMS)
 
-	e.NavLinkObservations = getEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Observations"
-	e.NavLinkObservedProperty = getEntityLink(e.Id, ENTITY_DATASTREAMS) + "/ObservedProperty"
-	e.NavLinkSensor = getEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Sensor"
-	e.NavLinkThing = getEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Thing"
+	e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Observations"
+	e.NavLinkObservedProperty = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/ObservedProperty"
+	e.NavLinkSensor = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Sensor"
+	e.NavLinkThing = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Thing"
 }
 
 func (m *MongoStore) postHandleSensor(e *SensorEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_SENSORS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_SENSORS)
 
-	e.NavLinkDatastreams = getEntityLink(e.Id, ENTITY_SENSORS) + "/Datastreams"
+	e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_SENSORS) + "/Datastreams"
 }
 
 func (m *MongoStore) postHandleObservation(e *ObservationEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_OBSERVATIONS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVATIONS)
 
-	e.NavLinkDatastream = getEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/Datastream"
-	e.NavLinkFeatureOfInterest = getEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/FeatureOfInterest"
+	e.NavLinkDatastream = ResolveEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/Datastream"
+	e.NavLinkFeatureOfInterest = ResolveEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/FeatureOfInterest"
 }
 
 func (m *MongoStore) postHandleFeatureOfInterest(e *FeatureOfInterestEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTERESTS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTERESTS)
 
-	e.NavLinkObservations = getEntityLink(e.Id, ENTITY_FEATURESOFINTERESTS) + "/Observations"
+	e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTERESTS) + "/Observations"
 }
 
 func (m *MongoStore) postHandleHistoricalLocation(e *HistoricalLocationEntity) {
-	e.SelfLink = getSelfLinkUrl(e.Id, ENTITY_HISTORICALLOCATIONS)
+	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_HISTORICALLOCATIONS)
 
-	e.NavLinkHistoricalLocations = getEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/HistoricalLocations"
-	e.NavLinkThing = getEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/Thing"
-}
-
-func getEntityLink(id string, ent EntityType) string {
-	s := string(ent)
-
-	if ent != "" {
-		s += "(" + id + ")"
-	}
-	return s
-}
-
-func getSelfLinkUrl(id string, ent EntityType) string {
-	return "http://" + GLOB_ENV_HOST + "/v1.0/" + getEntityLink(id, ent)
+	e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/HistoricalLocations"
+	e.NavLinkThing = ResolveEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/Thing"
 }
 
 func ResolveMongoCollectionName(ent EntityType) string {
