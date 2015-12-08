@@ -13,19 +13,14 @@ type ResourceUrlType struct {
 }
 
 func (s *DefaultServer) handleRootResource(c web.C, w http.ResponseWriter, r *http.Request) {
-	/*
-	ResolveSelfLinkUrl("", )
-	 */
-
-	data :=
-		[]ResourceUrlType{
-			{"Things", ResolveSelfLinkUrl("", ENTITY_THINGS)},
-			{"Locations", ResolveSelfLinkUrl("", ENTITY_LOCATIONS)},
-			{"Datastreams", ResolveSelfLinkUrl("", ENTITY_DATASTREAMS)},
-			{"Sensors", ResolveSelfLinkUrl("", ENTITY_SENSORS)},
-			{"Observations", ResolveSelfLinkUrl("", ENTITY_OBSERVATIONS)},
-			{"ObservedProperties", ResolveSelfLinkUrl("", ENTITY_OBSERVEDPROPERTIES)},
-			{"FeaturesOfInterest", ResolveSelfLinkUrl("", ENTITY_FEATURESOFINTEREST)},
+	data := []ResourceUrlType{
+		{"Things", ResolveSelfLinkUrl("", ENTITY_THINGS)},
+		{"Locations", ResolveSelfLinkUrl("", ENTITY_LOCATIONS)},
+		{"Datastreams", ResolveSelfLinkUrl("", ENTITY_DATASTREAMS)},
+		{"Sensors", ResolveSelfLinkUrl("", ENTITY_SENSORS)},
+		{"Observations", ResolveSelfLinkUrl("", ENTITY_OBSERVATIONS)},
+		{"ObservedProperties", ResolveSelfLinkUrl("", ENTITY_OBSERVEDPROPERTIES)},
+		{"FeaturesOfInterest", ResolveSelfLinkUrl("", ENTITY_FEATURESOFINTEREST)},
 	}
 
 	v := &ValueList{

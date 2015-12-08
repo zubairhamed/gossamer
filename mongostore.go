@@ -2,8 +2,8 @@ package gossamer
 
 import (
 	"gopkg.in/mgo.v2"
-	"log"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func NewMongoStore(hosts string) *MongoStore {
 
 type MongoStore struct {
 	session *mgo.Session
-	hosts 	string
+	hosts   string
 }
 
 func (m *MongoStore) Init() {
@@ -32,6 +32,10 @@ func (m *MongoStore) Init() {
 
 func (m *MongoStore) Shutdown() {
 	m.session.Close()
+}
+
+func (m *MongoStore) cloneSession() *mgo.Session {
+	return m.session.Clone()
 }
 
 func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEntity EntityType, lastEntityId string) interface{} {
@@ -62,9 +66,11 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 			# post server-driven pagination
 			$expand
 			$select
-	 */
+	*/
+	session := m.cloneSession()
+	defer session.Close()
 
-	c := m.session.DB("sensorthings").C(ResolveMongoCollectionName(ent))
+	c := session.DB("sensorthings").C(ResolveMongoCollectionName(ent))
 	entityIdIsEmpty := entityId == ""
 	lastEntityIdIsEmpty := lastEntityId == ""
 	bsonMap := bson.M{}
@@ -75,12 +81,12 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 	}
 
 	if !lastEntityIdIsEmpty {
-		bsonMap["@iot_" + strings.ToLower(string(lastEntity)) + "_id"] = lastEntityId
+		bsonMap["@iot_"+strings.ToLower(string(lastEntity))+"_id"] = lastEntityId
 	}
 	query := c.Find(bsonMap)
 
 	if !entityIdIsEmpty || IsSingularEntity(string(ent)) {
-		switch  {
+		switch {
 		case ent == ENTITY_THINGS || ent == ENTITY_THING:
 			var r ThingEntity
 			query.One(&r)
@@ -129,7 +135,7 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 			m.postHandleHistoricalLocation(&r)
 			return r
 		}
-	} else {    // Find all
+	} else { // Find all
 		iter := query.Iter()
 
 		switch ent {
@@ -140,7 +146,6 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 				m.postHandleThing(&r)
 				rs = append(rs, r)
 			}
-			log.Println(rs)
 			return rs
 
 		case ENTITY_OBSERVEDPROPERTIES:
@@ -296,4 +301,3 @@ func ResolveMongoCollectionName(ent EntityType) string {
 	}
 	return ""
 }
-

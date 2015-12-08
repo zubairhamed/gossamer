@@ -1,13 +1,14 @@
 package gossamer
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
-	"encoding/json"
 )
 
 func NewServer() Server {
@@ -84,7 +85,7 @@ func DiscoverEntityType(e string) EntityType {
 }
 
 func IsEntity(e string) bool {
-	if 	strings.HasPrefix(e, "Thing") ||
+	if strings.HasPrefix(e, "Thing") ||
 		strings.HasPrefix(e, "Things") ||
 		strings.HasPrefix(e, "Location") ||
 		strings.HasPrefix(e, "Locations") ||
@@ -106,7 +107,7 @@ func IsEntity(e string) bool {
 }
 
 func IsSingularEntity(e string) bool {
-	if 	(strings.HasPrefix(e, "Location") && !strings.HasPrefix(e, "Locations")) ||
+	if (strings.HasPrefix(e, "Location") && !strings.HasPrefix(e, "Locations")) ||
 		(strings.HasPrefix(e, "HistoricalLocation") && !strings.HasPrefix(e, "HistoricalLocations")) ||
 		(strings.HasPrefix(e, "Datastream") && !strings.HasPrefix(e, "Datastreams")) ||
 		(strings.HasPrefix(e, "Sensor") && !strings.HasPrefix(e, "Sensors")) ||
@@ -147,14 +148,25 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 				lastEntityId = v.GetId()
 				c2 <- true
 			}()
-			<- c2
+			<-c2
 		}
 		c1 <- true
 	}()
-	<- c1
+	<-c1
 
-	log.Println("Value to return to client:")
-	b, err := json.MarshalIndent(lastValue, "", "\t")
+	var outValue interface{}
+	if reflect.TypeOf(lastValue).Kind() == reflect.Slice {
+		l := reflect.ValueOf(lastValue).Len()
+
+		outValue = &ValueList{
+			Count: l,
+			Value: lastValue,
+		}
+	} else {
+		outValue = lastValue
+	}
+
+	b, err := json.MarshalIndent(outValue, "", "\t")
 	if err != nil {
 		log.Println("Error converting to JSON")
 	}
@@ -220,6 +232,7 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 
 func (s *DefaultServer) Start() {
 	goji.Get("/v1.0", s.handleRootResource)
+	goji.Get("/v1.0/", s.handleRootResource)
 	goji.Get("/v1.0/*", s.handleGetEntity)
 
 	log.Println("Start Server")
