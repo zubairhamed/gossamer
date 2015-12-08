@@ -106,14 +106,13 @@ func IsEntity(e string) bool {
 }
 
 func IsSingularEntity(e string) bool {
-	if 	strings.HasPrefix(e, "Thing") ||
-		strings.HasPrefix(e, "Location") ||
-		strings.HasPrefix(e, "HistoricalLocation") ||
-		strings.HasPrefix(e, "Datastream") ||
-		strings.HasPrefix(e, "Sensor") ||
-		strings.HasPrefix(e, "Observation") ||
-		strings.HasPrefix(e, "ObservedProperty") ||
-		strings.HasPrefix(e, "FeaturesOfInterest") {
+	if 	(strings.HasPrefix(e, "Location") && !strings.HasPrefix(e, "Locations")) ||
+		(strings.HasPrefix(e, "HistoricalLocation") && !strings.HasPrefix(e, "HistoricalLocations")) ||
+		(strings.HasPrefix(e, "Datastream") && !strings.HasPrefix(e, "Datastreams")) ||
+		(strings.HasPrefix(e, "Sensor") && !strings.HasPrefix(e, "Sensors")) ||
+		(strings.HasPrefix(e, "Observation") && !strings.HasPrefix(e, "Observations")) ||
+		(strings.HasPrefix(e, "ObservedProperty") && !strings.HasPrefix(e, "ObservedProperties")) ||
+		(strings.HasPrefix(e, "FeaturesOfInterest") && !strings.HasPrefix(e, "FeaturesOfInterests")) {
 		return true
 	}
 	return false
@@ -159,7 +158,10 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 	if err != nil {
 		log.Println("Error converting to JSON")
 	}
-	log.Println(string(b))
+	_, err = w.Write(b)
+	if err != nil {
+		log.Println(err)
+	}
 
 	/*
 		/Things(1)/Observations
@@ -214,20 +216,6 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 				continue
 
 	*/
-}
-
-func (s *DefaultServer) output(val interface{}, ent EntityType) {
-
-	switch ent {
-	case ENTITY_THINGS:
-		v := val.(ThingEntity)
-		b, err := json.Marshal(v)
-		if err != nil {
-			log.Println("Error converting to JSON")
-		}
-		log.Println(string(b))
-		break
-	}
 }
 
 func (s *DefaultServer) Start() {

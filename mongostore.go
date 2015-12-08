@@ -64,7 +64,6 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 			$select
 	 */
 
-	log.Println("####", ResolveMongoCollectionName(ent))
 	c := m.session.DB("sensorthings").C(ResolveMongoCollectionName(ent))
 	entityIdIsEmpty := entityId == ""
 	lastEntityIdIsEmpty := lastEntityId == ""
@@ -78,11 +77,9 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 	if !lastEntityIdIsEmpty {
 		bsonMap["@iot_" + strings.ToLower(string(lastEntity)) + "_id"] = lastEntityId
 	}
-	log.Println(bsonMap)
 	query := c.Find(bsonMap)
 
 	if !entityIdIsEmpty || IsSingularEntity(string(ent)) {
-		log.Println("SINGULAR")
 		switch  {
 		case ent == ENTITY_THINGS || ent == ENTITY_THING:
 			var r ThingEntity
@@ -143,6 +140,7 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 				m.postHandleThing(&r)
 				rs = append(rs, r)
 			}
+			log.Println(rs)
 			return rs
 
 		case ENTITY_OBSERVEDPROPERTIES:
@@ -208,13 +206,6 @@ func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, las
 			}
 			return rs
 		}
-	}
-
-	// Find one
-	if IsSingularEntity(string(ent)) {
-
-	} else {
-
 	}
 
 	log.Println("Retutning results", results)

@@ -206,7 +206,6 @@ type LocationEncodingType string
 const (
 	LOCATION_ENCTYPE_GEOJSON LocationEncodingType = "application/vnd.geo+json"
 )
-
 type Location interface {
 	SensorThing
 	GetDescription() string

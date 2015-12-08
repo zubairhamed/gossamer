@@ -7,7 +7,6 @@ type EncodingType string
 const (
 	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
 	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
-	ENCODINGTYPE_GEO      EncodingType = "application/vnd.geo+json"
 )
 
 type ObservationType string
@@ -39,11 +38,11 @@ func (e *LocationEntity) GetType() EntityType {
 }
 
 type LocationEntity struct {
-	SensorThingsEntity							`bson:",inline"`
-	NavLinkHistoricalLocations	string			`json:"HistoricalLocations@iot.navigationLink"`
-	NavLinkThings				string			`json:"Things@iot.navigationLink"`
-	Description  				string			`json:"description"`
-	EncodingType 				EncodingType	`json:"encodingType"`
+	SensorThingsEntity									`bson:",inline"`
+	NavLinkHistoricalLocations	string					`json:"HistoricalLocations@iot.navigationLink"`
+	NavLinkThings				string					`json:"Things@iot.navigationLink"`
+	Description  				string					`json:"description"`
+	EncodingType 				LocationEncodingType	`json:"encodingType"`
 }
 
 func (e *ThingEntity) GetType() EntityType {
@@ -149,3 +148,54 @@ type FeatureOfInterestEntity struct {
 func (e *FeatureOfInterestEntity) GetType() EntityType {
 	return ENTITY_FEATURESOFINTERESTS
 }
+
+/*
+{
+       "type": "FeatureCollection",
+       "features": [{
+           "type": "Feature",
+           "geometry": {
+               "type": "Point",
+               "coordinates": [102.0, 0.5]
+           },
+           "properties": {
+               "prop0": "value0"
+           }
+       }, {
+           "type": "Feature",
+           "geometry": {
+               "type": "LineString",
+               "coordinates": [
+                   [102.0, 0.0],
+                   [103.0, 1.0],
+                   [104.0, 0.0],
+                   [105.0, 1.0]
+               ]
+           },
+           "properties": {
+               "prop0": "value0",
+               "prop1": 0.0
+           }
+       }, {
+           "type": "Feature",
+           "geometry": {
+               "type": "Polygon",
+               "coordinates": [
+                   [
+                       [100.0, 0.0],
+                       [101.0, 0.0],
+                       [101.0, 1.0],
+                       [100.0, 1.0],
+                       [100.0, 0.0]
+                   ]
+               ]
+           },
+           "properties": {
+               "prop0": "value0",
+               "prop1": {
+                   "this": "that"
+               }
+           }
+       }]
+   } */
+
