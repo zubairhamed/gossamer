@@ -128,7 +128,7 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 		log.Println(err)
 	}
 
-	navPath := req.GetNavigation().GetItems()
+	navPath := req.GetResourcePath().All()
 	l := len(navPath)
 
 	if l == 0 {

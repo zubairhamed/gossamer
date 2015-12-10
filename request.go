@@ -7,16 +7,62 @@ import (
 )
 
 func CreateRequest(url *url.URL) (Request, error) {
-	nav := &DefaultNavigation{}
+//	nav := &DefaultNavigation{}
+
+//	path := url.Path
+//	pathSplit := strings.Split(path, "/")[2:]
+//	navItems := []NavigationItem{}
+//	pathSplitItems := len(pathSplit)
+//
+//	for idx, val := range pathSplit {
+//		if IsEntity(val) {
+//			navItem := &DefaultNavigationItem{}
+//			entityType := DiscoverEntityType(val)
+//			navItem.entityType = entityType
+//
+//			br1Index := strings.Index(val, "(")
+//			br2Index := strings.Index(val, ")")
+//
+//			if br1Index != -1 && br2Index != -1 {
+//				parenthesisValue := val[br1Index+1 : br2Index]
+//
+//				// Query Option
+//				if strings.HasPrefix(parenthesisValue, "$") {
+//					navItem.queryOptions, _ = CreateQueryOptions(parenthesisValue)
+//				} else {
+//					navItem.entityId = parenthesisValue
+//				}
+//			}
+//			navItems = append(navItems, navItem)
+//		} else {
+//			if strings.HasPrefix(val, "$") && idx == pathSplitItems-1 {
+//				nav.property = val
+//			} else {
+//				if idx == pathSplitItems-1 || idx == pathSplitItems-2 {
+//					nav.propertyValue = val
+//				} else {
+//					return nil, ERR_INVALID_ENTITY
+//				}
+//			}
+//		}
+//	}
+//
+//	nav.items = navItems
+
+	// NEW START
+	nav := &SensorThingsResourcePath{
+		currIndex: 0,
+		items: []ResourcePathItem{},
+	}
 
 	path := url.Path
 	pathSplit := strings.Split(path, "/")[2:]
-	navItems := []NavigationItem{}
+	items := []ResourcePathItem{}
 	pathSplitItems := len(pathSplit)
 
 	for idx, val := range pathSplit {
 		if IsEntity(val) {
-			navItem := &DefaultNavigationItem{}
+			navItem := &SensorThingsResourcePathItem{}
 			entityType := DiscoverEntityType(val)
 			navItem.entityType = entityType
 
@@ -33,7 +79,7 @@ func CreateRequest(url *url.URL) (Request, error) {
 					navItem.entityId = parenthesisValue
 				}
 			}
-			navItems = append(navItems, navItem)
+			items = append(items, navItem)
 		} else {
 			if strings.HasPrefix(val, "$") && idx == pathSplitItems-1 {
 				nav.property = val
@@ -47,25 +93,32 @@ func CreateRequest(url *url.URL) (Request, error) {
 		}
 	}
 
-	nav.items = navItems
+	nav.items = items
+	// NEW END
 
 	queryOpts, _ := CreateQueryOptions(url.RawQuery)
 	req := &DefaultRequest{
-		navigation:   nav,
+		resourcePath: nav,
+		// navigation:   nav,
 		queryOptions: queryOpts,
 	}
 	return req, nil
 }
 
 type DefaultRequest struct {
-	navigation   Navigation
+	resourcePath ResourcePath
+//	navigation   Navigation
 	queryOptions QueryOptions
 }
 
 func (r *DefaultRequest) GetProtocol() ProtocolType     { return 0 }
 func (r *DefaultRequest) GetQueryOptions() QueryOptions { return nil }
-func (r *DefaultRequest) GetNavigation() Navigation {
-	return r.navigation
+//func (r *DefaultRequest) GetNavigation() Navigation {
+//	return r.navigation
+//}
+
+func (r *DefaultRequest) GetResourcePath() ResourcePath {
+	return r.resourcePath
 }
 
 type DefaultQueryOption struct {

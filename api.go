@@ -118,17 +118,17 @@ type NavigationItem interface {
 	GetQueryOptions() QueryOptions
 }
 
-type Navigation interface {
-	//	String()
-	GetItems() []NavigationItem
-	//	GetProperty() string
-	//	GetPropertyValue() string
-}
+//type Navigation interface {
+//	//	String()
+//	GetItems() []NavigationItem
+//	//	GetProperty() string
+//	//	GetPropertyValue() string
+//}
 
 type Request interface {
 	GetProtocol() ProtocolType
 	GetQueryOptions() QueryOptions
-	GetNavigation() Navigation
+	GetResourcePath() ResourcePath
 }
 
 type SensingProfileHandler interface {
