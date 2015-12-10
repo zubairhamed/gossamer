@@ -166,7 +166,7 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 		outValue = lastValue
 	}
 
-	b, err := json.MarshalIndent(outValue, "", "\t")
+	b, err := json.MarshalIndent(outValue, "", "  ")
 	if err != nil {
 		log.Println("Error converting to JSON")
 	}
@@ -233,7 +233,13 @@ func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.
 func (s *DefaultServer) Start() {
 	goji.Get("/v1.0", s.handleRootResource)
 	goji.Get("/v1.0/", s.handleRootResource)
-	goji.Get("/v1.0/*", s.handleGetEntity)
+	// goji.Get("/v1.0/*", s.handleGetEntity)
+
+	goji.Get("/v1.0/*", s.handleGet)
+	goji.Get("/v1.0/*", s.handlePost)
+	goji.Get("/v1.0/*", s.handlePut)
+	goji.Get("/v1.0/*", s.handleDelete)
+	goji.Get("/v1.0/*", s.handlePatch)
 
 	log.Println("Start Server")
 	goji.Serve()

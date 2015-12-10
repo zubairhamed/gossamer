@@ -136,11 +136,6 @@ func (e *ObservedPropertyEntity) GetType() EntityType {
 	return ENTITY_OBSERVEDPROPERTIES
 }
 
-/*
-{
-	"result": 70.4
-}￼￼￼
-*/
 type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
 	NavLinkFeatureOfInterest string    `json:"FeatureOfInterest@iot.navigationLink"`

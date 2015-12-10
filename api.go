@@ -313,11 +313,22 @@ type ObservedProperty interface {
 type Observation interface {
 	SensorThing
 
+	// The time instant or period of when the Observation happens.
 	GetPhenomenonTime() time.Time
+
+	// The time of the Observation's result was generated.
 	GetResultTime() time.Time
-	GetResult()        // !!
+
+	// The estimated value of an ObservedProperty from the Observation.
+	GetResult() interface{}
+
+	// Describes the quality of the result.
 	GetResultQuality() // !!
+
+	// The time period during which the result may be used.
 	GetValidTime() time.Time
+
+	// Key-value pairs showing the environmental conditions during measurement.
 	GetParameters() map[string]string
 
 	GetFeatureOfInterest() FeatureOfInterest
