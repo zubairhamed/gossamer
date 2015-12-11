@@ -74,6 +74,8 @@ X-API-KEY-TYPE: SERVER / BROWSER / SENSOR
     “metadata”: “2011-11-18 23:58:00-06,AK_ASOS”
 }
 
+## Basic Querying
+
 ** GET /v1.0/Datastreams(id)/Observations
 {
     “count”: 60,
@@ -97,8 +99,6 @@ X-API-KEY-TYPE: SERVER / BROWSER / SENSOR
     },
     ……….]
 }
-
-## Basic Querying
 
 ## Errors
 400	Bad Request – Something in your request is not correct. It could be the content of the JSON or it could be the server endpoint is not expecting this content.

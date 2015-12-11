@@ -14,8 +14,6 @@ func NewServer() Server {
 }
 
 type DefaultServer struct {
-	sensingHandler SensingProfileHandler
-	taskingHandler TaskingProfileHandler
 	dataStore      Datastore
 }
 
@@ -119,117 +117,9 @@ func IsSingularEntity(e string) bool {
 
 var ERR_INVALID_ENTITY = errors.New("Invalid Entity")
 
-//func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.Request) {
-//
-//	req, err := CreateRequest(r.URL)
-//	if err != nil {
-//		log.Println(err)
-//	}
-//
-//	navPath := req.GetResourcePath().All()
-//	l := len(navPath)
-//
-//	if l == 0 {
-//		// TODO: Throw error
-//	}
-//
-//	c1 := make(chan bool)
-//	var lastEntity EntityType
-//	var lastEntityId string
-//	var lastValue interface{}
-//	go func() {
-//		for _, v := range navPath {
-//			c2 := make(chan bool)
-//			go func() {
-//				lastValue = s.dataStore.Get(v.GetEntity(), v.GetId(), v.GetQueryOptions(), lastEntity, lastEntityId)
-//				lastEntity = v.GetEntity()
-//				lastEntityId = v.GetId()
-//				c2 <- true
-//			}()
-//			<-c2
-//		}
-//		c1 <- true
-//	}()
-//	<-c1
-//
-//	var outValue interface{}
-//	if reflect.TypeOf(lastValue).Kind() == reflect.Slice {
-//		l := reflect.ValueOf(lastValue).Len()
-//
-//		outValue = &ValueList{
-//			Count: l,
-//			Value: lastValue,
-//		}
-//	} else {
-//		outValue = lastValue
-//	}
-//
-//	b, err := json.MarshalIndent(outValue, "", "  ")
-//	if err != nil {
-//		log.Println("Error converting to JSON")
-//	}
-//	_, err = w.Write(b)
-//	if err != nil {
-//		log.Println(err)
-//	}
-//
-//
-//		/Things(1)/Observations
-//		query(navItem, lastQueryVal) {
-//			if lastQueryVal == nil {
-//				switch navItem {
-//					case navItem.type && id not set:
-//					case navItem.type && id set:
-//				}
-//			} else {
-//
-//			}
-//		}
-//
-//		var lastQueryVal interface{}
-//		for navItem := range navItems
-//			lastQueryVal = query(navItem, lastQueryVal)
-//			if !hasNextNav {
-//
-//			}
-//
-//
-//		query(navEntity, lastQueryVal) {
-//			switch navEntity.type
-//				case Entity:
-//					if
-//		}
-//
-//
-//		var lastQueryVal interface{}
-//		var valueOut interface{}
-//		for navEntity in navigationItems
-//			lastQueryVal = query(navEntity, lastQueryVal)
-//
-//			if lastItem
-//				if hasProperty
-//				if hasValue
-//
-//
-//		for navigationItems
-//			fetch
-//				- all
-//				- one with id
-//
-//			if lasItem
-//				if has property || has value {
-//					writeOut property or Value
-//				} else {
-//					writeOut lastQueryVal
-//				}
-//			else
-//				continue
-//}
-
 func (s *DefaultServer) Start() {
 	goji.Get("/v1.0", s.handleRootResource)
 	goji.Get("/v1.0/", s.handleRootResource)
-	// goji.Get("/v1.0/*", s.handleGetEntity)
 
 	goji.Get("/v1.0/*", s.handleGet)
 	goji.Get("/v1.0/*", s.handlePost)
@@ -243,12 +133,4 @@ func (s *DefaultServer) Start() {
 
 func (s *DefaultServer) Stop() {
 	log.Println("Stopped Server")
-}
-
-func (s *DefaultServer) UseSensingProfile(h SensingProfileHandler) {
-	s.sensingHandler = h
-}
-
-func (s *DefaultServer) UseTaskingProfile(h TaskingProfileHandler) {
-	s.taskingHandler = h
 }

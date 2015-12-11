@@ -107,8 +107,6 @@ type FilterOption interface {
 type Server interface {
 	Stop()
 	Start()
-	UseSensingProfile(SensingProfileHandler)
-	UseTaskingProfile(TaskingProfileHandler)
 	UseStore(Datastore)
 }
 
@@ -116,12 +114,6 @@ type Request interface {
 	GetProtocol() ProtocolType
 	GetQueryOptions() QueryOptions
 	GetResourcePath() ResourcePath
-}
-
-type SensingProfileHandler interface {
-}
-
-type TaskingProfileHandler interface {
 }
 
 type Datastore interface {
