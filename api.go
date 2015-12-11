@@ -119,7 +119,6 @@ type Request interface {
 }
 
 type SensingProfileHandler interface {
-
 }
 
 type TaskingProfileHandler interface {
@@ -135,9 +134,9 @@ type Datastore interface {
 
 // Entities
 type SensorThing interface {
-		GetId() string
-		GetSelfLink() string
-		GetNavigationLink() string
+	GetId() string
+	GetSelfLink() string
+	GetNavigationLink() string
 	GetType() EntityType
 }
 

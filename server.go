@@ -119,7 +119,6 @@ func IsSingularEntity(e string) bool {
 
 var ERR_INVALID_ENTITY = errors.New("Invalid Entity")
 
-
 //func (s *DefaultServer) handleGetEntity(c web.C, w http.ResponseWriter, r *http.Request) {
 //
 //	req, err := CreateRequest(r.URL)

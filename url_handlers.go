@@ -110,7 +110,6 @@ func (n *SensorThingsResourcePathItem) GetId() string {
 	return n.entityId
 }
 
-
 type ResourcePath interface {
 	Next() ResourcePathItem
 	Prev() ResourcePathItem
@@ -130,8 +129,8 @@ type ResourcePath interface {
 }
 
 type SensorThingsResourcePath struct {
-	currIndex 	int
-	items 		[]ResourcePathItem
+	currIndex     int
+	items         []ResourcePathItem
 	property      string
 	propertyValue string
 }
@@ -156,7 +155,7 @@ func (r *SensorThingsResourcePath) First() ResourcePathItem {
 }
 
 func (r *SensorThingsResourcePath) Last() ResourcePathItem {
-	r.currIndex = r.Size()-1
+	r.currIndex = r.Size() - 1
 	return r.At(r.currIndex)
 }
 
@@ -195,7 +194,7 @@ func (r *SensorThingsResourcePath) Add(rsrc ResourcePathItem) {
 }
 
 func (r *SensorThingsResourcePath) At(idx int) ResourcePathItem {
-	sz := r.Size()-1
+	sz := r.Size() - 1
 	if idx > sz || idx < 0 {
 		return nil
 	}

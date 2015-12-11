@@ -168,42 +168,51 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, listResults bool)
 	return nil
 }
 
-
 func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
-	session := m.cloneSession()
-	defer session.Close()
-
+	queryComplete := make(chan bool)
 	var results interface{}
-	for rp.HasNext() {
-		curr := rp.Next()
-		currEntity := curr.GetEntity()
+	go func() {
+		session := m.cloneSession()
+		defer session.Close()
 
-		c := session.DB("sensorthings").C(ResolveMongoCollectionName(currEntity))
+		for rp.HasNext() {
+			curr := rp.Next()
+			currEntity := curr.GetEntity()
 
-		bsonMap := bson.M{}
-		if curr.GetId() != "" {
-			bsonMap["@iot_id"] = curr.GetId()
+			c := session.DB("sensorthings").C(ResolveMongoCollectionName(currEntity))
+
+			bsonMap := bson.M{}
+			if curr.GetId() != "" {
+				bsonMap["@iot_id"] = curr.GetId()
+			}
+
+			last := rp.At(rp.CurrentIndex() - 1)
+			if last != nil && last.GetId() != "" {
+				lastEntity := last.GetEntity()
+				bsonMap["@iot_"+strings.ToLower(string(lastEntity))+"_id"] = last.GetId()
+			}
+			log.Println("bsonMap", bsonMap)
+			query := c.Find(bsonMap)
+
+			resourceQueryComplete := make(chan bool)
+			go func() {
+				if curr.GetId() != "" || IsSingularEntity(string(currEntity)) {
+					results = m.doQuery(query, currEntity, true)
+				} else {
+					results = m.doQuery(query, currEntity, false)
+				}
+				resourceQueryComplete <- true
+			}()
+			<-resourceQueryComplete
+
+			if rp.IsLast() {
+				break
+			}
 		}
-
-		last := rp.At(rp.CurrentIndex()-1)
-		if last != nil && last.GetId() != "" {
-			lastEntity := last.GetEntity()
-			bsonMap["@iot_"+strings.ToLower(string(lastEntity))+"_id"] = last.GetId()
-		}
-		log.Println("bsonMap", bsonMap)
-		query := c.Find(bsonMap)
-
-		if curr.GetId() != "" || IsSingularEntity(string(currEntity)) {
-			results = m.doQuery(query, currEntity, true)
-		} else {
-			results = m.doQuery(query, currEntity, false)
-		}
-
-		if rp.IsLast() {
-			return results, nil
-		}
-	}
-	return nil, nil
+		queryComplete <- true
+	}()
+	<-queryComplete
+	return results, nil
 }
 
 func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEntity EntityType, lastEntityId string) interface{} {

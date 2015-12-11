@@ -9,7 +9,7 @@ import (
 func CreateRequest(url *url.URL) (Request, error) {
 	rp := &SensorThingsResourcePath{
 		currIndex: -1,
-		items: []ResourcePathItem{},
+		items:     []ResourcePathItem{},
 	}
 
 	path := url.Path
