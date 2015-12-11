@@ -40,6 +40,18 @@ X-API-KEY-TYPE: SERVER / BROWSER / SENSOR
     }
 }
 
+** GET /v1.0/Locations?$expand=Things&$filter=st_within(location,geography 'POLYGON ((-117.0236 49.1592, -117.3311 52.1932, -110.0802 52.1663, -110.0361 49.0297, -117.0236 49.1592))')
+{
+“@iot.selfLink”: “http://example.org/OGCSensorThings/v1.0/Locations(27837)”,
+“@iot.id”: 27837,
+“encodingType”: “application/vnd.geo+json”,
+“Things@iot.navigationLink”: “../Locations(27837)/Things”,
+“description”: “my backyard”,
+“location”: {
+“coordinates”: [ -117.123, 54.123 ],
+“type”: “Point”
+},
+“HistoricalLocations@iot.navigationLink”: “../Locations(27837)/HistoricalLocations”
+}
+
 ## Basic Querying
-
-
