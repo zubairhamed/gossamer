@@ -7,51 +7,8 @@ import (
 )
 
 func CreateRequest(url *url.URL) (Request, error) {
-//	nav := &DefaultNavigation{}
-
-//	path := url.Path
-//	pathSplit := strings.Split(path, "/")[2:]
-//	navItems := []NavigationItem{}
-//	pathSplitItems := len(pathSplit)
-//
-//	for idx, val := range pathSplit {
-//		if IsEntity(val) {
-//			navItem := &DefaultNavigationItem{}
-//			entityType := DiscoverEntityType(val)
-//			navItem.entityType = entityType
-//
-//			br1Index := strings.Index(val, "(")
-//			br2Index := strings.Index(val, ")")
-//
-//			if br1Index != -1 && br2Index != -1 {
-//				parenthesisValue := val[br1Index+1 : br2Index]
-//
-//				// Query Option
-//				if strings.HasPrefix(parenthesisValue, "$") {
-//					navItem.queryOptions, _ = CreateQueryOptions(parenthesisValue)
-//				} else {
-//					navItem.entityId = parenthesisValue
-//				}
-//			}
-//			navItems = append(navItems, navItem)
-//		} else {
-//			if strings.HasPrefix(val, "$") && idx == pathSplitItems-1 {
-//				nav.property = val
-//			} else {
-//				if idx == pathSplitItems-1 || idx == pathSplitItems-2 {
-//					nav.propertyValue = val
-//				} else {
-//					return nil, ERR_INVALID_ENTITY
-//				}
-//			}
-//		}
-//	}
-//
-//	nav.items = navItems
-
-	// NEW START
-	nav := &SensorThingsResourcePath{
-		currIndex: 0,
+	rp := &SensorThingsResourcePath{
+		currIndex: -1,
 		items: []ResourcePathItem{},
 	}
 
@@ -82,10 +39,10 @@ func CreateRequest(url *url.URL) (Request, error) {
 			items = append(items, navItem)
 		} else {
 			if strings.HasPrefix(val, "$") && idx == pathSplitItems-1 {
-				nav.property = val
+				rp.property = val
 			} else {
 				if idx == pathSplitItems-1 || idx == pathSplitItems-2 {
-					nav.propertyValue = val
+					rp.propertyValue = val
 				} else {
 					return nil, ERR_INVALID_ENTITY
 				}
@@ -93,13 +50,11 @@ func CreateRequest(url *url.URL) (Request, error) {
 		}
 	}
 
-	nav.items = items
-	// NEW END
+	rp.items = items
 
 	queryOpts, _ := CreateQueryOptions(url.RawQuery)
 	req := &DefaultRequest{
-		resourcePath: nav,
-		// navigation:   nav,
+		resourcePath: rp,
 		queryOptions: queryOpts,
 	}
 	return req, nil
@@ -107,15 +62,11 @@ func CreateRequest(url *url.URL) (Request, error) {
 
 type DefaultRequest struct {
 	resourcePath ResourcePath
-//	navigation   Navigation
 	queryOptions QueryOptions
 }
 
 func (r *DefaultRequest) GetProtocol() ProtocolType     { return 0 }
 func (r *DefaultRequest) GetQueryOptions() QueryOptions { return nil }
-//func (r *DefaultRequest) GetNavigation() Navigation {
-//	return r.navigation
-//}
 
 func (r *DefaultRequest) GetResourcePath() ResourcePath {
 	return r.resourcePath

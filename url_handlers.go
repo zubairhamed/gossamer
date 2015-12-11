@@ -5,6 +5,7 @@ import (
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
+	"reflect"
 )
 
 type ResourceUrlType struct {
@@ -39,8 +40,36 @@ func (s *DefaultServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reques
 		log.Println(err)
 	}
 
-	log.Println(req)
+	rp := req.GetResourcePath()
 
+	result, err := s.dataStore.Query(rp)
+	if err != nil {
+
+	}
+
+	var jsonOut interface{}
+	if reflect.TypeOf(result).Kind() == reflect.Slice {
+		// Check for $count and include
+
+		jsonOut = &ValueList{
+			Value: result,
+		}
+	} else {
+		jsonOut = result
+	}
+
+	b, err := json.MarshalIndent(jsonOut, "", "  ")
+	if err != nil {
+		log.Println("Error converting to JSON")
+	}
+
+	_, err = w.Write(b)
+	if err != nil {
+		log.Println(err)
+	}
+
+	w.Write(b)
+	// http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
 func (s *DefaultServer) handlePost(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -94,11 +123,7 @@ type ResourcePath interface {
 
 	IsLast() bool
 	IsFirst() bool
-
-	GoNext()
-	GoPrev()
-	GoFirst()
-	GoLast()
+	HasNext() bool
 
 	CurrentIndex() int
 	Size() int
@@ -114,11 +139,13 @@ type SensorThingsResourcePath struct {
 }
 
 func (r *SensorThingsResourcePath) Next() ResourcePathItem {
-	return r.At(r.currIndex+1)
+	r.currIndex++
+	return r.At(r.currIndex)
 }
 
 func (r *SensorThingsResourcePath) Prev() ResourcePathItem {
-	return r.At(r.currIndex-1)
+	r.currIndex--
+	return r.At(r.currIndex)
 }
 
 func (r *SensorThingsResourcePath) Current() ResourcePathItem {
@@ -126,11 +153,20 @@ func (r *SensorThingsResourcePath) Current() ResourcePathItem {
 }
 
 func (r *SensorThingsResourcePath) First() ResourcePathItem {
-	return r.At(0)
+	r.currIndex = 0
+	return r.At(r.currIndex)
 }
 
 func (r *SensorThingsResourcePath) Last() ResourcePathItem {
-	return r.At(r.Size()-1)
+	r.currIndex = r.Size()-1
+	return r.At(r.currIndex)
+}
+
+func (r *SensorThingsResourcePath) HasNext() bool {
+	if r.IsLast() {
+		return false
+	}
+	return true
 }
 
 func (r *SensorThingsResourcePath) IsLast() bool {
@@ -146,20 +182,6 @@ func (r *SensorThingsResourcePath) IsFirst() bool {
 		return true
 	}
 	return false
-}
-
-func (r *SensorThingsResourcePath) GoNext() {
-	r.currIndex++
-}
-
-func (r *SensorThingsResourcePath) GoPrev() {
-	r.currIndex--
-}
-func (r *SensorThingsResourcePath) GoFirst() {
-	r.currIndex = 0
-}
-func (r *SensorThingsResourcePath) GoLast() {
-	r.currIndex = r.Size()-1
 }
 
 func (r *SensorThingsResourcePath) CurrentIndex() int {

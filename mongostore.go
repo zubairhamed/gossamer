@@ -38,6 +38,174 @@ func (m *MongoStore) cloneSession() *mgo.Session {
 	return m.session.Clone()
 }
 
+func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, listResults bool) interface{} {
+	if listResults {
+		switch {
+		case ent == ENTITY_THINGS || ent == ENTITY_THING:
+			var r ThingEntity
+			query.One(&r)
+			m.postHandleThing(&r)
+			return r
+
+		case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
+			var r ObservedPropertyEntity
+			query.One(&r)
+			m.postHandleObservedProperty(&r)
+			return r
+
+		case ent == ENTITY_LOCATIONS || ent == ENTITY_LOCATION:
+			var r LocationEntity
+			query.One(&r)
+			m.postHandleLocation(&r)
+			return r
+
+		case ent == ENTITY_DATASTREAMS || ent == ENTITY_DATASTREAM:
+			var r DatastreamEntity
+			query.One(&r)
+			m.postHandleDatastream(&r)
+			return r
+
+		case ent == ENTITY_SENSORS || ent == ENTITY_SENSOR:
+			var r SensorEntity
+			query.One(&r)
+			m.postHandleSensor(&r)
+			return r
+
+		case ent == ENTITY_OBSERVATIONS || ent == ENTITY_OBSERVATION:
+			var r ObservationEntity
+			query.One(&r)
+			m.postHandleObservation(&r)
+			return r
+
+		case ent == ENTITY_FEATURESOFINTERESTS || ent == ENTITY_FEATURESOFINTEREST:
+			var r FeatureOfInterestEntity
+			query.One(&r)
+			m.postHandleFeatureOfInterest(&r)
+			return r
+
+		case ent == ENTITY_HISTORICALLOCATIONS || ent == ENTITY_HISTORICALLOCATION:
+			var r HistoricalLocationEntity
+			query.One(&r)
+			m.postHandleHistoricalLocation(&r)
+			return r
+		}
+	} else {
+		iter := query.Iter()
+		switch ent {
+		case ENTITY_THINGS:
+			rs := []ThingEntity{}
+			var r ThingEntity
+			for iter.Next(&r) {
+				m.postHandleThing(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_OBSERVEDPROPERTIES:
+			rs := []ObservedPropertyEntity{}
+			var r ObservedPropertyEntity
+			for iter.Next(&r) {
+				m.postHandleObservedProperty(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_LOCATIONS:
+			rs := []LocationEntity{}
+			var r LocationEntity
+			for iter.Next(&r) {
+				m.postHandleLocation(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_DATASTREAMS:
+			rs := []DatastreamEntity{}
+			var r DatastreamEntity
+			for iter.Next(&r) {
+				m.postHandleDatastream(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_SENSORS:
+			rs := []SensorEntity{}
+			var r SensorEntity
+			for iter.Next(&r) {
+				m.postHandleSensor(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_OBSERVATIONS:
+			rs := []ObservationEntity{}
+			var r ObservationEntity
+			for iter.Next(&r) {
+				m.postHandleObservation(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_FEATURESOFINTERESTS:
+			rs := []FeatureOfInterestEntity{}
+			var r FeatureOfInterestEntity
+			for iter.Next(&r) {
+				m.postHandleFeatureOfInterest(&r)
+				rs = append(rs, r)
+			}
+			return rs
+
+		case ENTITY_HISTORICALLOCATIONS:
+			rs := []HistoricalLocationEntity{}
+			var r HistoricalLocationEntity
+			for iter.Next(&r) {
+				m.postHandleHistoricalLocation(&r)
+				rs = append(rs, r)
+			}
+			return rs
+		}
+	}
+	return nil
+}
+
+
+func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
+	session := m.cloneSession()
+	defer session.Close()
+
+	var results interface{}
+	for rp.HasNext() {
+		curr := rp.Next()
+		currEntity := curr.GetEntity()
+
+		c := session.DB("sensorthings").C(ResolveMongoCollectionName(currEntity))
+
+		bsonMap := bson.M{}
+		if curr.GetId() != "" {
+			bsonMap["@iot_id"] = curr.GetId()
+		}
+
+		last := rp.At(rp.CurrentIndex()-1)
+		if last != nil && last.GetId() != "" {
+			lastEntity := last.GetEntity()
+			bsonMap["@iot_"+strings.ToLower(string(lastEntity))+"_id"] = last.GetId()
+		}
+		log.Println("bsonMap", bsonMap)
+		query := c.Find(bsonMap)
+
+		if curr.GetId() != "" || IsSingularEntity(string(currEntity)) {
+			results = m.doQuery(query, currEntity, true)
+		} else {
+			results = m.doQuery(query, currEntity, false)
+		}
+
+		if rp.IsLast() {
+			return results, nil
+		}
+	}
+	return nil, nil
+}
+
 func (m *MongoStore) Get(ent EntityType, entityId string, opts QueryOptions, lastEntity EntityType, lastEntityId string) interface{} {
 
 	/*

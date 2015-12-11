@@ -40,8 +40,8 @@ type ThingEntity struct {
 	Datastreams         []Datastream         `json:",omitempty"`
 }
 
-func (e *LocationEntity) GetType() EntityType {
-	return ENTITY_THINGS
+func (e ThingEntity) GetType() EntityType {
+	return ENTITY_LOCATIONS
 }
 
 type LocationEntity struct {
@@ -55,8 +55,8 @@ type LocationEntity struct {
 	HistoricalLocations []HistoricalLocation `json:",omitempty"`
 }
 
-func (e *ThingEntity) GetType() EntityType {
-	return ENTITY_LOCATIONS
+func (e LocationEntity) GetType() EntityType {
+	return ENTITY_THINGS
 }
 
 type HistoricalLocationEntity struct {

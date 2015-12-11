@@ -112,19 +112,6 @@ type Server interface {
 	UseStore(Datastore)
 }
 
-type NavigationItem interface {
-	GetEntity() EntityType
-	GetId() string
-	GetQueryOptions() QueryOptions
-}
-
-//type Navigation interface {
-//	//	String()
-//	GetItems() []NavigationItem
-//	//	GetProperty() string
-//	//	GetPropertyValue() string
-//}
-
 type Request interface {
 	GetProtocol() ProtocolType
 	GetQueryOptions() QueryOptions
@@ -132,53 +119,16 @@ type Request interface {
 }
 
 type SensingProfileHandler interface {
-	//	GetThings(Request)
-	//	GetThing(string, Request)
-	//
-	//	GetLocations(Request)
-	//	GetLocation(string, Request)
-	//
-	//	GetDatastreams(Request)
-	//	GetDatastream(string, Request)
-	//
-	//	GetSensors(Request)
-	//	GetSensor(string, Request)
-	//
-	//	GetObservations(Request)
-	//	GetObservation(string, Request)
-	//
-	//	GetObservedProperties(Request)
-	//	GetObservedProperty(string, Request)
-	//
-	//	GetFeaturesOfInterests(Request)
-	//	GetFeaturesOfInterest(string, Request)
+
 }
 
 type TaskingProfileHandler interface {
 }
 
 type Datastore interface {
-	//	GetThings() []Thing
-	//	GetThing(string) Thing
+	// Get(EntityType, string, QueryOptions, EntityType, string) interface{}
 
-	//	GetObservedProperties() []ObservedProperty
-	//	GetObservedProperty(string)
-	//
-	//	GetLocations() []Location
-	//	GetLocation(string) Location
-	//
-	//	GetDatastreams() []Datastream
-	//	GetDatastream(string) Datastream
-	//
-	//	GetSensors() []Sensor
-	//	GetSensor(string) Sensor
-	//
-	//	GetObservations() []Observation
-	//	GetObservation(string) Observation
-	//
-	//	GetFeatureOfInterests() []FeatureOfInterest
-	//	GetFeatureOfInterest(string) FeatureOfInterest
-	Get(EntityType, string, QueryOptions, EntityType, string) interface{}
+	Query(ResourcePath) (interface{}, error)
 	Init()
 	Shutdown()
 }
