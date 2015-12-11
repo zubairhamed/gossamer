@@ -1,0 +1,45 @@
+## Authentication
+=================
+
+X-API-KEY: your-key-here
+X-API-KEY-TYPE: SERVER / BROWSER / SENSOR
+
+## Query Parameters
+===================
+** GET /Things(id)?$expand=locations
+{
+    “@iot.selfLink”: “http://example.org/OGCSensorThings/v1.0/Things(27815)”,
+    “Datastreams@iot.navigationLink”: “../Things(27815)/Datastreams”,
+    “@iot.id”: 27815,
+    “Locations”: [
+    {
+        “@iot.selfLink”: “http://example.org/OGCSensorThings/v1.0/Locations(27817)”,
+        “@iot.id”: 27817,
+        “encodingType”: “application/vnd.geo+json”,
+        “description”: “my backyard”,
+        “location”: {
+            “coordinates”: [ -117.123, 54.123 ],
+            “type”: “Point”
+        }
+    }],
+    “description”: “camping lantern”,
+    “properties”: {
+        “property2”: “it glows in the dark”,
+        “property1”: “it’s waterproof”,
+        “property3”: “it repels insects”
+    },
+    “HistoricalLocations@iot.navigationLink”: “../Things(27815)/HistoricalLocations”
+}
+
+** GET /Things(id)?$select=properties
+{
+    “properties”: {
+        “property2”: “it glows in the dark”,
+        “property1”: “it’s waterproof”,
+        “property3”: “it repels insects”
+    }
+}
+
+## Basic Querying
+
+
