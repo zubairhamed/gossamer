@@ -1,6 +1,8 @@
 package gossamer
 
-import "time"
+import (
+	"time"
+)
 
 type EncodingType string
 
@@ -16,12 +18,12 @@ type SensorThingsEntity struct {
 	SelfLink string `json:"@iot.selfLink"`
 }
 
-func (s *SensorThingsEntity) GetId() string {
-	return s.Id
+func (e SensorThingsEntity) GetId() string {
+	return e.Id
 }
 
-func (s *SensorThingsEntity) GetSelfLink() string {
-	return s.SelfLink
+func (e SensorThingsEntity) GetSelfLink() string {
+	return e.SelfLink
 }
 
 type ThingEntity struct {
@@ -41,7 +43,11 @@ type ThingEntity struct {
 }
 
 func (e ThingEntity) GetType() EntityType {
-	return ENTITY_LOCATIONS
+	return ENTITY_THINGS
+}
+
+func (e ThingEntity) GetAssociatedId(ent EntityType) string {
+	return ""
 }
 
 type LocationEntity struct {
@@ -56,7 +62,11 @@ type LocationEntity struct {
 }
 
 func (e LocationEntity) GetType() EntityType {
-	return ENTITY_THINGS
+	return ENTITY_LOCATIONS
+}
+
+func (e LocationEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
 type HistoricalLocationEntity struct {
@@ -70,8 +80,12 @@ type HistoricalLocationEntity struct {
 	Locations []Location `json:",omitempty"`
 }
 
-func (e *HistoricalLocationEntity) GetType() EntityType {
+func (e HistoricalLocationEntity) GetType() EntityType {
 	return ENTITY_HISTORICALLOCATIONS
+}
+
+func (e HistoricalLocationEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
 type DatastreamEntity struct {
@@ -84,14 +98,28 @@ type DatastreamEntity struct {
 	ResultTime              time.Time `json:"resultTime"`
 	Description             string    `json:"description"`
 
+	// Associated Entity Ids
+	IdThing					string	  `json:"-" bson:"@iot_things_id"`
+	IdObservedProperty		string	  `json:"-" bson:"@iot_observedproperties_id"`
+	IdSensor				string	  `json:"-" bson:"@iot_sensors_id"`
+
 	ObservedProperty ObservedProperty `json:",omitempty"`
 	Sensor           Sensor           `json:",omitempty"`
 	Thing            Thing            `json:",omitempty"`
 	Observations     []Observation    `json:",omitempty"`
 }
 
-func (e *DatastreamEntity) GetType() EntityType {
+func (e DatastreamEntity) GetType() EntityType {
 	return ENTITY_DATASTREAMS
+}
+
+func (e DatastreamEntity) GetAssociatedEntityId(ent EntityType) string {
+	switch ent {
+	case ENTITY_SENSOR:
+		return e.IdSensor
+		break
+	}
+	return ""
 }
 
 type SensorEntity struct {
@@ -104,8 +132,12 @@ type SensorEntity struct {
 	Datastreams []Datastream `json:",omitempty"`
 }
 
-func (e *SensorEntity) GetType() EntityType {
+func (e SensorEntity) GetType() EntityType {
 	return ENTITY_SENSORS
+}
+
+func (e SensorEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
 type ObservedPropertyEntity struct {
@@ -118,8 +150,12 @@ type ObservedPropertyEntity struct {
 	Datastreams []Datastream `json:",omitempty"`
 }
 
-func (e *ObservedPropertyEntity) GetType() EntityType {
+func (e ObservedPropertyEntity) GetType() EntityType {
 	return ENTITY_OBSERVEDPROPERTIES
+}
+
+func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
 type ObservationEntity struct {
@@ -133,8 +169,12 @@ type ObservationEntity struct {
 	FeatureOfInterest FeatureOfInterest `json:",omitempty"`
 }
 
-func (e *ObservationEntity) GetType() EntityType {
+func (e ObservationEntity) GetType() EntityType {
 	return ENTITY_OBSERVATIONS
+}
+
+func (e ObservationEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
 type FeatureOfInterestEntity struct {
@@ -146,11 +186,10 @@ type FeatureOfInterestEntity struct {
 	Observations []Observation `json:",omitempty"`
 }
 
-func (e *FeatureOfInterestEntity) GetType() EntityType {
+func (e FeatureOfInterestEntity) GetType() EntityType {
 	return ENTITY_FEATURESOFINTERESTS
 }
 
-type ValueList struct {
-	Count int         `json:"count,omitempty"`
-	Value interface{} `json:"value"`
+func (e FeatureOfInterestEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }

@@ -40,56 +40,6 @@ func (m *MongoStore) cloneSession() *mgo.Session {
 
 func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, listResults bool) interface{} {
 	if listResults {
-		switch {
-		case ent == ENTITY_THINGS || ent == ENTITY_THING:
-			var r ThingEntity
-			query.One(&r)
-			m.postHandleThing(&r)
-			return r
-
-		case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
-			var r ObservedPropertyEntity
-			query.One(&r)
-			m.postHandleObservedProperty(&r)
-			return r
-
-		case ent == ENTITY_LOCATIONS || ent == ENTITY_LOCATION:
-			var r LocationEntity
-			query.One(&r)
-			m.postHandleLocation(&r)
-			return r
-
-		case ent == ENTITY_DATASTREAMS || ent == ENTITY_DATASTREAM:
-			var r DatastreamEntity
-			query.One(&r)
-			m.postHandleDatastream(&r)
-			return r
-
-		case ent == ENTITY_SENSORS || ent == ENTITY_SENSOR:
-			var r SensorEntity
-			query.One(&r)
-			m.postHandleSensor(&r)
-			return r
-
-		case ent == ENTITY_OBSERVATIONS || ent == ENTITY_OBSERVATION:
-			var r ObservationEntity
-			query.One(&r)
-			m.postHandleObservation(&r)
-			return r
-
-		case ent == ENTITY_FEATURESOFINTERESTS || ent == ENTITY_FEATURESOFINTEREST:
-			var r FeatureOfInterestEntity
-			query.One(&r)
-			m.postHandleFeatureOfInterest(&r)
-			return r
-
-		case ent == ENTITY_HISTORICALLOCATIONS || ent == ENTITY_HISTORICALLOCATION:
-			var r HistoricalLocationEntity
-			query.One(&r)
-			m.postHandleHistoricalLocation(&r)
-			return r
-		}
-	} else {
 		iter := query.Iter()
 		switch ent {
 		case ENTITY_THINGS:
@@ -164,6 +114,56 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, listResults bool)
 			}
 			return rs
 		}
+	} else {
+		switch {
+		case ent == ENTITY_THINGS || ent == ENTITY_THING:
+			var r ThingEntity
+			query.One(&r)
+			m.postHandleThing(&r)
+			return r
+
+		case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
+			var r ObservedPropertyEntity
+			query.One(&r)
+			m.postHandleObservedProperty(&r)
+			return r
+
+		case ent == ENTITY_LOCATIONS || ent == ENTITY_LOCATION:
+			var r LocationEntity
+			query.One(&r)
+			m.postHandleLocation(&r)
+			return r
+
+		case ent == ENTITY_DATASTREAMS || ent == ENTITY_DATASTREAM:
+			var r DatastreamEntity
+			query.One(&r)
+			m.postHandleDatastream(&r)
+			return r
+
+		case ent == ENTITY_SENSORS || ent == ENTITY_SENSOR:
+			var r SensorEntity
+			query.One(&r)
+			m.postHandleSensor(&r)
+			return r
+
+		case ent == ENTITY_OBSERVATIONS || ent == ENTITY_OBSERVATION:
+			var r ObservationEntity
+			query.One(&r)
+			m.postHandleObservation(&r)
+			return r
+
+		case ent == ENTITY_FEATURESOFINTERESTS || ent == ENTITY_FEATURESOFINTEREST:
+			var r FeatureOfInterestEntity
+			query.One(&r)
+			m.postHandleFeatureOfInterest(&r)
+			return r
+
+		case ent == ENTITY_HISTORICALLOCATIONS || ent == ENTITY_HISTORICALLOCATION:
+			var r HistoricalLocationEntity
+			query.One(&r)
+			m.postHandleHistoricalLocation(&r)
+			return r
+		}
 	}
 	return nil
 }
@@ -181,13 +181,19 @@ func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
 
 			c := session.DB("sensorthings").C(ResolveMongoCollectionName(currEntity))
 
+			last := rp.At(rp.CurrentIndex() - 1)
 			bsonMap := bson.M{}
 			if curr.GetId() != "" {
 				bsonMap["@iot_id"] = curr.GetId()
+			} else
+			if IsSingularEntity(string(currEntity)) {
+				assocId := results.(SensorThing).GetAssociatedEntityId(curr.GetEntity())
+				if assocId != "" {
+					bsonMap["@iot_id"] = assocId
+				}
 			}
 
-			last := rp.At(rp.CurrentIndex() - 1)
-			if last != nil && last.GetId() != "" {
+			if last != nil && last.GetId() != "" && !IsSingularEntity(string(currEntity)) {
 				lastEntity := last.GetEntity()
 				bsonMap["@iot_"+strings.ToLower(string(lastEntity))+"_id"] = last.GetId()
 			}
@@ -197,9 +203,9 @@ func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
 			resourceQueryComplete := make(chan bool)
 			go func() {
 				if curr.GetId() != "" || IsSingularEntity(string(currEntity)) {
-					results = m.doQuery(query, currEntity, true)
-				} else {
 					results = m.doQuery(query, currEntity, false)
+				} else {
+					results = m.doQuery(query, currEntity, true)
 				}
 				resourceQueryComplete <- true
 			}()

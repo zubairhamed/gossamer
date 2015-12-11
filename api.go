@@ -133,8 +133,8 @@ type Datastore interface {
 // Entities
 type SensorThing interface {
 	GetId() string
+	GetAssociatedEntityId(EntityType) string
 	GetSelfLink() string
-	GetNavigationLink() string
 	GetType() EntityType
 }
 
