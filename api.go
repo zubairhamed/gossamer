@@ -9,6 +9,12 @@ const (
 	COAP ProtocolType = 1
 )
 
+type ResourcePathItem interface {
+	GetEntity() EntityType
+	GetId() string
+	GetQueryOptions() QueryOptions
+}
+
 type EntityType string
 
 const (

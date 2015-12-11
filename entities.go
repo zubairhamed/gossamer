@@ -74,20 +74,6 @@ func (e *HistoricalLocationEntity) GetType() EntityType {
 	return ENTITY_HISTORICALLOCATIONS
 }
 
-/*
-{
-	"unitOfMeasurement": {
-		"name": "degree Celsius",
-		"symbol": "°C",
-		"definition": "http://unitsofmeasure.org/ucum.html#para-30"
-	},
-	"observationType": "http://www.opengis.net/def/observationType/OGC- OM/2.0/OM_Measurement",
-	"observedArea": {
-		"type": "Polygon",
-		"coordinates": [[[100,0],[101,0],[101,1],[100,1],[100,0]]]
-	},
-}
-*/
 type DatastreamEntity struct {
 	SensorThingsEntity      `bson:",inline"`
 	NavLinkThing            string    `json:"Thing@iot.navigationLink"`
@@ -151,13 +137,6 @@ func (e *ObservationEntity) GetType() EntityType {
 	return ENTITY_OBSERVATIONS
 }
 
-/*
-{
-	"feature": {
-		"type": "Point",
-		"coordinates": [-114.06,51.05] }
-	}
-*/
 type FeatureOfInterestEntity struct {
 	SensorThingsEntity  `bson:",inline"`
 	NavLinkObservations string       `json:"Observations@iot.navigationLink"`
@@ -175,53 +154,3 @@ type ValueList struct {
 	Count int         `json:"count,omitempty"`
 	Value interface{} `json:"value"`
 }
-
-/*
-{
-       "type": "FeatureCollection",
-       "features": [{
-           "type": "Feature",
-           "geometry": {
-               "type": "Point",
-               "coordinates": [102.0, 0.5]
-           },
-           "properties": {
-               "prop0": "value0"
-           }
-       }, {
-           "type": "Feature",
-           "geometry": {
-               "type": "LineString",
-               "coordinates": [
-                   [102.0, 0.0],
-                   [103.0, 1.0],
-                   [104.0, 0.0],
-                   [105.0, 1.0]
-               ]
-           },
-           "properties": {
-               "prop0": "value0",
-               "prop1": 0.0
-           }
-       }, {
-           "type": "Feature",
-           "geometry": {
-               "type": "Polygon",
-               "coordinates": [
-                   [
-                       [100.0, 0.0],
-                       [101.0, 0.0],
-                       [101.0, 1.0],
-                       [100.0, 1.0],
-                       [100.0, 0.0]
-                   ]
-               ]
-           },
-           "properties": {
-               "prop0": "value0",
-               "prop1": {
-                   "this": "that"
-               }
-           }
-       }]
-   } */

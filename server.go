@@ -1,27 +1,29 @@
 package gossamer
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
 func NewServer() Server {
-	return &DefaultServer{}
+	return &GossamerServer{}
 }
 
-type DefaultServer struct {
-	dataStore      Datastore
+type GossamerServer struct {
+	dataStore Datastore
 }
 
-func (s *DefaultServer) handleNotImplemented(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) handleNotImplemented(c web.C, w http.ResponseWriter, r *http.Request) {
 	log.Println("Not implemented")
 }
 
-func (s *DefaultServer) UseStore(ds Datastore) {
+func (s *GossamerServer) UseStore(ds Datastore) {
 	s.dataStore = ds
 }
 
@@ -117,7 +119,7 @@ func IsSingularEntity(e string) bool {
 
 var ERR_INVALID_ENTITY = errors.New("Invalid Entity")
 
-func (s *DefaultServer) Start() {
+func (s *GossamerServer) Start() {
 	goji.Get("/v1.0", s.handleRootResource)
 	goji.Get("/v1.0/", s.handleRootResource)
 
@@ -131,6 +133,80 @@ func (s *DefaultServer) Start() {
 	goji.Serve()
 }
 
-func (s *DefaultServer) Stop() {
+func (s *GossamerServer) Stop() {
 	log.Println("Stopped Server")
+}
+
+func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *http.Request) {
+	data := []ResourceUrlType{
+		{"Things", ResolveSelfLinkUrl("", ENTITY_THINGS)},
+		{"Locations", ResolveSelfLinkUrl("", ENTITY_LOCATIONS)},
+		{"Datastreams", ResolveSelfLinkUrl("", ENTITY_DATASTREAMS)},
+		{"Sensors", ResolveSelfLinkUrl("", ENTITY_SENSORS)},
+		{"Observations", ResolveSelfLinkUrl("", ENTITY_OBSERVATIONS)},
+		{"ObservedProperties", ResolveSelfLinkUrl("", ENTITY_OBSERVEDPROPERTIES)},
+		{"FeaturesOfInterest", ResolveSelfLinkUrl("", ENTITY_FEATURESOFINTEREST)},
+	}
+
+	v := &ValueList{
+		Value: data,
+	}
+
+	out, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		log.Println(err)
+	}
+	w.Write(out)
+}
+
+func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
+	req, err := CreateRequest(r.URL)
+	if err != nil {
+		log.Println(err)
+	}
+
+	rp := req.GetResourcePath()
+
+	result, err := s.dataStore.Query(rp)
+	if err != nil {
+
+	}
+
+	var jsonOut interface{}
+	if reflect.TypeOf(result).Kind() == reflect.Slice {
+		// Check for $count and include
+
+		jsonOut = &ValueList{
+			Value: result,
+		}
+	} else {
+		jsonOut = result
+	}
+
+	b, err := json.MarshalIndent(jsonOut, "", "  ")
+	if err != nil {
+		log.Println("Error converting to JSON")
+	}
+
+	_, err = w.Write(b)
+	if err != nil {
+		log.Println(err)
+	}
+	// http.Error(w, err.Error(), http.StatusBadRequest)
+}
+
+func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (s *GossamerServer) handlePut(c web.C, w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (s *GossamerServer) handleDelete(c web.C, w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (s *GossamerServer) handlePatch(c web.C, w http.ResponseWriter, r *http.Request) {
+
 }
