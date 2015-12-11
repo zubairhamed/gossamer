@@ -67,8 +67,6 @@ func (s *DefaultServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		log.Println(err)
 	}
-
-	w.Write(b)
 	// http.Error(w, err.Error(), http.StatusBadRequest)
 }
 

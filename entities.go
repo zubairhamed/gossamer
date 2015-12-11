@@ -30,7 +30,7 @@ type ThingEntity struct {
 	NavLinkDatastreams         string            `json:"Datastreams@iot.navigationLink"`
 	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink"`
 	Description                string            `json:"description"`
-	Properties                 map[string]string `json:"properties"`
+	Properties                 map[string]string `json:"properties,omitempty"`
 	LocationsId                []string          `json:"-"`
 	HistoricalLocationsId      []string          `json:"-"`
 	DatastreamsId              []string          `json:"-"`
