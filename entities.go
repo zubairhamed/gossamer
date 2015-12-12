@@ -46,7 +46,7 @@ func (e ThingEntity) GetType() EntityType {
 	return ENTITY_THINGS
 }
 
-func (e ThingEntity) GetAssociatedId(ent EntityType) string {
+func (e ThingEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
