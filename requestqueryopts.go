@@ -207,14 +207,12 @@ func (o *GossamerOrderByOption) GetSortProperties() []string {
 }
 
 type GossamerOrderByOptionValue struct {
-	s 	string
+	s string
 }
 
 func (o GossamerOrderByOptionValue) GetSortProperty() string {
 	return o.s
 }
-
-
 
 type GossamerTopOption struct {
 	value int

@@ -215,6 +215,7 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 	query = c.Find(bsonMap)
 
 	// Filter
+
 	// Count
 
 	// OrderBy
@@ -226,10 +227,16 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 	// Skip
 
 	// Top
+	if opts.TopSet() {
+		top := opts.GetTopOption().GetValue()
+		query.Limit(top)
+	}
 
 	// Expand
 
 	// Select
+	// Return Specified Fields Only
+	// db.inventory.find( { type: 'food' }, { item: 1, qty: 1, _id:0 } )
 
 	return
 }
