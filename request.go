@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func CreateRequest(url *url.URL, t ProtocolType) (Request, error) {
+func CreateIncomingRequest(url *url.URL, t ProtocolType) (Request, error) {
 	rp := &SensorThingsResourcePath{
 		currIndex: -1,
 		items:     []ResourcePathItem{},

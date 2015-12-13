@@ -59,7 +59,7 @@ func TestParseRequestUrl(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, reqUrl)
 
-		req, err := CreateRequest(reqUrl)
+		req, err := CreateIncomingRequest(reqUrl, HTTP)
 		assert.Nil(t, err, "Error occured parsing URL: "+c.in)
 		assert.NotNil(t, req)
 	}
@@ -68,7 +68,7 @@ func TestParseRequestUrl(t *testing.T) {
 	var req Request
 
 	reqUrl, _ = url.Parse("http://example.org/v1.0/ObservedProperties")
-	req, _ = CreateRequest(reqUrl)
+	req, _ = CreateIncomingRequest(reqUrl, HTTP)
 	assert.NotNil(t, req)
 
 	assert.NotNil(t, req.GetResourcePath())
@@ -77,7 +77,7 @@ func TestParseRequestUrl(t *testing.T) {
 	assert.Empty(t, req.GetResourcePath().First().GetId())
 
 	reqUrl, _ = url.Parse("http://example.org/v1.0/Things(1)")
-	req, _ = CreateRequest(reqUrl)
+	req, _ = CreateIncomingRequest(reqUrl, HTTP)
 	assert.NotNil(t, req)
 	assert.NotNil(t, req.GetResourcePath())
 	assert.Equal(t, 1, len(req.GetResourcePath().All()))
@@ -85,7 +85,7 @@ func TestParseRequestUrl(t *testing.T) {
 	assert.Equal(t, "1", req.GetResourcePath().First().GetId())
 
 	reqUrl, _ = url.Parse("http://example.org/v1.0/Things?$expand=Datastreams")
-	req, _ = CreateRequest(reqUrl)
+	req, _ = CreateIncomingRequest(reqUrl, HTTP)
 	assert.NotNil(t, req)
 	assert.NotNil(t, req.GetResourcePath())
 	assert.Equal(t, 1, len(req.GetResourcePath().All()))
@@ -93,7 +93,7 @@ func TestParseRequestUrl(t *testing.T) {
 	assert.Empty(t, req.GetResourcePath().First().GetId())
 
 	reqUrl, _ = url.Parse("http://example.org/v1.0/Things(1)/Observations")
-	req, _ = CreateRequest(reqUrl)
+	req, _ = CreateIncomingRequest(reqUrl, HTTP)
 	assert.NotNil(t, req)
 	assert.NotNil(t, req.GetResourcePath())
 	assert.Equal(t, 2, len(req.GetResourcePath().All()))

@@ -161,7 +161,7 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 }
 
 func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
-	req, err := CreateRequest(r.URL, HTTP)
+	req, err := CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
 		log.Println(err)
 	}
