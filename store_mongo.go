@@ -7,9 +7,10 @@ import (
 	"strings"
 )
 
-func NewMongoStore(hosts string) *MongoStore {
+func NewMongoStore(hosts string, db string) *MongoStore {
 	ms := &MongoStore{
 		hosts: hosts,
+		db:    db,
 	}
 	ms.Init()
 
@@ -18,6 +19,7 @@ func NewMongoStore(hosts string) *MongoStore {
 
 type MongoStore struct {
 	session *mgo.Session
+	db      string
 	hosts   string
 }
 
@@ -168,7 +170,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 	return nil
 }
 
-func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult interface{}) (query *mgo.Query, findMultiple bool) {
+func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryOptions, lastResult interface{}) (query *mgo.Query, findMultiple bool) {
 	last := rp.At(rp.CurrentIndex() - 1)
 	curr := rp.At(rp.CurrentIndex())
 	currEntity := curr.GetEntity()
@@ -188,7 +190,7 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 
 			switch {
 			case lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_THINGS,
-				 lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_HISTORICALLOCATIONS:
+				lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_HISTORICALLOCATIONS:
 
 				bsonMap["@iot_locations_id"] = map[string]interface{}{
 					"$in": []string{last.GetId()},
@@ -200,7 +202,6 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 				}
 
 			case lastEntity == ENTITY_THINGS && currEntity == ENTITY_LOCATIONS:
-				log.Println("Case D")
 				bsonMap["@iot_id"] = map[string]interface{}{
 					"$in": lastResult.(ThingEntity).IdLocations,
 				}
@@ -210,12 +211,30 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 			}
 		}
 	}
+
 	query = c.Find(bsonMap)
+
+	// Filter
+	// Count
+
+	// OrderBy
+	if opts.OrderBySet() {
+		opt := opts.GetOrderByOption()
+		query.Sort(strings.Replace(strings.Join(opt.GetSortProperties(), ","), "@iot.", "@iot_", -1))
+	}
+
+	// Skip
+
+	// Top
+
+	// Expand
+
+	// Select
 
 	return
 }
 
-func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
+func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, error) {
 	queryComplete := make(chan bool)
 	var results interface{}
 	go func() {
@@ -226,8 +245,8 @@ func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
 			curr := rp.Next()
 			currEntity := curr.GetEntity()
 
-			c := session.DB("sensorthings").C(ResolveMongoCollectionName(currEntity))
-			query, findMultiple := m.createQuery(c, rp, results)
+			c := session.DB(m.db).C(ResolveMongoCollectionName(currEntity))
+			query, findMultiple := m.createQuery(c, rp, opts, results)
 
 			resourceQueryComplete := make(chan bool)
 			go func() {

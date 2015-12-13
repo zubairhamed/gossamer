@@ -7,7 +7,7 @@ import (
 func main() {
 	server := gossamer.NewServer()
 
-	server.UseStore(gossamer.NewMongoStore("localhost"))
+	server.UseStore(gossamer.NewMongoStore("localhost", "sensorthings"))
 
 	server.Start()
 }

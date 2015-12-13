@@ -161,14 +161,14 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 }
 
 func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
-	req, err := CreateRequest(r.URL)
+	req, err := CreateRequest(r.URL, HTTP)
 	if err != nil {
 		log.Println(err)
 	}
 
 	rp := req.GetResourcePath()
 
-	result, err := s.dataStore.Query(rp)
+	result, err := s.dataStore.Query(rp, req.GetQueryOptions())
 	if err != nil {
 
 	}

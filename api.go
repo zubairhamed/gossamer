@@ -9,6 +9,24 @@ const (
 	COAP ProtocolType = 1
 )
 
+type ResourcePath interface {
+	Next() ResourcePathItem
+	Prev() ResourcePathItem
+	Current() ResourcePathItem
+	First() ResourcePathItem
+	Last() ResourcePathItem
+	All() []ResourcePathItem
+
+	IsLast() bool
+	IsFirst() bool
+	HasNext() bool
+
+	CurrentIndex() int
+	Size() int
+	Add(ResourcePathItem)
+	At(int) ResourcePathItem
+}
+
 type ResourcePathItem interface {
 	GetEntity() EntityType
 	GetId() string
@@ -50,6 +68,7 @@ const (
 	QUERYOPT_UNKNOWN QueryOptionType = "UNKNOWN"
 )
 
+// Determines a list of Query Options that has been set for a request
 type QueryOptions interface {
 	ExpandSet() bool
 	SelectSet() bool
@@ -68,27 +87,37 @@ type QueryOptions interface {
 	GetFilterOption() FilterOption
 }
 
+// Query Option
 type QueryOption interface {
 	GetType() QueryOptionType
 }
 
+// The $expand system query option indicates the related entities to be represented inline. The value of the $expand
+// query option must be a comma separated list of navigation property names. Additionally each navigation property
+// can be followed by a forward slash and another navigation property to enable identifying a multi-level relationship.
 type ExpandOption interface {
 	QueryOption
 	GetValue() []string
 }
 
+// The $select system query option requests that the service to return only the properties explicitly requested by
+// the client. The value of a $select query option is a comma-separated list of selection clauses. Each selection
+// clause may be a property name (including navigation property names). The service returns the specified content, if available, along with any available expanded navigation properties.
 type SelectOption interface {
 	QueryOption
 	GetValue() []string
 }
 
+// The $orderby system query option specifies the order in which items are returned from the service.
 type OrderByOption interface {
 	QueryOption
 	GetValue() []OrderByOptionValue
+	GetSortProperties() []string
 }
 
 // asc, desc
 type OrderByOptionValue interface {
+	GetSortProperty() string
 }
 
 type TopOption interface {
@@ -123,9 +152,7 @@ type Request interface {
 }
 
 type Datastore interface {
-	// Get(EntityType, string, QueryOptions, EntityType, string) interface{}
-
-	Query(ResourcePath) (interface{}, error)
+	Query(ResourcePath, QueryOptions) (interface{}, error)
 	Init()
 	Shutdown()
 }
@@ -183,6 +210,8 @@ type Location interface {
 // Thing with their time.
 type HistoricalLocation interface {
 	SensorThing
+
+	// The time when the Thing is known at the Location.
 	GetTime() time.Time
 
 	GetLocations() []Location

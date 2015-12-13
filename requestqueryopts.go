@@ -18,25 +18,25 @@ func IsQueryOption(s string) bool {
 
 func DiscoverQueryOptionType(s string) QueryOptionType {
 	switch {
-	case strings.HasPrefix(s, "$expand"):
+	case strings.HasPrefix(s, string(QUERYOPT_EXPAND)):
 		return QUERYOPT_EXPAND
 
-	case strings.HasPrefix(s, "$select"):
+	case strings.HasPrefix(s, string(QUERYOPT_SELECT)):
 		return QUERYOPT_SELECT
 
-	case strings.HasPrefix(s, "$orderby"):
+	case strings.HasPrefix(s, string(QUERYOPT_ORDERBY)):
 		return QUERYOPT_ORDERBY
 
-	case strings.HasPrefix(s, "$top"):
+	case strings.HasPrefix(s, string(QUERYOPT_TOP)):
 		return QUERYOPT_TOP
 
-	case strings.HasPrefix(s, "$skip"):
+	case strings.HasPrefix(s, string(QUERYOPT_SKIP)):
 		return QUERYOPT_SKIP
 
-	case strings.HasPrefix(s, "$count"):
+	case strings.HasPrefix(s, string(QUERYOPT_COUNT)):
 		return QUERYOPT_COUNT
 
-	case strings.HasPrefix(s, "$filter"):
+	case strings.HasPrefix(s, string(QUERYOPT_FILTER)):
 		return QUERYOPT_FILTER
 
 	default:
@@ -140,7 +140,18 @@ func CreateSkipOption(s string) (SkipOption, error) {
 }
 
 func CreateOrderByOption(s string) (OrderByOption, error) {
-	return &GossamerOrderByOption{}, nil
+	vals := strings.Split(s, ",")
+	orderByVals := []OrderByOptionValue{}
+
+	for _, v := range vals {
+		orderByVals = append(orderByVals, GossamerOrderByOptionValue{
+			s: v,
+		})
+	}
+
+	return &GossamerOrderByOption{
+		values: orderByVals,
+	}, nil
 }
 
 func CreateSelectOption(s string) (SelectOption, error) {
@@ -187,8 +198,23 @@ func (o *GossamerOrderByOption) GetValue() []OrderByOptionValue {
 	return o.values
 }
 
-type GossamerOrderByOptionValue struct {
+func (o *GossamerOrderByOption) GetSortProperties() []string {
+	vals := []string{}
+	for _, v := range o.values {
+		vals = append(vals, v.GetSortProperty())
+	}
+	return vals
 }
+
+type GossamerOrderByOptionValue struct {
+	s 	string
+}
+
+func (o GossamerOrderByOptionValue) GetSortProperty() string {
+	return o.s
+}
+
+
 
 type GossamerTopOption struct {
 	value int
