@@ -4,15 +4,6 @@ import (
 	"time"
 )
 
-type EncodingType string
-
-const (
-	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
-	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
-)
-
-type ObservationType string
-
 type SensorThingsEntity struct {
 	Id       string `json:"@iot.id,omitempty" bson:"@iot_id"`
 	SelfLink string `json:"@iot.selfLink,omitempty"`
@@ -26,6 +17,9 @@ func (e SensorThingsEntity) GetSelfLink() string {
 	return e.SelfLink
 }
 
+// The OGC SensorThings API follows the ITU-T definition, i.e., with regard to the Internet of Things,
+// a thing is an object of the physical world (physical things) or the information world (virtual things)
+// that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
 type ThingEntity struct {
 	SensorThingsEntity         `bson:",inline"`
 	NavLinkLocations           string               `json:"Locations@iot.navigationLink,omitempty"`
@@ -47,6 +41,14 @@ func (e ThingEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// The Location entity locates the Thing or the Things it associated with. A Thing’s Location entity is
+// defined as the last known location of the Thing.
+// A Thing’s Location may be identical to the Thing’s Observations’ FeatureOfInterest. In the context of the IoT,
+// the principle location of interest is usually associated with the location of the Thing, especially for in-situ
+// sensing applications. For example, the location of interest of a wifi-connected thermostat should be the building
+// or the room in which the smart thermostat is located. And the FeatureOfInterest of the Observations made by the
+// thermostat (e.g., room temperature readings) should also be the building or the room. In this case, the content
+// of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type LocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
 	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink,omitempty"`
@@ -65,6 +67,8 @@ func (e LocationEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// A Thing’s HistoricalLocation entity set provides the current (i.e., last known) and previous locations of the
+// Thing with their time.
 type HistoricalLocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
 	NavLinkHistoricalLocations string `json:"HistoricalLocations@iot.navigationLink,omitempty"`
@@ -85,6 +89,8 @@ func (e HistoricalLocationEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// A Datastream groups a collection of Observations and the Observations in a Datastream measure the
+// same ObservedProperty and are produced by the same Sensor.
 type DatastreamEntity struct {
 	SensorThingsEntity      `bson:",inline"`
 	NavLinkThing            string    `json:"Thing@iot.navigationLink,omitempty"`
@@ -117,6 +123,8 @@ func (e DatastreamEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// A Sensor is an instrument that observes a property or phenomenon with the goal of producing an estimate of the
+// value of the property.
 type SensorEntity struct {
 	SensorThingsEntity `bson:",inline"`
 	NavLinkDatastreams string       `json:"Datastreams@iot.navigationLink,omitempty"`
@@ -133,6 +141,7 @@ func (e SensorEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// An ObservedProperty specifies the phenomenon of an Observation.
 type ObservedPropertyEntity struct {
 	SensorThingsEntity `bson:",inline"`
 	NavLinkDatastreams string `json:"Datastreams@iot.navigationLink,omitempty"`
@@ -149,6 +158,7 @@ func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// An Observation is act of measuring or otherwise determining the value of a property
 type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
 	NavLinkFeatureOfInterest string    `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
@@ -167,6 +177,12 @@ func (e ObservationEntity) GetAssociatedEntityId(ent EntityType) string {
 	return ""
 }
 
+// An Observation results in a value being assigned to a phenomenon. The phenomenon is a property of a feature, the
+// latter being the FeatureOfInterest of the Observation [OGC and ISO 19156:2001]. In the context of the Internet of
+// Things, many Observations’ FeatureOfInterest can be the Location of the Thing. For example, the FeatureOfInterest
+// of a wifi-connect thermostat can be the Location of the thermostat (i.e., the living room where the thermostat is
+// located in). In the case of remote sensing, the FeatureOfInterest can be the geographical area or volume that is
+// being sensed.
 type FeatureOfInterestEntity struct {
 	SensorThingsEntity  `bson:",inline"`
 	NavLinkObservations string       `json:"Observations@iot.navigationLink,omitempty"`

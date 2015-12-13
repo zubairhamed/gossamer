@@ -2,6 +2,15 @@ package gossamer
 
 import "time"
 
+type EncodingType string
+
+const (
+	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
+	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
+)
+
+type ObservationType string
+
 type ProtocolType int
 
 const (
@@ -267,6 +276,8 @@ const (
 	SENSOR_ENCTYPE_SENSORML SensorEncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
 )
 
+// A Sensor is an instrument that observes a property or phenomenon with the goal of producing an estimate of the
+// value of the property.
 type Sensor interface {
 	SensorThing
 	GetDescription() string
@@ -276,6 +287,7 @@ type Sensor interface {
 	GetDatastreams() []Datastream
 }
 
+// An ObservedProperty specifies the phenomenon of an Observation.
 type ObservedProperty interface {
 	SensorThing
 
@@ -286,6 +298,7 @@ type ObservedProperty interface {
 	GetDatastreams() []Datastream
 }
 
+// An Observation is act of measuring or otherwise determining the value of a property
 type Observation interface {
 	SensorThing
 
@@ -311,6 +324,12 @@ type Observation interface {
 	GetDatastream() Datastream
 }
 
+// An Observation results in a value being assigned to a phenomenon. The phenomenon is a property of a feature, the
+// latter being the FeatureOfInterest of the Observation [OGC and ISO 19156:2001]. In the context of the Internet of
+// Things, many Observations’ FeatureOfInterest can be the Location of the Thing. For example, the FeatureOfInterest
+// of a wifi-connect thermostat can be the Location of the thermostat (i.e., the living room where the thermostat is
+// located in). In the case of remote sensing, the FeatureOfInterest can be the geographical area or volume that is
+// being sensed.
 type FeatureOfInterest interface {
 	SensorThing
 
