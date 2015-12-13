@@ -18,24 +18,6 @@ func (n *SensorThingsResourcePathItem) GetId() string {
 	return n.entityId
 }
 
-type ResourcePath interface {
-	Next() ResourcePathItem
-	Prev() ResourcePathItem
-	Current() ResourcePathItem
-	First() ResourcePathItem
-	Last() ResourcePathItem
-	All() []ResourcePathItem
-
-	IsLast() bool
-	IsFirst() bool
-	HasNext() bool
-
-	CurrentIndex() int
-	Size() int
-	Add(ResourcePathItem)
-	At(int) ResourcePathItem
-}
-
 type SensorThingsResourcePath struct {
 	currIndex     int
 	items         []ResourcePathItem

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func CreateRequest(url *url.URL) (Request, error) {
+func CreateRequest(url *url.URL, t ProtocolType) (Request, error) {
 	rp := &SensorThingsResourcePath{
 		currIndex: -1,
 		items:     []ResourcePathItem{},
@@ -53,6 +53,7 @@ func CreateRequest(url *url.URL) (Request, error) {
 
 	queryOpts, _ := CreateQueryOptions(url.RawQuery)
 	req := &GossamerRequest{
+		protocol:     t,
 		resourcePath: rp,
 		queryOptions: queryOpts,
 	}
@@ -60,12 +61,18 @@ func CreateRequest(url *url.URL) (Request, error) {
 }
 
 type GossamerRequest struct {
+	protocol     ProtocolType
 	resourcePath ResourcePath
 	queryOptions QueryOptions
 }
 
-func (r *GossamerRequest) GetProtocol() ProtocolType     { return 0 }
-func (r *GossamerRequest) GetQueryOptions() QueryOptions { return nil }
+func (r *GossamerRequest) GetProtocol() ProtocolType {
+	return r.protocol
+}
+
+func (r *GossamerRequest) GetQueryOptions() QueryOptions {
+	return r.queryOptions
+}
 
 func (r *GossamerRequest) GetResourcePath() ResourcePath {
 	return r.resourcePath
