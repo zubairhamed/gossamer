@@ -28,18 +28,15 @@ func (e SensorThingsEntity) GetSelfLink() string {
 
 type ThingEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkLocations           string            `json:"Locations@iot.navigationLink"`
-	NavLinkDatastreams         string            `json:"Datastreams@iot.navigationLink"`
-	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink"`
-	Description                string            `json:"description"`
-	Properties                 map[string]string `json:"properties,omitempty"`
-	LocationsId                []string          `json:"-"`
-	HistoricalLocationsId      []string          `json:"-"`
-	DatastreamsId              []string          `json:"-"`
-
-	Locations           []Location           `json:",omitempty"`
-	HistoricalLocations []HistoricalLocation `json:",omitempty"`
-	Datastreams         []Datastream         `json:",omitempty"`
+	NavLinkLocations           string               `json:"Locations@iot.navigationLink"`
+	NavLinkDatastreams         string               `json:"Datastreams@iot.navigationLink"`
+	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink"`
+	Description                string               `json:"description"`
+	Properties                 map[string]string    `json:"properties,omitempty"`
+	IdLocations                []string             `json:"-" bson:"@iot_locations_id"`
+	Locations                  []Location           `json:",omitempty"`
+	HistoricalLocations        []HistoricalLocation `json:",omitempty"`
+	Datastreams                []Datastream         `json:",omitempty"`
 }
 
 func (e ThingEntity) GetType() EntityType {
@@ -52,13 +49,12 @@ func (e ThingEntity) GetAssociatedEntityId(ent EntityType) string {
 
 type LocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkHistoricalLocations string       `json:"HistoricalLocations@iot.navigationLink"`
-	NavLinkThings              string       `json:"Things@iot.navigationLink"`
-	Description                string       `json:"description"`
-	EncodingType               EncodingType `bson:"encodingType" json:"encodingType"`
-
-	Things              []Thing              `json:",omitempty"`
-	HistoricalLocations []HistoricalLocation `json:",omitempty"`
+	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink"`
+	NavLinkThings              string               `json:"Things@iot.navigationLink"`
+	Description                string               `json:"description"`
+	EncodingType               EncodingType         `bson:"encodingType" json:"encodingType"`
+	Things                     []Thing              `json:",omitempty"`
+	HistoricalLocations        []HistoricalLocation `json:",omitempty"`
 }
 
 func (e LocationEntity) GetType() EntityType {
@@ -74,10 +70,11 @@ type HistoricalLocationEntity struct {
 	NavLinkHistoricalLocations string `json:"HistoricalLocations@iot.navigationLink"`
 	NavLinkThing               string `json:"Thing@iot.navigationLink"`
 	Time                       time.Time
-	EncodingType               EncodingType `json:"encodingType"`
-
-	Thing     Thing      `json:",omitempty"`
-	Locations []Location `json:",omitempty"`
+	EncodingType               EncodingType `json:"encodingType,omitempty"`
+	IdThing                    string       `json:"-" bson:"@iot_things_id"`
+	IdLocations                []string     `json:"-" bson:"@iot_locations_id"`
+	Thing                      Thing        `json:",omitempty"`
+	Locations                  []Location   `json:",omitempty"`
 }
 
 func (e HistoricalLocationEntity) GetType() EntityType {
@@ -90,23 +87,20 @@ func (e HistoricalLocationEntity) GetAssociatedEntityId(ent EntityType) string {
 
 type DatastreamEntity struct {
 	SensorThingsEntity      `bson:",inline"`
-	NavLinkThing            string    `json:"Thing@iot.navigationLink"`
-	NavLinkSensor           string    `json:"Sensor@iot.navigationLink"`
-	NavLinkObservedProperty string    `json:"ObservedProperty@iot.navigationLink"`
-	NavLinkObservations     string    `json:"Observations@iot.navigationLink"`
-	PhenomenonTime          time.Time `json:"phenomenonTime"`
-	ResultTime              time.Time `json:"resultTime"`
-	Description             string    `json:"description"`
-
-	// Associated Entity Ids
-	IdThing					string	  `json:"-" bson:"@iot_things_id"`
-	IdObservedProperty		string	  `json:"-" bson:"@iot_observedproperties_id"`
-	IdSensor				string	  `json:"-" bson:"@iot_sensors_id"`
-
-	ObservedProperty ObservedProperty `json:",omitempty"`
-	Sensor           Sensor           `json:",omitempty"`
-	Thing            Thing            `json:",omitempty"`
-	Observations     []Observation    `json:",omitempty"`
+	NavLinkThing            string           `json:"Thing@iot.navigationLink"`
+	NavLinkSensor           string           `json:"Sensor@iot.navigationLink"`
+	NavLinkObservedProperty string           `json:"ObservedProperty@iot.navigationLink"`
+	NavLinkObservations     string           `json:"Observations@iot.navigationLink"`
+	PhenomenonTime          time.Time        `json:"phenomenonTime"`
+	ResultTime              time.Time        `json:"resultTime"`
+	Description             string           `json:"description"`
+	IdThing                 string           `json:"-" bson:"@iot_things_id"`
+	IdObservedProperty      string           `json:"-" bson:"@iot_observedproperties_id"`
+	IdSensor                string           `json:"-" bson:"@iot_sensors_id"`
+	ObservedProperty        ObservedProperty `json:",omitempty"`
+	Sensor                  Sensor           `json:",omitempty"`
+	Thing                   Thing            `json:",omitempty"`
+	Observations            []Observation    `json:",omitempty"`
 }
 
 func (e DatastreamEntity) GetType() EntityType {
@@ -114,10 +108,15 @@ func (e DatastreamEntity) GetType() EntityType {
 }
 
 func (e DatastreamEntity) GetAssociatedEntityId(ent EntityType) string {
-	switch ent {
-	case ENTITY_SENSOR:
+	switch {
+	case ent == ENTITY_SENSOR || ent == ENTITY_SENSORS:
 		return e.IdSensor
-		break
+
+	case ent == ENTITY_THING || ent == ENTITY_THINGS:
+		return e.IdThing
+
+	case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
+		return e.IdObservedProperty
 	}
 	return ""
 }
@@ -128,8 +127,7 @@ type SensorEntity struct {
 	Description        string       `json:"description"`
 	EncodingType       EncodingType `json:"encodingType"`
 	Metadata           string       `json:"metadata"`
-
-	Datastreams []Datastream `json:",omitempty"`
+	Datastreams        []Datastream `json:",omitempty"`
 }
 
 func (e SensorEntity) GetType() EntityType {
@@ -142,12 +140,11 @@ func (e SensorEntity) GetAssociatedEntityId(ent EntityType) string {
 
 type ObservedPropertyEntity struct {
 	SensorThingsEntity `bson:",inline"`
-	NavLinkDatastreams string `json:"Datastreams@iot.navigationLink"`
-	Description        string `json:"description"`
-	Name               string `json:"name"`
-	Definition         string `json:"definition"`
-
-	Datastreams []Datastream `json:",omitempty"`
+	NavLinkDatastreams string       `json:"Datastreams@iot.navigationLink"`
+	Description        string       `json:"description"`
+	Name               string       `json:"name"`
+	Definition         string       `json:"definition"`
+	Datastreams        []Datastream `json:",omitempty"`
 }
 
 func (e ObservedPropertyEntity) GetType() EntityType {
@@ -160,13 +157,14 @@ func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
 
 type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
-	NavLinkFeatureOfInterest string    `json:"FeatureOfInterest@iot.navigationLink"`
-	NavLinkDatastream        string    `json:"Datastream@iot.navigationLink"`
-	PhenomenonTime           time.Time `json:"phenomenonTime"`
-	ResultTime               time.Time `json:"resultTime"`
-
-	Datastream        Datastream        `json:",omitempty"`
-	FeatureOfInterest FeatureOfInterest `json:",omitempty"`
+	NavLinkFeatureOfInterest string            `json:"FeatureOfInterest@iot.navigationLink"`
+	NavLinkDatastream        string            `json:"Datastream@iot.navigationLink"`
+	PhenomenonTime           time.Time         `json:"phenomenonTime"`
+	ResultTime               time.Time         `json:"resultTime"`
+	IdDatastream             string            `json:"-" bson:"@iot_datastreams_id"`
+	IdFeatureOfInterest      string            `json:"-" bson:"@iot_featureofinterests_id"`
+	Datastream               Datastream        `json:",omitempty"`
+	FeatureOfInterest        FeatureOfInterest `json:",omitempty"`
 }
 
 func (e ObservationEntity) GetType() EntityType {
@@ -179,11 +177,10 @@ func (e ObservationEntity) GetAssociatedEntityId(ent EntityType) string {
 
 type FeatureOfInterestEntity struct {
 	SensorThingsEntity  `bson:",inline"`
-	NavLinkObservations string       `json:"Observations@iot.navigationLink"`
-	Description         string       `json:"description"`
-	EncodingType        EncodingType `json:"encodingType"`
-
-	Observations []Observation `json:",omitempty"`
+	NavLinkObservations string        `json:"Observations@iot.navigationLink"`
+	Description         string        `json:"description"`
+	EncodingType        EncodingType  `json:"encodingType"`
+	Observations        []Observation `json:",omitempty"`
 }
 
 func (e FeatureOfInterestEntity) GetType() EntityType {

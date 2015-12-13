@@ -178,8 +178,8 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 	if curr.GetId() != "" {
 		bsonMap["@iot_id"] = curr.GetId()
 		findMultiple = false
-	} else
-	if IsSingularEntity(string(currEntity)) {
+	} else if IsSingularEntity(string(currEntity)) {
+		log.Println("Is Singular")
 		bsonMap["@iot_id"] = lastResult.(SensorThing).GetAssociatedEntityId(currEntity)
 		findMultiple = false
 	} else {
@@ -216,6 +216,7 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 			log.Println("Uh oh..")
 		}
 	}
+	log.Println("bsonMap", bsonMap)
 	query = c.Find(bsonMap)
 
 	return
@@ -238,11 +239,6 @@ func (m *MongoStore) Query(rp ResourcePath) (interface{}, error) {
 			resourceQueryComplete := make(chan bool)
 			go func() {
 				results = m.doQuery(query, currEntity, findMultiple)
-//				if curr.GetId() != "" || IsSingularEntity(string(currEntity)) {
-//					results = m.doQuery(query, currEntity, false)
-//				} else {
-//					results = m.doQuery(query, currEntity, true)
-//				}
 				resourceQueryComplete <- true
 			}()
 			<-resourceQueryComplete

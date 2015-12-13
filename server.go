@@ -106,6 +106,7 @@ func IsEntity(e string) bool {
 
 func IsSingularEntity(e string) bool {
 	if (strings.HasPrefix(e, "Location") && !strings.HasPrefix(e, "Locations")) ||
+		(strings.HasPrefix(e, "Thing") && !strings.HasPrefix(e, "Things")) ||
 		(strings.HasPrefix(e, "HistoricalLocation") && !strings.HasPrefix(e, "HistoricalLocations")) ||
 		(strings.HasPrefix(e, "Datastream") && !strings.HasPrefix(e, "Datastreams")) ||
 		(strings.HasPrefix(e, "Sensor") && !strings.HasPrefix(e, "Sensors")) ||
