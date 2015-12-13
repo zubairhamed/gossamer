@@ -47,6 +47,10 @@ func DiscoverQueryOptionType(s string) QueryOptionType {
 func CreateQueryOptions(q string) (QueryOptions, error) {
 	opts := &GossamerQueryOption{}
 	if q == "" {
+		return opts, nil
+	}
+
+	if q == "" {
 		return opts, ERR_QUERYOPTION_BLANK
 	}
 	optsSplit := strings.Split(q, "&")
@@ -207,14 +211,12 @@ func (o *GossamerOrderByOption) GetSortProperties() []string {
 }
 
 type GossamerOrderByOptionValue struct {
-	s 	string
+	s string
 }
 
 func (o GossamerOrderByOptionValue) GetSortProperty() string {
 	return o.s
 }
-
-
 
 type GossamerTopOption struct {
 	value int

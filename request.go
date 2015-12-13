@@ -1,6 +1,7 @@
 package gossamer
 
 import (
+	"log"
 	"net/url"
 	"strings"
 )
@@ -51,7 +52,11 @@ func CreateRequest(url *url.URL, t ProtocolType) (Request, error) {
 
 	rp.items = items
 
-	queryOpts, _ := CreateQueryOptions(url.RawQuery)
+	queryOpts, err := CreateQueryOptions(url.RawQuery)
+	if err != nil {
+		log.Println("Error creating option: ", err)
+		return nil, err
+	}
 	req := &GossamerRequest{
 		protocol:     t,
 		resourcePath: rp,
