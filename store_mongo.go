@@ -179,7 +179,6 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 		bsonMap["@iot_id"] = curr.GetId()
 		findMultiple = false
 	} else if IsSingularEntity(string(currEntity)) {
-		log.Println("Is Singular")
 		bsonMap["@iot_id"] = lastResult.(SensorThing).GetAssociatedEntityId(currEntity)
 		findMultiple = false
 	} else {
@@ -188,35 +187,29 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, lastResult 
 			lastEntity := last.GetEntity()
 
 			switch {
-			case lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_THINGS:
-				// Locations(id)/Things
-				// MULTIPLE: { where iot_locations_id contains prev.id}
-				break
+			case lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_THINGS,
+				 lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_HISTORICALLOCATIONS:
 
-			case lastEntity == ENTITY_LOCATIONS && currEntity == ENTITY_HISTORICALLOCATIONS:
-				//				# Locations(id)/HistoricalLocations
-				//				MULTIPLE: { where iot_locations_id contains prev.id}
-				break
+				bsonMap["@iot_locations_id"] = map[string]interface{}{
+					"$in": []string{last.GetId()},
+				}
 
 			case lastEntity == ENTITY_HISTORICALLOCATIONS && currEntity == ENTITY_LOCATIONS:
-				// # HistoricalLocations(id)/Locations
-				// MULTIPLE: { where iot_id contains prev.id }
-				break
+				bsonMap["@iot_id"] = map[string]interface{}{
+					"$in": lastResult.(HistoricalLocationEntity).IdLocations,
+				}
 
 			case lastEntity == ENTITY_THINGS && currEntity == ENTITY_LOCATIONS:
-				// # Things(id)/Locations
-				// MULTIPLE: { where iot_id is in prev.iot_locations_id}
-				break
+				log.Println("Case D")
+				bsonMap["@iot_id"] = map[string]interface{}{
+					"$in": lastResult.(ThingEntity).IdLocations,
+				}
 
 			default:
 				bsonMap["@iot_"+strings.ToLower(string(lastEntity))+"_id"] = last.GetId()
-				break
 			}
-		} else {
-			log.Println("Uh oh..")
 		}
 	}
-	log.Println("bsonMap", bsonMap)
 	query = c.Find(bsonMap)
 
 	return
