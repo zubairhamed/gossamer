@@ -225,6 +225,10 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 	}
 
 	// Skip
+	if opts.SkipSet() {
+		skip := opts.GetSkipOption().GetValue()
+		query.Skip(skip)
+	}
 
 	// Top
 	if opts.TopSet() {
