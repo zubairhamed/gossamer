@@ -40,7 +40,7 @@ func (m *MongoStore) cloneSession() *mgo.Session {
 	return m.session.Clone()
 }
 
-func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool) interface{} {
+func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool, opts QueryOptions) interface{} {
 	if findMultiple {
 		iter := query.Iter()
 		switch ent {
@@ -48,7 +48,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []ThingEntity{}
 			var r ThingEntity
 			for iter.Next(&r) {
-				m.postHandleThing(&r)
+				m.postHandleThing(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -57,7 +57,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []ObservedPropertyEntity{}
 			var r ObservedPropertyEntity
 			for iter.Next(&r) {
-				m.postHandleObservedProperty(&r)
+				m.postHandleObservedProperty(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -66,7 +66,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []LocationEntity{}
 			var r LocationEntity
 			for iter.Next(&r) {
-				m.postHandleLocation(&r)
+				m.postHandleLocation(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -75,7 +75,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []DatastreamEntity{}
 			var r DatastreamEntity
 			for iter.Next(&r) {
-				m.postHandleDatastream(&r)
+				m.postHandleDatastream(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -84,7 +84,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []SensorEntity{}
 			var r SensorEntity
 			for iter.Next(&r) {
-				m.postHandleSensor(&r)
+				m.postHandleSensor(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -93,7 +93,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []ObservationEntity{}
 			var r ObservationEntity
 			for iter.Next(&r) {
-				m.postHandleObservation(&r)
+				m.postHandleObservation(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -102,7 +102,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []FeatureOfInterestEntity{}
 			var r FeatureOfInterestEntity
 			for iter.Next(&r) {
-				m.postHandleFeatureOfInterest(&r)
+				m.postHandleFeatureOfInterest(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -111,7 +111,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			rs := []HistoricalLocationEntity{}
 			var r HistoricalLocationEntity
 			for iter.Next(&r) {
-				m.postHandleHistoricalLocation(&r)
+				m.postHandleHistoricalLocation(&r, opts)
 				rs = append(rs, r)
 			}
 			return rs
@@ -121,49 +121,49 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 		case ent == ENTITY_THINGS || ent == ENTITY_THING:
 			var r ThingEntity
 			query.One(&r)
-			m.postHandleThing(&r)
+			m.postHandleThing(&r, opts)
 			return r
 
 		case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
 			var r ObservedPropertyEntity
 			query.One(&r)
-			m.postHandleObservedProperty(&r)
+			m.postHandleObservedProperty(&r, opts)
 			return r
 
 		case ent == ENTITY_LOCATIONS || ent == ENTITY_LOCATION:
 			var r LocationEntity
 			query.One(&r)
-			m.postHandleLocation(&r)
+			m.postHandleLocation(&r, opts)
 			return r
 
 		case ent == ENTITY_DATASTREAMS || ent == ENTITY_DATASTREAM:
 			var r DatastreamEntity
 			query.One(&r)
-			m.postHandleDatastream(&r)
+			m.postHandleDatastream(&r, opts)
 			return r
 
 		case ent == ENTITY_SENSORS || ent == ENTITY_SENSOR:
 			var r SensorEntity
 			query.One(&r)
-			m.postHandleSensor(&r)
+			m.postHandleSensor(&r, opts)
 			return r
 
 		case ent == ENTITY_OBSERVATIONS || ent == ENTITY_OBSERVATION:
 			var r ObservationEntity
 			query.One(&r)
-			m.postHandleObservation(&r)
+			m.postHandleObservation(&r, opts)
 			return r
 
 		case ent == ENTITY_FEATURESOFINTERESTS || ent == ENTITY_FEATURESOFINTEREST:
 			var r FeatureOfInterestEntity
 			query.One(&r)
-			m.postHandleFeatureOfInterest(&r)
+			m.postHandleFeatureOfInterest(&r, opts)
 			return r
 
 		case ent == ENTITY_HISTORICALLOCATIONS || ent == ENTITY_HISTORICALLOCATION:
 			var r HistoricalLocationEntity
 			query.One(&r)
-			m.postHandleHistoricalLocation(&r)
+			m.postHandleHistoricalLocation(&r, opts)
 			return r
 		}
 	}
@@ -216,8 +216,6 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 
 	// Filter
 
-	// Count
-
 	// OrderBy
 	if opts.OrderBySet() {
 		opt := opts.GetOrderByOption()
@@ -237,10 +235,22 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 	}
 
 	// Expand
+	if opts.ExpandSet() {
+		// vals := opts.GetExpandOption().GetValue()
+	}
 
 	// Select
-	// Return Specified Fields Only
-	// db.inventory.find( { type: 'food' }, { item: 1, qty: 1, _id:0 } )
+	if opts.SelectSet() {
+		opt := opts.GetSelectOption().GetValue()
+		selectBsonMap := bson.M{}
+
+		if len(opt) > 0 {
+			for _, v := range opt {
+				selectBsonMap[v] = 1
+			}
+			query.Select(selectBsonMap)
+		}
+	}
 
 	return
 }
@@ -261,7 +271,7 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 
 			resourceQueryComplete := make(chan bool)
 			go func() {
-				results = m.doQuery(query, currEntity, findMultiple)
+				results = m.doQuery(query, currEntity, findMultiple, opts)
 				resourceQueryComplete <- true
 			}()
 			<-resourceQueryComplete
@@ -276,60 +286,78 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 	return results, nil
 }
 
-func (m *MongoStore) postHandleThing(e *ThingEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_THINGS)
+func (m *MongoStore) postHandleThing(e *ThingEntity, opts QueryOptions) {
 
-	e.NavLinkLocations = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/Locations"
-	e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/HistoricalLocations"
-	e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/Datastreams"
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_THINGS)
+
+		e.NavLinkLocations = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/Locations"
+		e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/HistoricalLocations"
+		e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_THINGS) + "/Datastreams"
+	}
 }
 
-func (m *MongoStore) postHandleObservedProperty(e *ObservedPropertyEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVEDPROPERTIES)
+func (m *MongoStore) postHandleObservedProperty(e *ObservedPropertyEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVEDPROPERTIES)
 
-	e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_OBSERVEDPROPERTIES) + "/Datastreams"
+		e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_OBSERVEDPROPERTIES) + "/Datastreams"
+
+	}
 }
 
-func (m *MongoStore) postHandleLocation(e *LocationEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_LOCATIONS)
+func (m *MongoStore) postHandleLocation(e *LocationEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_LOCATIONS)
 
-	e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_LOCATIONS) + "/HistoricalLocations"
-	e.NavLinkThings = ResolveEntityLink(e.Id, ENTITY_LOCATIONS) + "/Things"
+		e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_LOCATIONS) + "/HistoricalLocations"
+		e.NavLinkThings = ResolveEntityLink(e.Id, ENTITY_LOCATIONS) + "/Things"
+	}
 }
 
-func (m *MongoStore) postHandleDatastream(e *DatastreamEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_DATASTREAMS)
+func (m *MongoStore) postHandleDatastream(e *DatastreamEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_DATASTREAMS)
 
-	e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Observations"
-	e.NavLinkObservedProperty = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/ObservedProperty"
-	e.NavLinkSensor = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Sensor"
-	e.NavLinkThing = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Thing"
+		e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Observations"
+		e.NavLinkObservedProperty = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/ObservedProperty"
+		e.NavLinkSensor = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Sensor"
+		e.NavLinkThing = ResolveEntityLink(e.Id, ENTITY_DATASTREAMS) + "/Thing"
+	}
 }
 
-func (m *MongoStore) postHandleSensor(e *SensorEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_SENSORS)
+func (m *MongoStore) postHandleSensor(e *SensorEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_SENSORS)
 
-	e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_SENSORS) + "/Datastreams"
+		e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_SENSORS) + "/Datastreams"
+	}
 }
 
-func (m *MongoStore) postHandleObservation(e *ObservationEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVATIONS)
+func (m *MongoStore) postHandleObservation(e *ObservationEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVATIONS)
 
-	e.NavLinkDatastream = ResolveEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/Datastream"
-	e.NavLinkFeatureOfInterest = ResolveEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/FeatureOfInterest"
+		e.NavLinkDatastream = ResolveEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/Datastream"
+		e.NavLinkFeatureOfInterest = ResolveEntityLink(e.Id, ENTITY_OBSERVATIONS) + "/FeatureOfInterest"
+	}
 }
 
-func (m *MongoStore) postHandleFeatureOfInterest(e *FeatureOfInterestEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTERESTS)
+func (m *MongoStore) postHandleFeatureOfInterest(e *FeatureOfInterestEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTERESTS)
 
-	e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTERESTS) + "/Observations"
+		e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTERESTS) + "/Observations"
+	}
 }
 
-func (m *MongoStore) postHandleHistoricalLocation(e *HistoricalLocationEntity) {
-	e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_HISTORICALLOCATIONS)
+func (m *MongoStore) postHandleHistoricalLocation(e *HistoricalLocationEntity, opts QueryOptions) {
+	if !opts.SelectSet() {
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_HISTORICALLOCATIONS)
 
-	e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/HistoricalLocations"
-	e.NavLinkThing = ResolveEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/Thing"
+		e.NavLinkHistoricalLocations = ResolveEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/HistoricalLocations"
+		e.NavLinkThing = ResolveEntityLink(e.Id, ENTITY_HISTORICALLOCATIONS) + "/Thing"
+	}
 }
 
 func ResolveMongoCollectionName(ent EntityType) string {

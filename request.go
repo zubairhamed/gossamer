@@ -1,9 +1,9 @@
 package gossamer
 
 import (
+	"log"
 	"net/url"
 	"strings"
-	"log"
 )
 
 func CreateRequest(url *url.URL, t ProtocolType) (Request, error) {
