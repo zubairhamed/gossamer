@@ -213,11 +213,24 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 	}
 
 	query = c.Find(bsonMap)
-	
+
+	// Filter
+	// Count
+
+	// OrderBy
 	if opts.OrderBySet() {
 		opt := opts.GetOrderByOption()
-		query.Sort(strings.Join(opt.GetSortProperties(), ","))
+		query.Sort(strings.Replace(strings.Join(opt.GetSortProperties(), ","), "@iot.", "@iot_", -1))
 	}
+
+	// Skip
+
+	// Top
+
+	// Expand
+
+	// Select
+
 	return
 }
 
