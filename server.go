@@ -175,9 +175,17 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 
 	var jsonOut interface{}
 	if reflect.TypeOf(result).Kind() == reflect.Slice {
+		count := reflect.ValueOf(result).Len()
+		if req.GetQueryOptions().CountSet() {
+			opt := req.GetQueryOptions().GetCountOption()
+			if !opt.GetValue() {
+				count = 0
+			}
+		}
 		// Check for $count and include
 
 		jsonOut = &ValueList{
+			Count: count,
 			Value: result,
 		}
 	} else {
