@@ -1,0 +1,13 @@
+## things
+{
+    "_id" : ObjectId("56664b3c35b46b805918e037"),
+    "@iot_id" : "fc8762ab-4570-420d-ab1c-b5dc627d6f6d",
+    "@iot_locations": [ "78ce8797-8b7b-404e-a0e9-b0f03f6828b6" ],
+    "@iot_historicallocations": [],
+    "@iot_datastreams": [],
+    "description" : "Thermostat",
+    "properties" : {
+        "make" : "Nest",
+        "model" : "XYZ"
+    }
+}

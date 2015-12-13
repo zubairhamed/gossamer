@@ -7,16 +7,7 @@ import (
 func main() {
 	server := gossamer.NewServer()
 
-	server.UseSensingProfile(&DefaultSensingProfileHandler{})
-	server.UseTaskingProfile(&DefaultTaskingProfileHandler{})
-
 	server.UseStore(gossamer.NewMongoStore("localhost"))
 
 	server.Start()
-}
-
-type DefaultSensingProfileHandler struct {
-}
-
-type DefaultTaskingProfileHandler struct {
 }

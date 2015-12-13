@@ -1,229 +1,192 @@
 package gossamer
 
-import "time"
+import (
+	"time"
+)
 
 type EncodingType string
 
 const (
 	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
 	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
-	ENCODINGTYPE_GEO      EncodingType = "application/vnd.geo+json"
 )
 
 type ObservationType string
 
 type SensorThingsEntity struct {
-	Id             string	`bson:"@iot_id"`
-	SelfLink       string
-	NavigationLink string
+	Id       string `bson:"@iot_id" json:"@iot.id"`
+	SelfLink string `json:"@iot.selfLink"`
 }
 
-func (s *SensorThingsEntity) GetId() string {
-	return s.Id
+func (e SensorThingsEntity) GetId() string {
+	return e.Id
 }
 
-func (s *SensorThingsEntity) GetSelfLink() string {
-	return s.SelfLink
+func (e SensorThingsEntity) GetSelfLink() string {
+	return e.SelfLink
 }
 
-func (s *SensorThingsEntity) GetNavigationLink() string {
-	return s.NavigationLink
-}
-
-/*
-{
-	"@iot.id": 1,
-	"@iot.selfLink": "http://example.org/v1.0/Things(1)",
-	"Locations@iot.navigationLink": "Things(1)/Locations",
-	"Datastreams@iot.navigationLink": "Things(1)/Datastreams",
-	"HistoricalLocations@iot.navigationLink": "Things(1)/HistoricalLocations",
-	"description": "This thing is an oven.",
-	"properties": {
-		"owner": "John Doe",
-		"color": "Silver"
-	}
-}
-*/
 type ThingEntity struct {
-	SensorThingsEntity	`bson:",inline"`
-	Description string
-	Properties  map[string]string
-	// location 			*Location
-	// historicalLocations	[]*HistoricalLocation
-	// datastreams			[]*Datastream
+	SensorThingsEntity         `bson:",inline"`
+	NavLinkLocations           string               `json:"Locations@iot.navigationLink"`
+	NavLinkDatastreams         string               `json:"Datastreams@iot.navigationLink"`
+	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink"`
+	Description                string               `json:"description"`
+	Properties                 map[string]string    `json:"properties,omitempty"`
+	IdLocations                []string             `json:"-" bson:"@iot_locations_id"`
+	Locations                  []Location           `json:",omitempty"`
+	HistoricalLocations        []HistoricalLocation `json:",omitempty"`
+	Datastreams                []Datastream         `json:",omitempty"`
 }
 
-func (e *LocationEntity) GetType() EntityType {
+func (e ThingEntity) GetType() EntityType {
 	return ENTITY_THINGS
 }
 
-/*
-{
-"@iot.id": 1,
-"@iot.selfLink": "http://example.org/v1.0/Locations(1)", "Things@iot.navigationLink": "Locations(1)/Things", "HistoricalLocations@iot.navigationLink": "Locations(1)/HistoricalLocations", "encodingType": "application/vnd.geo+json",
-"location": {
-"type": "Point",
-"coordinates": [-114.06,51.05] }
-}
-*/
-type LocationEntity struct {
-	SensorThingsEntity
-	description  string
-	encodingType EncodingType
-	// location 		??
-	// things 				[]*Thing
-	// HistoricalLocation	[]*HistoricalLocation
+func (e ThingEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
-func (e *ThingEntity) GetType() EntityType {
+type LocationEntity struct {
+	SensorThingsEntity         `bson:",inline"`
+	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink"`
+	NavLinkThings              string               `json:"Things@iot.navigationLink"`
+	Description                string               `json:"description"`
+	EncodingType               EncodingType         `bson:"encodingType" json:"encodingType"`
+	Things                     []Thing              `json:",omitempty"`
+	HistoricalLocations        []HistoricalLocation `json:",omitempty"`
+}
+
+func (e LocationEntity) GetType() EntityType {
 	return ENTITY_LOCATIONS
 }
 
-/*
-{
-	"@iot.id": 1,
-	"@iot.selfLink": "http://example.org/v1.0/Locations(1)",
-	 "Things@iot.navigationLink": "Locations(1)/Things",
-	 "HistoricalLocations@iot.navigationLink": "Locations(1)/HistoricalLocations",
-	 "encodingType": "application/vnd.geo+json",
-	"location": {
-		"type": "Point",
-		"coordinates": [-114.06,51.05]
-	}
-}
-*/
-type HistoricalLocationEntity struct {
-	SensorThingsEntity
-	time time.Time
-	// thing 		*Thing
-	// locations 	[]*Location
+func (e LocationEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
-func (e *HistoricalLocationEntity) GetType() EntityType {
+type HistoricalLocationEntity struct {
+	SensorThingsEntity         `bson:",inline"`
+	NavLinkHistoricalLocations string `json:"HistoricalLocations@iot.navigationLink"`
+	NavLinkThing               string `json:"Thing@iot.navigationLink"`
+	Time                       time.Time
+	EncodingType               EncodingType `json:"encodingType,omitempty"`
+	IdThing                    string       `json:"-" bson:"@iot_things_id"`
+	IdLocations                []string     `json:"-" bson:"@iot_locations_id"`
+	Thing                      Thing        `json:",omitempty"`
+	Locations                  []Location   `json:",omitempty"`
+}
+
+func (e HistoricalLocationEntity) GetType() EntityType {
 	return ENTITY_HISTORICALLOCATIONS
 }
 
-/*
-{
-	"@iot.id": 1,
-	"@iot.selfLink": "http://example.org/v1.0/Datastreams(1)",
-	"Thing@iot.navigationLink": "HistoricalLocations(1)/Thing",
-	"Sensor@iot.navigationLink": "Datastreams(1)/Sensor",
-	"ObservedProperty@iot.navigationLink": "Datastreams(1)/ObservedProperty",
-	"Observations@iot.navigationLink": "Datastreams(1)/Observations",
-	"description": "This is a datastream measuring the temperature in an oven.",
-	"unitOfMeasurement": {
-		"name": "degree Celsius",
-		"symbol": "°C",
-		"definition": "http://unitsofmeasure.org/ucum.html#para-30"
-	},
-	"observationType": "http://www.opengis.net/def/observationType/OGC- OM/2.0/OM_Measurement",
-	"observedArea": {
-		"type": "Polygon",
-		"coordinates": [[[100,0],[101,0],[101,1],[100,1],[100,0]]]
-	},
-	"phenomenonTime": "2014-03-01T13:00:00Z/2015-05-11T15:30:00Z",
-	"resultTime": "2014-03-01T13:00:00Z/2015-05-11T15:30:00Z"
-}
-*/
-
-type UCUM struct {
+func (e HistoricalLocationEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
 type DatastreamEntity struct {
-	SensorThingsEntity
-	description       string
-	unitOfMeasurement *UCUM
-	observationType   ObservationType
-	// observedArea		??
-	// phenomenonTime 	??
-	// resultTime 			??
-	// thing 	*Thing
-	// sensor 	?
-	// ObservedProperty
-	// Observation
+	SensorThingsEntity      `bson:",inline"`
+	NavLinkThing            string           `json:"Thing@iot.navigationLink"`
+	NavLinkSensor           string           `json:"Sensor@iot.navigationLink"`
+	NavLinkObservedProperty string           `json:"ObservedProperty@iot.navigationLink"`
+	NavLinkObservations     string           `json:"Observations@iot.navigationLink"`
+	PhenomenonTime          time.Time        `json:"phenomenonTime"`
+	ResultTime              time.Time        `json:"resultTime"`
+	Description             string           `json:"description"`
+	IdThing                 string           `json:"-" bson:"@iot_things_id"`
+	IdObservedProperty      string           `json:"-" bson:"@iot_observedproperties_id"`
+	IdSensor                string           `json:"-" bson:"@iot_sensors_id"`
+	ObservedProperty        ObservedProperty `json:",omitempty"`
+	Sensor                  Sensor           `json:",omitempty"`
+	Thing                   Thing            `json:",omitempty"`
+	Observations            []Observation    `json:",omitempty"`
 }
 
-func (e *DatastreamEntity) GetType() EntityType {
+func (e DatastreamEntity) GetType() EntityType {
 	return ENTITY_DATASTREAMS
 }
 
-/*
-{
-"@iot.id": 1,
-"@iot.selfLink": "http://example.org/v1.0/Sensors(1)", "Datastreams@iot.navigationLink": "Sensors(1)/Datastreams", "description": "TMP36 - Analog Temperature sensor", "encodingType": "application/pdf",
-"metadata": "http://example.org/TMP35_36_37.pdf"
-}
-*/
-type SensorEntity struct {
-	SensorThingsEntity
-	description  string
-	encodingType EncodingType
-	metadata     string
-	datastream   []*Datastream
+func (e DatastreamEntity) GetAssociatedEntityId(ent EntityType) string {
+	switch {
+	case ent == ENTITY_SENSOR || ent == ENTITY_SENSORS:
+		return e.IdSensor
+
+	case ent == ENTITY_THING || ent == ENTITY_THINGS:
+		return e.IdThing
+
+	case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
+		return e.IdObservedProperty
+	}
+	return ""
 }
 
-func (e *SensorEntity) GetType() EntityType {
+type SensorEntity struct {
+	SensorThingsEntity `bson:",inline"`
+	NavLinkDatastreams string       `json:"Datastreams@iot.navigationLink"`
+	Description        string       `json:"description"`
+	EncodingType       EncodingType `json:"encodingType"`
+	Metadata           string       `json:"metadata"`
+	Datastreams        []Datastream `json:",omitempty"`
+}
+
+func (e SensorEntity) GetType() EntityType {
 	return ENTITY_SENSORS
 }
 
-/*
-{
-	"@iot.id": 1,
-	"@iot.selfLink": "http://example.org/v1.0/ObservedProperties(1)",
-	"Datastreams@iot.navigationLink": "ObservedProperties(1)/Datastreams",
-	"description": "The dewpoint temperature is the temperature to which the air must be cooled, at constant pressure, for dew to form. As the grass and other objects near the ground cool to the dewpoint, some of the water vapor in the atmosphere condenses into liquid water on the objects.",
-	"name": "DewPoint Temperature",
-	"definition": "http://dbpedia.org/page/Dew_point"
-}
-*/
-type ObservedPropertyEntity struct {
-	SensorThingsEntity
-	name        string
-	definition  string
-	description string
-	// Datastream
+func (e SensorEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
-func (e *ObservedPropertyEntity) GetType() EntityType {
+type ObservedPropertyEntity struct {
+	SensorThingsEntity `bson:",inline"`
+	NavLinkDatastreams string       `json:"Datastreams@iot.navigationLink"`
+	Description        string       `json:"description"`
+	Name               string       `json:"name"`
+	Definition         string       `json:"definition"`
+	Datastreams        []Datastream `json:",omitempty"`
+}
+
+func (e ObservedPropertyEntity) GetType() EntityType {
 	return ENTITY_OBSERVEDPROPERTIES
 }
 
-/*
-{
-	"@iot.id": 1,
-	"@iot.selfLink": "http://example.org/v1.0/Observations(1)",
-	"FeatureOfInterest@iot.navigationLink": "Observations(1)/FeatureOfInterest",
-	"Datastream@iot.navigationLink":"Observations(1)/Datastream",
-	"phenomenonTime": "2014-12-31T11:59:59.00+08:00",
-	"resultTime": "2014-12-31T11:59:59.00+08:00",
-	"result": 70.4
-}￼￼￼
-*/
-type ObservationEntity struct {
-	SensorThingsEntity
+func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
-func (e *ObservationEntity) GetType() EntityType {
+type ObservationEntity struct {
+	SensorThingsEntity       `bson:",inline"`
+	NavLinkFeatureOfInterest string            `json:"FeatureOfInterest@iot.navigationLink"`
+	NavLinkDatastream        string            `json:"Datastream@iot.navigationLink"`
+	PhenomenonTime           time.Time         `json:"phenomenonTime"`
+	ResultTime               time.Time         `json:"resultTime"`
+	IdDatastream             string            `json:"-" bson:"@iot_datastreams_id"`
+	IdFeatureOfInterest      string            `json:"-" bson:"@iot_featureofinterests_id"`
+	Datastream               Datastream        `json:",omitempty"`
+	FeatureOfInterest        FeatureOfInterest `json:",omitempty"`
+}
+
+func (e ObservationEntity) GetType() EntityType {
 	return ENTITY_OBSERVATIONS
 }
 
-/*
-{
-	"@iot.id": 1,
-	"@iot.selfLink": "http://example.org/v1.0/FeaturesOfInterest(1)",
-	"Observations@iot.navigationLink": "FeaturesOfInterest(1)/Observations",
-	"description": "This is a weather station.",
-	"encodingType": "application/vnd.geo+json",
-	"feature": {
-		"type": "Point",
-		"coordinates": [-114.06,51.05] }
-	}
-*/
-type FeatureOfInterestEntity struct {
-	SensorThingsEntity
+func (e ObservationEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }
 
-func (e *FeatureOfInterestEntity) GetType() EntityType {
+type FeatureOfInterestEntity struct {
+	SensorThingsEntity  `bson:",inline"`
+	NavLinkObservations string        `json:"Observations@iot.navigationLink"`
+	Description         string        `json:"description"`
+	EncodingType        EncodingType  `json:"encodingType"`
+	Observations        []Observation `json:",omitempty"`
+}
+
+func (e FeatureOfInterestEntity) GetType() EntityType {
 	return ENTITY_FEATURESOFINTERESTS
+}
+
+func (e FeatureOfInterestEntity) GetAssociatedEntityId(ent EntityType) string {
+	return ""
 }

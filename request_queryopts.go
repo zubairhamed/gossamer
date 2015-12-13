@@ -45,7 +45,7 @@ func DiscoverQueryOptionType(s string) QueryOptionType {
 }
 
 func CreateQueryOptions(q string) (QueryOptions, error) {
-	opts := &DefaultQueryOption{}
+	opts := &GossamerQueryOption{}
 	if q == "" {
 		return opts, ERR_QUERYOPTION_BLANK
 	}
@@ -97,7 +97,7 @@ func CreateQueryOption(o QueryOptionType, s string) (QueryOption, error) {
 func CreateExpandOption(s string) (ExpandOption, error) {
 	splitValues := strings.Split(s, ",")
 
-	return &DefaultExpandOption{
+	return &GossamerExpandOption{
 		values: splitValues,
 	}, nil
 }
@@ -108,7 +108,7 @@ func CreateTopOption(s string) (TopOption, error) {
 		return nil, err
 	}
 
-	return &DefaultTopOption{
+	return &GossamerTopOption{
 		value: i,
 	}, nil
 }
@@ -119,13 +119,13 @@ func CreateCountOption(s string) (CountOption, error) {
 		return nil, err
 	}
 
-	return &DefaultCountOption{
+	return &GossamerCountOption{
 		value: i,
 	}, nil
 }
 
 func CreateFilterOption(s string) (FilterOption, error) {
-	return &DefaultFilterOption{}, nil
+	return &GossamerFilterOption{}, nil
 }
 
 func CreateSkipOption(s string) (SkipOption, error) {
@@ -134,101 +134,195 @@ func CreateSkipOption(s string) (SkipOption, error) {
 		return nil, err
 	}
 
-	return &DefaultSkipOption{
+	return &GossamerSkipOption{
 		value: i,
 	}, nil
 }
 
 func CreateOrderByOption(s string) (OrderByOption, error) {
-	return &DefaultOrderByOption{}, nil
+	return &GossamerOrderByOption{}, nil
 }
 
 func CreateSelectOption(s string) (SelectOption, error) {
 	splitValues := strings.Split(s, ",")
 
-	return &DefaultSelectOption{
+	return &GossamerSelectOption{
 		values: splitValues,
 	}, nil
 }
 
-type DefaultExpandOption struct {
+type GossamerExpandOption struct {
 	values []string
 }
 
-func (o *DefaultExpandOption) GetType() QueryOptionType {
+func (o *GossamerExpandOption) GetType() QueryOptionType {
 	return QUERYOPT_EXPAND
 }
 
-func (o *DefaultExpandOption) GetValue() []string {
+func (o *GossamerExpandOption) GetValue() []string {
 	return o.values
 }
 
-type DefaultSelectOption struct {
+type GossamerSelectOption struct {
 	values []string
 }
 
-func (o *DefaultSelectOption) GetType() QueryOptionType {
+func (o *GossamerSelectOption) GetType() QueryOptionType {
 	return QUERYOPT_SELECT
 }
 
-func (o *DefaultSelectOption) GetValue() []string {
+func (o *GossamerSelectOption) GetValue() []string {
 	return o.values
 }
 
-type DefaultOrderByOption struct {
+type GossamerOrderByOption struct {
 	values []OrderByOptionValue
 }
 
-func (o *DefaultOrderByOption) GetType() QueryOptionType {
+func (o *GossamerOrderByOption) GetType() QueryOptionType {
 	return QUERYOPT_ORDERBY
 }
 
-func (o *DefaultOrderByOption) GetValue() []OrderByOptionValue {
+func (o *GossamerOrderByOption) GetValue() []OrderByOptionValue {
 	return o.values
 }
 
-type DefaultOrderByOptionValue struct {
+type GossamerOrderByOptionValue struct {
 }
 
-type DefaultTopOption struct {
+type GossamerTopOption struct {
 	value int
 }
 
-func (o *DefaultTopOption) GetValue() int {
+func (o *GossamerTopOption) GetValue() int {
 	return o.value
 }
 
-func (o *DefaultTopOption) GetType() QueryOptionType {
+func (o *GossamerTopOption) GetType() QueryOptionType {
 	return QUERYOPT_TOP
 }
 
-type DefaultSkipOption struct {
+type GossamerSkipOption struct {
 	value int
 }
 
-func (o *DefaultSkipOption) GetType() QueryOptionType {
+func (o *GossamerSkipOption) GetType() QueryOptionType {
 	return QUERYOPT_SKIP
 }
 
-func (o *DefaultSkipOption) GetValue() int {
+func (o *GossamerSkipOption) GetValue() int {
 	return o.value
 }
 
-type DefaultCountOption struct {
+type GossamerCountOption struct {
 	value bool
 }
 
-func (o *DefaultCountOption) GetType() QueryOptionType {
+func (o *GossamerCountOption) GetType() QueryOptionType {
 	return QUERYOPT_COUNT
 }
 
-func (o *DefaultCountOption) GetValue() bool {
+func (o *GossamerCountOption) GetValue() bool {
 	return o.value
 }
 
-type DefaultFilterOption struct {
+type GossamerFilterOption struct {
 }
 
-func (o *DefaultFilterOption) GetType() QueryOptionType {
+func (o *GossamerFilterOption) GetType() QueryOptionType {
 	return QUERYOPT_FILTER
+}
+
+type GossamerQueryOption struct {
+	expandOption  QueryOption
+	selectOption  QueryOption
+	orderByOption QueryOption
+	topOption     QueryOption
+	skipOption    QueryOption
+	countOption   QueryOption
+	filterOption  QueryOption
+}
+
+func (o *GossamerQueryOption) Set(optType QueryOptionType, value QueryOption) {
+	switch optType {
+	case QUERYOPT_EXPAND:
+		o.expandOption = value
+
+	case QUERYOPT_COUNT:
+		o.countOption = value
+
+	case QUERYOPT_FILTER:
+		o.filterOption = value
+
+	case QUERYOPT_TOP:
+		o.topOption = value
+
+	case QUERYOPT_SKIP:
+		o.skipOption = value
+
+	case QUERYOPT_ORDERBY:
+		o.orderByOption = value
+
+	case QUERYOPT_SELECT:
+		o.selectOption = value
+
+	case QUERYOPT_UNKNOWN:
+		log.Println("Attempting to set unknown Query Option")
+		return
+	}
+}
+
+func (o *GossamerQueryOption) ExpandSet() bool {
+	return o.expandOption != nil
+}
+
+func (o *GossamerQueryOption) SelectSet() bool {
+	return o.selectOption != nil
+}
+
+func (o *GossamerQueryOption) OrderBySet() bool {
+	return o.orderByOption != nil
+}
+
+func (o *GossamerQueryOption) TopSet() bool {
+	return o.topOption != nil
+}
+
+func (o *GossamerQueryOption) SkipSet() bool {
+	return o.skipOption != nil
+}
+
+func (o *GossamerQueryOption) CountSet() bool {
+	return o.countOption != nil
+}
+
+func (o *GossamerQueryOption) FilterSet() bool {
+	return o.filterOption != nil
+}
+
+func (o *GossamerQueryOption) GetExpandOption() ExpandOption {
+	return o.expandOption.(ExpandOption)
+}
+func (o *GossamerQueryOption) GetSelectOption() SelectOption {
+	return o.selectOption.(SelectOption)
+}
+
+func (o *GossamerQueryOption) GetOrderByOption() OrderByOption {
+	return o.orderByOption.(OrderByOption)
+}
+
+func (o *GossamerQueryOption) GetTopOption() TopOption {
+	return o.topOption.(TopOption)
+}
+
+func (o *GossamerQueryOption) GetSkipOption() SkipOption {
+	return o.skipOption.(SkipOption)
+}
+
+func (o *GossamerQueryOption) GetCountOption() CountOption {
+	return o.countOption.(CountOption)
+}
+
+func (o *GossamerQueryOption) GetFilterOption() FilterOption {
+	return o.filterOption.(FilterOption)
 }
