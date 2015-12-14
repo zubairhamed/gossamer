@@ -30,14 +30,17 @@ func TestValidateMandatoryPropertiesForLocation(t *testing.T) {
 	locationEntity := NewLocationEntity()
 	err = ValidateMandatoryProperties(locationEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Location entity: 'description'", err.Error())
 
 	locationEntity.Description = "XXXXXXX"
 	err = ValidateMandatoryProperties(locationEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Location entity: 'encodingType'", err.Error())
 
 	locationEntity.EncodingType = "XXXXXXX"
 	err = ValidateMandatoryProperties(locationEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Location entity: 'location'", err.Error())
 
 	locationEntity.Location = "XXXXXXX"
 	err = ValidateMandatoryProperties(locationEntity)
@@ -50,6 +53,7 @@ func TestValidateMandatoryPropertiesForHistoricalLocation(t *testing.T) {
 	historicalLocation := NewHistoricalLocationEntity()
 	err = ValidateMandatoryProperties(historicalLocation)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for HistoricalLocation entity: 'time'", err.Error())
 
 	historicalLocation.Time = time.Now()
 	err = ValidateMandatoryProperties(historicalLocation)
@@ -62,14 +66,17 @@ func TestValidateMandatoryPropertiesForDatastream(t *testing.T) {
 	datastreamEntity := NewDatastreamEntity()
 	err = ValidateMandatoryProperties(datastreamEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Datastream entity: 'description'", err.Error())
 
 	datastreamEntity.Description = "XXXXXXX"
 	err = ValidateMandatoryProperties(datastreamEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Datastream entity: 'unitOfMeasurement'", err.Error())
 
 	datastreamEntity.UnitOfMeasurement = "XXXXXXX"
 	err = ValidateMandatoryProperties(datastreamEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Datastream entity: 'observationType'", err.Error())
 
 	datastreamEntity.ObservationType = "XXXXXXX"
 	err = ValidateMandatoryProperties(datastreamEntity)
@@ -82,14 +89,17 @@ func TestValidateMandatoryPropertiesForSensor(t *testing.T) {
 	sensorEntity := NewSensorEntity()
 	err = ValidateMandatoryProperties(sensorEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Sensor entity: 'description'", err.Error())
 
 	sensorEntity.Description = "XXXXXXX"
 	err = ValidateMandatoryProperties(sensorEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Sensor entity: 'encodingType'", err.Error())
 
 	sensorEntity.EncodingType = "XXXXXXX"
 	err = ValidateMandatoryProperties(sensorEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Sensor entity: 'metadata'", err.Error())
 
 	sensorEntity.Metadata = "XXXXXXX"
 	err = ValidateMandatoryProperties(sensorEntity)
@@ -102,14 +112,17 @@ func TestValidateMandatoryPropertiesForObservedProperty(t *testing.T) {
 	observedPropertyEntity := NewObservedPropertyEntity()
 	err = ValidateMandatoryProperties(observedPropertyEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for ObservedProperty entity: 'name'", err.Error())
 
 	observedPropertyEntity.Name = "XXXXXXX"
 	err = ValidateMandatoryProperties(observedPropertyEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for ObservedProperty entity: 'definition'", err.Error())
 
 	observedPropertyEntity.Definition = "XXXXXXX"
 	err = ValidateMandatoryProperties(observedPropertyEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for ObservedProperty entity: 'description'", err.Error())
 
 	observedPropertyEntity.Description = "XXXXXXX"
 	err = ValidateMandatoryProperties(observedPropertyEntity)
@@ -122,14 +135,17 @@ func TestValidateMandatoryPropertiesForObservation(t *testing.T) {
 	observationEntity := NewObservationEntity()
 	err = ValidateMandatoryProperties(observationEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Observation entity: 'phenomenonTime'", err.Error())
 
 	observationEntity.PhenomenonTime = time.Now()
 	err = ValidateMandatoryProperties(observationEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Observation entity: 'resultTime'", err.Error())
 
 	observationEntity.ResultTime = time.Now()
 	err = ValidateMandatoryProperties(observationEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for Observation entity: 'result'", err.Error())
 
 	observationEntity.Result = "XXXXXXX"
 	err = ValidateMandatoryProperties(observationEntity)
@@ -142,14 +158,17 @@ func TestValidateMandatoryPropertiesForFeatureOfInterest(t *testing.T) {
 	featureOfInterestEntity := NewFeatureOfInterestEntity()
 	err = ValidateMandatoryProperties(featureOfInterestEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for FeaturesOfInterest entity: 'description'", err.Error())
 
 	featureOfInterestEntity.Description = "XXXXXXX"
 	err = ValidateMandatoryProperties(featureOfInterestEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for FeaturesOfInterest entity: 'encodingType'", err.Error())
 
 	featureOfInterestEntity.EncodingType = "XXXXXXX"
 	err = ValidateMandatoryProperties(featureOfInterestEntity)
 	assert.NotNil(t, err)
+	assert.Equal(t, "Missing mandatory property for FeaturesOfInterest entity: 'feature'", err.Error())
 
 	featureOfInterestEntity.Feature = "XXXXXXX"
 	err = ValidateMandatoryProperties(featureOfInterestEntity)
