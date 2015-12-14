@@ -208,6 +208,21 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 	var req Request
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
+
+	decoder := json.NewDecoder(r.Body)
+	var payload interface{}
+	ent := req.GetResourcePath().Last().GetEntity()
+	if !IsSingularEntity(string(ent)) {
+		switch ent {
+		case ENTITY_THINGS:
+			var e ThingEntity
+			err = decoder.Decode(&e)
+			payload = e
+		}
+
+		log.Println("Insert non-singular entity")
+	}
+
 	if err != nil {
 		log.Println(err)
 	}

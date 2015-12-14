@@ -286,7 +286,7 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 	return results, nil
 }
 
-func (m *MongoStore) Insert(rp ResourcePath) (error) {
+func (m *MongoStore) Insert(rp ResourcePath) error {
 	queryComplete := make(chan bool)
 	var results interface{}
 
@@ -314,9 +314,6 @@ func (m *MongoStore) Insert(rp ResourcePath) (error) {
 				// Insert Operation
 			}
 		}
-		queryComplete <- true
-
-
 		queryComplete <- true
 	}()
 
