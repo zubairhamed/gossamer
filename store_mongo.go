@@ -286,6 +286,46 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 	return results, nil
 }
 
+func (m *MongoStore) Insert(rp ResourcePath) (error) {
+	queryComplete := make(chan bool)
+	var results interface{}
+
+	go func() {
+		session := m.cloneSession()
+		defer session.Close()
+
+		opts, _ := CreateQueryOptions("")
+		for rp.HasNext() {
+			curr := rp.Next()
+			currEntity := curr.GetEntity()
+
+			c := session.DB(m.db).C(ResolveMongoCollectionName(currEntity))
+			query, findMultiple := m.createQuery(c, rp, opts, results)
+
+			resourceQueryComplete := make(chan bool)
+			go func() {
+				results = m.doQuery(query, currEntity, findMultiple, opts)
+				resourceQueryComplete <- true
+			}()
+			<-resourceQueryComplete
+
+			if rp.IsLast() {
+				log.Println("Insert operation on ", currEntity, "with results", results)
+				// Insert Operation
+			}
+		}
+		queryComplete <- true
+
+
+		queryComplete <- true
+	}()
+
+	<-queryComplete
+	log.Println("ds.Insert")
+
+	return nil
+}
+
 func (m *MongoStore) postHandleThing(e *ThingEntity, opts QueryOptions) {
 
 	if !opts.SelectSet() {

@@ -1,7 +1,8 @@
 package gossamer
+
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestServer(t *testing.T) {
@@ -9,7 +10,7 @@ func TestServer(t *testing.T) {
 	assert.NotNil(t, server)
 }
 
-func TestDiscoverEntityTypeFunction(t *testing.T){
+func TestDiscoverEntityTypeFunction(t *testing.T) {
 	assert.Equal(t, ENTITY_THINGS, DiscoverEntityType("Things"))
 	assert.Equal(t, ENTITY_THING, DiscoverEntityType("Thing"))
 	assert.Equal(t, ENTITY_LOCATIONS, DiscoverEntityType("Locations"))
@@ -68,4 +69,3 @@ func TestIsSingularEntityFunction(t *testing.T) {
 	assert.False(t, IsSingularEntity("HistoricalLocations"))
 	assert.False(t, IsSingularEntity("UNKNOWN"))
 }
-

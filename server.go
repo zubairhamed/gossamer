@@ -125,10 +125,10 @@ func (s *GossamerServer) Start() {
 	goji.Get("/v1.0/", s.handleRootResource)
 
 	goji.Get("/v1.0/*", s.handleGet)
-	goji.Get("/v1.0/*", s.handlePost)
-	goji.Get("/v1.0/*", s.handlePut)
-	goji.Get("/v1.0/*", s.handleDelete)
-	goji.Get("/v1.0/*", s.handlePatch)
+	goji.Post("/v1.0/*", s.handlePost)
+	goji.Put("/v1.0/*", s.handlePut)
+	goji.Delete("/v1.0/*", s.handleDelete)
+	goji.Patch("/v1.0/*", s.handlePatch)
 
 	log.Println("Start Server")
 	goji.Serve()
@@ -167,10 +167,9 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 	}
 
 	rp := req.GetResourcePath()
-
 	result, err := s.dataStore.Query(rp, req.GetQueryOptions())
 	if err != nil {
-
+		log.Println(err)
 	}
 
 	var jsonOut interface{}
@@ -205,7 +204,25 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 }
 
 func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Request) {
+	var err error
+	var req Request
 
+	req, err = CreateIncomingRequest(r.URL, HTTP)
+	if err != nil {
+		log.Println(err)
+	}
+
+	rp := req.GetResourcePath()
+	err = s.dataStore.Insert(rp)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Get Entity
+	// Verify Content-Type == "application/json"
+	// Verify Mandatory Properties
+	// Verify Integrity Constraints
+	// Disallow HistoricalLocation inserts
 }
 
 func (s *GossamerServer) handlePut(c web.C, w http.ResponseWriter, r *http.Request) {
