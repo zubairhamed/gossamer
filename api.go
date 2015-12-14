@@ -162,7 +162,7 @@ type Request interface {
 
 type Datastore interface {
 	Query(ResourcePath, QueryOptions) (interface{}, error)
-	Insert(ResourcePath) error
+	Insert(ResourcePath, SensorThing) error
 	Init()
 	Shutdown()
 }

@@ -286,7 +286,7 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 	return results, nil
 }
 
-func (m *MongoStore) Insert(rp ResourcePath) error {
+func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 	queryComplete := make(chan bool)
 	var results interface{}
 
@@ -298,7 +298,6 @@ func (m *MongoStore) Insert(rp ResourcePath) error {
 		for rp.HasNext() {
 			curr := rp.Next()
 			currEntity := curr.GetEntity()
-
 			c := session.DB(m.db).C(ResolveMongoCollectionName(currEntity))
 			query, findMultiple := m.createQuery(c, rp, opts, results)
 
@@ -310,10 +309,23 @@ func (m *MongoStore) Insert(rp ResourcePath) error {
 			<-resourceQueryComplete
 
 			if rp.IsLast() {
-				log.Println("Insert operation on ", currEntity, "with results", results)
-				// Insert Operation
+				break
 			}
 		}
+
+		var err error
+		err = ValidateMandatoryProperties(payload)
+		if err != nil {
+			log.Print(err)
+		}
+
+		err = ValidateIntegrityConstraints(payload)
+		if err != nil {
+			log.Print(err)
+		}
+
+		log.Println("Insert operation on ", payload, "with last results", results)
+
 		queryComplete <- true
 	}()
 

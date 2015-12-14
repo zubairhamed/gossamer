@@ -220,15 +220,14 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 			payload = e
 		}
 
+		rp := req.GetResourcePath()
+		err = s.dataStore.Insert(rp, payload.(SensorThing))
+		if err != nil {
+			log.Println(err)
+		}
 		log.Println("Insert non-singular entity")
 	}
 
-	if err != nil {
-		log.Println(err)
-	}
-
-	rp := req.GetResourcePath()
-	err = s.dataStore.Insert(rp)
 	if err != nil {
 		log.Println(err)
 	}
