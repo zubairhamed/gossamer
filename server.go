@@ -224,6 +224,8 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		st := payload.(SensorThing)
 
 		rp := req.GetResourcePath()
+
+		// TODO: if inserting HistoricalLocation, throw error, Not Allowed
 		err = ValidateMandatoryProperties(st)
 		if err != nil {
 			log.Println("An error occured inserting entity: ", err)

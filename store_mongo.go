@@ -313,13 +313,26 @@ func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 			}
 		}
 
-		log.Println("Insert operation on ", payload, "with last results", results)
+		// Generate IoT ID and Insert
+		err := m.doInsert(payload, results)
+		if err != nil {
+			log.Println(err)
+		}
 
 		queryComplete <- true
 	}()
-
 	<-queryComplete
-	log.Println("ds.Insert")
+
+	return nil
+}
+
+func (m *MongoStore) doInsert(payload SensorThing, results interface{}) error {
+	session := m.cloneSession()
+	defer session.Close()
+
+	// Things
+	// Location
+	// Datastream
 
 	return nil
 }

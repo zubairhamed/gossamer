@@ -2,7 +2,6 @@ package gossamer
 
 import (
 	"errors"
-	"log"
 	"reflect"
 )
 
@@ -20,7 +19,6 @@ func ResolveSelfLinkUrl(id string, ent EntityType) string {
 }
 
 func ValidateMandatoryProperties(e SensorThing) error {
-	log.Println(e)
 	elem := reflect.TypeOf(e).Elem().Name()
 
 	switch elem {
@@ -86,7 +84,6 @@ func ValidateMandatoryProperties(e SensorThing) error {
 			return errors.New("Missing mandatory property for Sensor entity: 'metadata'")
 		}
 
-
 	case "ObservationEntity":
 		ent := e.(*ObservationEntity)
 
@@ -101,7 +98,6 @@ func ValidateMandatoryProperties(e SensorThing) error {
 		if ent.Result == nil {
 			return errors.New("Missing mandatory property for Observation entity: 'result'")
 		}
-
 
 	case "FeatureOfInterestEntity":
 		ent := e.(*FeatureOfInterestEntity)
@@ -127,6 +123,29 @@ func ValidateMandatoryProperties(e SensorThing) error {
 }
 
 func ValidateIntegrityConstraints(e SensorThing) error {
-	log.Println("Validating Integrity Constrants:", e)
+	elem := reflect.TypeOf(e).Elem().Name()
+	switch elem {
+	case "DatastreamEntity":
+		ent := e.(*DatastreamEntity)
+
+		if ent.IdThing == "" && ent.Thing == nil {
+			return errors.New("Missing constrains for Datastream Entity: 'Thing'")
+		}
+
+		if ent.IdSensor == "" && ent.Sensor == nil {
+			return errors.New("Missing constrains for Datastream Entity: 'Sensor'")
+		}
+
+		if ent.IdObservedProperty == "" && ent.ObservedProperty == nil {
+			return errors.New("Missing constrains for Datastream Entity: 'ObservedProperty'")
+		}
+
+	case "ObservationEntity":
+		ent := e.(*ObservationEntity)
+		if ent.IdDatastream == "" && ent.Datastream == nil {
+			return errors.New("Missing constrains for Observation Entity: 'Datastream'")
+		}
+
+	}
 	return nil
 }
