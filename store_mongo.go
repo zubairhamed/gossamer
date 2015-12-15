@@ -313,17 +313,6 @@ func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 			}
 		}
 
-		var err error
-		err = ValidateMandatoryProperties(payload)
-		if err != nil {
-			log.Print(err)
-		}
-
-		err = ValidateIntegrityConstraints(payload)
-		if err != nil {
-			log.Print(err)
-		}
-
 		log.Println("Insert operation on ", payload, "with last results", results)
 
 		queryComplete <- true

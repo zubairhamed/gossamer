@@ -217,19 +217,34 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		case ENTITY_THINGS:
 			var e ThingEntity
 			err = decoder.Decode(&e)
-			payload = e
+			log.Println("e", e)
+			payload = &e
 		}
 
+		st := payload.(SensorThing)
+
 		rp := req.GetResourcePath()
-		err = s.dataStore.Insert(rp, payload.(SensorThing))
+		err = ValidateMandatoryProperties(st)
 		if err != nil {
-			log.Println(err)
+			log.Println("An error occured inserting entity: ", err)
+			return
 		}
-		log.Println("Insert non-singular entity")
+
+		err = ValidateIntegrityConstraints(st)
+		if err != nil {
+			log.Println("An error occured inserting entity: ", err)
+			return
+		}
+
+		err = s.dataStore.Insert(rp, st)
+		if err != nil {
+			log.Println("An error occured inserting entity: ", err)
+			return
+		}
 	}
 
 	if err != nil {
-		log.Println(err)
+		log.Println("An error occured inserting entity: ", err)
 	}
 
 	// Get Entity

@@ -20,6 +20,7 @@ func ResolveSelfLinkUrl(id string, ent EntityType) string {
 }
 
 func ValidateMandatoryProperties(e SensorThing) error {
+	log.Println(e)
 	elem := reflect.TypeOf(e).Elem().Name()
 
 	switch elem {
