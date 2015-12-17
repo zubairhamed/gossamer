@@ -327,34 +327,39 @@ func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 	return nil
 }
 
-func (m *MongoStore) doInsert(payload SensorThing, results interface{}) error {
+func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err error) {
+
 	session := m.cloneSession()
 	defer session.Close()
 
 	elem := reflect.TypeOf(payload).Elem().Name()
 	switch elem {
 	case "ObservationEntity":
-		log.Println("ObservationEntity")
 		e := payload.(*ObservationEntity)
-
+		e.Id = "abc123"
 		if e.Datastream != nil {
 			if e.Datastream.Id != "" {
-				// e.IdDatastream = e.Datastream.id
+				e.IdDatastream = e.Datastream.Id
 			} else {
 				// Insert New DataStream in Datastream Collection
 				// e.IdDatastream = e.Datastream.id
 			}
-
 		}
 
 		if e.FeatureOfInterest != nil {
 			if e.FeatureOfInterest.Id != "" {
-				// Update ID Links
-				// e.IdFeatureOfInterest = e.FeatureOfInterest.id
+				e.IdFeatureOfInterest = e.FeatureOfInterest.Id
 			} else {
 				// Insert New FeatureOfInterest in FeatureOfInterest Collection
 				// e.IdFeatureOfInterest = e.FeatureOfInterest.id
 			}
+		}
+
+		c := session.DB(m.db).C(ResolveMongoCollectionName(ENTITY_OBSERVATIONS))
+		err = c.Insert(e)
+		if err != nil {
+			log.Println(err)
+			return
 		}
 
 	case "ThingEntity":

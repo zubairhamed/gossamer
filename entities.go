@@ -6,7 +6,7 @@ import (
 
 type SensorThingsEntity struct {
 	Id       string `json:"@iot.id,omitempty" bson:"@iot_id"`
-	SelfLink string `json:"@iot.selfLink,omitempty"`
+	SelfLink string `json:"@iot.selfLink,omitempty" bson:"-"`
 }
 
 func (e SensorThingsEntity) GetId() string {
@@ -216,15 +216,15 @@ func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
 // An Observation is act of measuring or otherwise determining the value of a property
 type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
-	NavLinkFeatureOfInterest string                   `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
-	NavLinkDatastream        string                   `json:"Datastream@iot.navigationLink,omitempty"`
+	NavLinkFeatureOfInterest string                   `json:"FeatureOfInterest@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkDatastream        string                   `json:"Datastream@iot.navigationLink,omitempty" bson:"-"`
 	PhenomenonTime           *TimePeriod              `json:"phenomenonTime,omitempty"`
 	ResultTime               *TimeInstant             `json:"resultTime,omitempty"`
 	Result                   interface{}              `json:"result,omitempty" bson:"result"`
 	IdDatastream             string                   `json:"-" bson:"@iot_datastreams_id"`
 	IdFeatureOfInterest      string                   `json:"-" bson:"@iot_featureofinterests_id"`
-	Datastream               *DatastreamEntity        `json:"Datastream,omitempty"`
-	FeatureOfInterest        *FeatureOfInterestEntity `json:"FeatureOfInterest,omitempty"`
+	Datastream               *DatastreamEntity        `json:"Datastream,omitempty" bson:"-"`
+	FeatureOfInterest        *FeatureOfInterestEntity `json:"FeatureOfInterest,omitempty" bson:"-"`
 }
 
 func (e ObservationEntity) GetType() EntityType {

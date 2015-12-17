@@ -155,7 +155,7 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 
 	out, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		log.Println(err)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
 	}
 	w.Write(out)
 }
@@ -206,11 +206,12 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 	var err error
 	var req Request
 
+	// TODO: Verify Content-Type == "application/json"
+
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
 		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusBadRequest)
 	}
-
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -279,12 +280,6 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 			return
 		}
 	}
-
-	// Get Entity
-	// Verify Content-Type == "application/json"
-	// Verify Mandatory Properties
-	// Verify Integrity Constraints
-	// Disallow HistoricalLocation inserts
 }
 
 func (s *GossamerServer) handlePut(c web.C, w http.ResponseWriter, r *http.Request) {
