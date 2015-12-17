@@ -216,14 +216,15 @@ func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
 // An Observation is act of measuring or otherwise determining the value of a property
 type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
-	NavLinkFeatureOfInterest string           `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
-	NavLinkDatastream        string           `json:"Datastream@iot.navigationLink,omitempty"`
-	PhenomenonTime           *TimePeriod       `json:"phenomenonTime,omitempty"`
-	ResultTime               *TimeInstant      `json:"resultTime,omitempty"`
-	Result                   interface{}      `json:"result,omitempty" bson:"result"`
-	IdDatastream             string           `json:"-" bson:"@iot_datastreams_id"`
-	IdFeatureOfInterest      string           `json:"-" bson:"@iot_featureofinterests_id"`
-	Datastream               *DatastreamEntity `json:"Datastream,omitempty"`
+	NavLinkFeatureOfInterest string                   `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
+	NavLinkDatastream        string                   `json:"Datastream@iot.navigationLink,omitempty"`
+	PhenomenonTime           *TimePeriod              `json:"phenomenonTime,omitempty"`
+	ResultTime               *TimeInstant             `json:"resultTime,omitempty"`
+	Result                   interface{}              `json:"result,omitempty" bson:"result"`
+	IdDatastream             string                   `json:"-" bson:"@iot_datastreams_id"`
+	IdFeatureOfInterest      string                   `json:"-" bson:"@iot_featureofinterests_id"`
+	Datastream               *DatastreamEntity        `json:"Datastream,omitempty"`
+	FeatureOfInterest        *FeatureOfInterestEntity `json:"FeatureOfInterest,omitempty"`
 }
 
 func (e ObservationEntity) GetType() EntityType {

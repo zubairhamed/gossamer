@@ -335,6 +335,71 @@ func (m *MongoStore) doInsert(payload SensorThing, results interface{}) error {
 	switch elem {
 	case "ObservationEntity":
 		log.Println("ObservationEntity")
+		e := payload.(*ObservationEntity)
+
+		if e.Datastream != nil {
+			if e.Datastream.Id != "" {
+				// e.IdDatastream = e.Datastream.id
+			} else {
+				// Insert New DataStream in Datastream Collection
+				// e.IdDatastream = e.Datastream.id
+			}
+
+		}
+
+		if e.FeatureOfInterest != nil {
+			if e.FeatureOfInterest.Id != "" {
+				// Update ID Links
+				// e.IdFeatureOfInterest = e.FeatureOfInterest.id
+			} else {
+				// Insert New FeatureOfInterest in FeatureOfInterest Collection
+				// e.IdFeatureOfInterest = e.FeatureOfInterest.id
+			}
+		}
+
+	case "ThingEntity":
+		// Historical Location
+		// Cannot create
+
+		// Location
+		// things.iot_locations_id insert []
+
+		// Datastream
+		// datastream.iot_things_id = this.id
+
+	case "HistoricalLocationEntity":
+		// Shouldn't be allowed to insert
+
+	case "DatastreamEntity":
+		// ObservedProperty
+		// datastream.iot_observedproperty_id
+		// Sensor
+		// datastream.iot_sensor_id
+
+		// Observation
+		// observation.iot_datastreams_id
+
+		// Thing
+		// datastream.iot_things_id
+
+	case "SensorEntity":
+		// Datastream
+
+	case "ObservedPropertyEntity":
+		// Datastream
+
+	case "FeatureOfInterest":
+		// Observation
+		/*
+		   Things
+		   HistoricalLocation
+		   Datastream
+		   Sensor
+		   ObservedProperty
+
+
+		*/
+
 	}
 	log.Println(elem)
 

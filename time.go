@@ -16,10 +16,9 @@ func NewDefaultTimePeriod() *TimePeriod {
 func NewTimePeriod(from time.Time, to time.Time) *TimePeriod {
 	return &TimePeriod{
 		FromTime: from,
-		ToTime: to,
+		ToTime:   to,
 	}
 }
-
 
 type TimePeriod struct {
 	FromTime time.Time

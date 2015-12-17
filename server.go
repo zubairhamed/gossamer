@@ -224,13 +224,39 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 			var e ObservationEntity
 			err = decoder.Decode(&e)
 			payload = &e
+
+		case ENTITY_HISTORICALLOCATIONS:
+			http.Error(w, "Adding Historical Locations not allowedS", http.StatusMethodNotAllowed)
+			return
+
+		case ENTITY_SENSORS:
+			var e SensorThingsEntity
+			err = decoder.Decode(&e)
+			payload = &e
+
+		case ENTITY_LOCATION:
+			var e LocationEntity
+			err = decoder.Decode(&e)
+			payload = &e
+
+		case ENTITY_FEATURESOFINTERESTS:
+			var e FeatureOfInterestEntity
+			err = decoder.Decode(&e)
+			payload = &e
+
+		case ENTITY_DATASTREAMS:
+			var e DatastreamEntity
+			err = decoder.Decode(&e)
+			payload = &e
+
+		case ENTITY_OBSERVEDPROPERTIES:
+			var e ObservedPropertyEntity
+			err = decoder.Decode(&e)
+			payload = &e
 		}
 
 		st := payload.(SensorThing)
-
 		rp := req.GetResourcePath()
-
-		// TODO: if inserting HistoricalLocation, throw error, Not Allowed
 
 		err = ValidateMandatoryProperties(st)
 		if err != nil {
