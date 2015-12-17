@@ -163,13 +163,13 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
 	req, err := CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		log.Println(err)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusBadRequest)
 	}
 
 	rp := req.GetResourcePath()
 	result, err := s.dataStore.Query(rp, req.GetQueryOptions())
 	if err != nil {
-		log.Println(err)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
 	}
 
 	var jsonOut interface{}
@@ -193,14 +193,13 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 
 	b, err := json.MarshalIndent(jsonOut, "", "  ")
 	if err != nil {
-		log.Println("Error converting to JSON")
+		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
 	}
 
 	_, err = w.Write(b)
 	if err != nil {
-		log.Println(err)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
 	}
-	// http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
 func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -208,6 +207,10 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 	var req Request
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
+	if err != nil {
+		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusBadRequest)
+	}
+
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -226,7 +229,7 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 			payload = &e
 
 		case ENTITY_HISTORICALLOCATIONS:
-			http.Error(w, "Adding Historical Locations not allowedS", http.StatusMethodNotAllowed)
+			http.Error(w, "Adding Historical Locations not allowed", http.StatusMethodNotAllowed)
 			return
 
 		case ENTITY_SENSORS:
@@ -260,25 +263,21 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 		err = ValidateMandatoryProperties(st)
 		if err != nil {
-			log.Println("An error occured inserting entity: ", err)
+			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		err = ValidateIntegrityConstraints(st)
 		if err != nil {
-			log.Println("An error occured inserting entity: ", err)
+			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		err = s.dataStore.Insert(rp, st)
 		if err != nil {
-			log.Println("An error occured inserting entity: ", err)
+			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
 			return
 		}
-	}
-
-	if err != nil {
-		log.Println("An error occured inserting entity: ", err)
 	}
 
 	// Get Entity
