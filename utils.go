@@ -3,6 +3,7 @@ package gossamer
 import (
 	"errors"
 	"reflect"
+	"log"
 )
 
 func ResolveEntityLink(id string, ent EntityType) string {
@@ -86,7 +87,7 @@ func ValidateMandatoryProperties(e SensorThing) error {
 
 	case "ObservationEntity":
 		ent := e.(*ObservationEntity)
-
+		log.Println("ent", ent.PhenomenonTime.IsZero())
 		if ent.PhenomenonTime.IsZero() {
 			return errors.New("Missing mandatory property for Observation entity: 'phenomenonTime'")
 		}
@@ -122,6 +123,10 @@ func ValidateMandatoryProperties(e SensorThing) error {
 	return nil
 }
 
+func ValidateDeep(e SensorThing) error {
+	return nil
+}
+
 func ValidateIntegrityConstraints(e SensorThing) error {
 	elem := reflect.TypeOf(e).Elem().Name()
 	switch elem {
@@ -142,7 +147,7 @@ func ValidateIntegrityConstraints(e SensorThing) error {
 
 	case "ObservationEntity":
 		ent := e.(*ObservationEntity)
-		if ent.IdDatastream == "" && ent.Datastream == nil {
+		if ent.IdDatastream == "" && &ent.Datastream == nil {
 			return errors.New("Missing constrains for Observation Entity: 'Datastream'")
 		}
 

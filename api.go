@@ -1,6 +1,8 @@
 package gossamer
 
-import "time"
+import (
+	"time"
+)
 
 type EncodingType string
 

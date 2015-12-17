@@ -4,6 +4,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
+	"reflect"
 	"strings"
 )
 
@@ -329,6 +330,13 @@ func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 func (m *MongoStore) doInsert(payload SensorThing, results interface{}) error {
 	session := m.cloneSession()
 	defer session.Close()
+
+	elem := reflect.TypeOf(payload).Elem().Name()
+	switch elem {
+	case "ObservationEntity":
+		log.Println("ObservationEntity")
+	}
+	log.Println(elem)
 
 	// Things
 	// Location

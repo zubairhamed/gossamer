@@ -210,6 +210,7 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 
 	decoder := json.NewDecoder(r.Body)
+
 	var payload interface{}
 	ent := req.GetResourcePath().Last().GetEntity()
 	if !IsSingularEntity(string(ent)) {
@@ -217,7 +218,11 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		case ENTITY_THINGS:
 			var e ThingEntity
 			err = decoder.Decode(&e)
-			log.Println("e", e)
+			payload = &e
+
+		case ENTITY_OBSERVATIONS:
+			var e ObservationEntity
+			err = decoder.Decode(&e)
 			payload = &e
 		}
 
@@ -226,6 +231,7 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		rp := req.GetResourcePath()
 
 		// TODO: if inserting HistoricalLocation, throw error, Not Allowed
+
 		err = ValidateMandatoryProperties(st)
 		if err != nil {
 			log.Println("An error occured inserting entity: ", err)
