@@ -145,7 +145,8 @@ func TestValidateMandatoryPropertiesForObservation(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "Missing mandatory property for Observation entity: 'resultTime'", err.Error())
 
-	observationEntity.ResultTime = TimeInstant(time.Now())
+	ti := TimeInstant(time.Now())
+	observationEntity.ResultTime = &ti
 	err = ValidateMandatoryProperties(observationEntity)
 	assert.NotNil(t, err)
 	assert.Equal(t, "Missing mandatory property for Observation entity: 'result'", err.Error())

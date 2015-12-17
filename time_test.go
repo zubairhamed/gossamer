@@ -9,7 +9,7 @@ import (
 )
 
 func TestTimePeriod(t *testing.T) {
-	var tp TimePeriod
+	var tp *TimePeriod
 	var err error
 
 	tp = NewDefaultTimePeriod()

@@ -9,12 +9,12 @@ import (
 var STD_TIME_FORMAT_INSTANT = "2006-01-02T15:04:05-07:00"
 var STD_TIME_FORMAT_PERIOD = "2006-01-02T15:04:05.00Z"
 
-func NewDefaultTimePeriod() TimePeriod {
-	return TimePeriod{}
+func NewDefaultTimePeriod() *TimePeriod {
+	return &TimePeriod{}
 }
 
-func NewTimePeriod(from time.Time, to time.Time) TimePeriod {
-	return TimePeriod{
+func NewTimePeriod(from time.Time, to time.Time) *TimePeriod {
+	return &TimePeriod{
 		FromTime: from,
 		ToTime: to,
 	}
@@ -77,8 +77,8 @@ func (t TimePeriod) IsZero() bool {
 
 type TimeInstant time.Time
 
-func NewTimeInstant() TimeInstant {
-	return TimeInstant{}
+func NewTimeInstant() *TimeInstant {
+	return &TimeInstant{}
 }
 
 func (t TimeInstant) MarshalJSON() ([]byte, error) {
