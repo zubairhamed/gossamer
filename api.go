@@ -345,6 +345,3 @@ type FeatureOfInterest interface {
 
 	GetObservations() []Observation
 }
-
-// Globals
-var GLOB_ENV_HOST = "localhost:8000"

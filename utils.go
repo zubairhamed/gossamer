@@ -183,6 +183,10 @@ func ThrowHttpMethodNotAllowed(msg string, w http.ResponseWriter) {
 	http.Error(w, msg, http.StatusMethodNotAllowed)
 }
 
+func ThrowNotAcceptable(msg string, w http.ResponseWriter) {
+	http.Error(w, msg, http.StatusNotAcceptable)
+}
+
 func GenerateEntityId() string {
 	return uuid.NewV4().String()
 }

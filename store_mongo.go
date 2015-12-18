@@ -438,7 +438,6 @@ func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err err
 		log.Println(err)
 		return
 	}
-
 	return nil
 }
 
@@ -458,7 +457,6 @@ func (m *MongoStore) postHandleObservedProperty(e *ObservedPropertyEntity, opts 
 		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVEDPROPERTIES)
 
 		e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_OBSERVEDPROPERTIES) + "/Datastreams"
-
 	}
 }
 

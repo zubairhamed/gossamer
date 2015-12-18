@@ -210,7 +210,9 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 	var err error
 	var req Request
 
-	// TODO: Verify Content-Type == "application/json"
+	if r.Header.Get("Content-Type") != "application/json" {
+		ThrowNotAcceptable("Format of request is not JSON", w)
+	}
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {

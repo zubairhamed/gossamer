@@ -1,0 +1,6 @@
+gom 'github.com/satori/go.uuid'
+gom 'gopkg.in/mgo.v2'
+gom 'github.com/zenazn/goji'
+gom 'github.com/stretchr/testify/assert'
+gom 'github.com/axw/gocov/gocov'
+gom 'github.com/mattn/goveralls'

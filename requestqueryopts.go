@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Checks if a given query option is a valid one
 func IsQueryOption(s string) bool {
 	if strings.HasPrefix(s, "$expand") || strings.HasPrefix(s, "$select") || strings.HasPrefix(s, "$orderby") ||
 		strings.HasPrefix(s, "$top") || strings.HasPrefix(s, "$skip") || strings.HasPrefix(s, "$count") ||
@@ -16,6 +17,7 @@ func IsQueryOption(s string) bool {
 	return false
 }
 
+// Returns the QueryOptionType for a given query option string
 func DiscoverQueryOptionType(s string) QueryOptionType {
 	switch {
 	case strings.HasPrefix(s, string(QUERYOPT_EXPAND)):
