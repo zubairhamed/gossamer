@@ -106,7 +106,20 @@ func SetAssociatedEntityId(entity SensorThing, et EntityType, id string) {
 
 	case ENTITY_DATASTREAMS:
 		e := (entity).(*DatastreamEntity)
-		log.Println(e)
+		if et == ENTITY_THINGS {
+			e.Thing = NewThingEntity()
+			e.Thing.Id = id
+		}
+
+		if et == ENTITY_OBSERVEDPROPERTIES {
+			e.ObservedProperty = NewObservedPropertyEntity()
+			e.ObservedProperty.Id = id
+		}
+
+		if et == ENTITY_SENSORS {
+			e.Sensor = NewSensorEntity()
+			e.Sensor.Id = id
+		}
 
 	case ENTITY_OBSERVEDPROPERTIES:
 		e := (entity).(*ObservedPropertyEntity)
@@ -133,27 +146,27 @@ func DecodeJsonToEntityStruct(decoder *json.Decoder, et EntityType) (SensorThing
 	case ENTITY_SENSORS:
 		var e SensorEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 
 	case ENTITY_LOCATION:
 		var e LocationEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 
 	case ENTITY_FEATURESOFINTERESTS:
 		var e FeatureOfInterestEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 
 	case ENTITY_DATASTREAMS:
 		var e DatastreamEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 
 	case ENTITY_OBSERVEDPROPERTIES:
 		var e ObservedPropertyEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 	}
 	return nil, errors.New("Unknown Entity Type")
 }

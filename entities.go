@@ -95,13 +95,13 @@ func (e ThingEntity) GetType() EntityType {
 // of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type LocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
-	NavLinkThings              string               `json:"Things@iot.navigationLink,omitempty" bson:"-"`
-	Description                string               `json:"description,omitempty"`
-	EncodingType               EncodingType         `json:"encodingType,omitempty" bson:"encodingType"`
-	Location                   interface{}          `json:"location,omitempty" bson:"location"`
-	Things                     []Thing              `json:"Things,omitempty" bson:"-"`
-	HistoricalLocations        []HistoricalLocation `json:"HistoricalLocations,omitempty" bson:"-"`
+	NavLinkHistoricalLocations string                      `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkThings              string                      `json:"Things@iot.navigationLink,omitempty" bson:"-"`
+	Description                string                      `json:"description,omitempty"`
+	EncodingType               EncodingType                `json:"encodingType,omitempty" bson:"encodingType"`
+	Location                   interface{}                 `json:"location,omitempty" bson:"location"`
+	Things                     []*ThingEntity              `json:"Things,omitempty" bson:"-"`
+	HistoricalLocations        []*HistoricalLocationEntity `json:"HistoricalLocations,omitempty" bson:"-"`
 }
 
 func (e LocationEntity) GetDescription() string {
@@ -120,14 +120,14 @@ func (e LocationEntity) GetType() EntityType {
 // Thing with their time.
 type HistoricalLocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkHistoricalLocations string       `json:"HistoricalLocations@iot.navigationLink,omitempty"`
-	NavLinkThing               string       `json:"Thing@iot.navigationLink,omitempty"`
-	Time                       time.Time    `json:"time"`
-	EncodingType               EncodingType `json:"encodingType,omitempty"`
-	IdThing                    string       `json:"-" bson:"@iot_things_id"`
-	IdLocations                []string     `json:"-" bson:"@iot_locations_id"`
-	Thing                      Thing        `json:"Thing,omitempty"`
-	Locations                  []Location   `json:"Locations,omitempty"`
+	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink,omitempty"`
+	NavLinkThing               string            `json:"Thing@iot.navigationLink,omitempty"`
+	Time                       time.Time         `json:"time"`
+	EncodingType               EncodingType      `json:"encodingType,omitempty"`
+	IdThing                    string            `json:"-" bson:"@iot_things_id"`
+	IdLocations                []string          `json:"-" bson:"@iot_locations_id"`
+	Thing                      *ThingEntity      `json:"Thing,omitempty"`
+	Locations                  []*LocationEntity `json:"Locations,omitempty"`
 }
 
 func (e HistoricalLocationEntity) GetType() EntityType {
