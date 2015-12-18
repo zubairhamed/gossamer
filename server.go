@@ -155,7 +155,8 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 
 	out, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		return
 	}
 	w.Write(out)
 }
@@ -163,13 +164,14 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
 	req, err := CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusBadRequest)
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
 	}
 
 	rp := req.GetResourcePath()
 	result, err := s.dataStore.Query(rp, req.GetQueryOptions())
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		return
 	}
 
 	var jsonOut interface{}
@@ -193,12 +195,14 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 
 	b, err := json.MarshalIndent(jsonOut, "", "  ")
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		return
 	}
 
 	_, err = w.Write(b)
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		return
 	}
 }
 
@@ -210,20 +214,26 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusBadRequest)
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST + err.Error(), w)
 	}
 
-	decoder := json.NewDecoder(r.Body)
+	if err = ValidatePostRequestUrl(req); err != nil {
+		ThrowHttpMethodNotAllowed(err.Error(), w)
+		return
+	}
 
 	rp := req.GetResourcePath()
 	ent := rp.Last().GetEntity()
 	cont := rp.Containing()
 
 	if !IsSingularEntity(string(ent)) {
-		e, err := DecodeJsonToEntityStruct(decoder, ent);
+		decoder := json.NewDecoder(r.Body)
+		e, err := DecodeJsonToEntityStruct(decoder, ent)
 		if err != nil {
-			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusInternalServerError)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			return
 		}
+
 		if cont != nil {
 			SetAssociatedEntityId(e, cont.GetEntity(), cont.GetId())
 		}
@@ -232,19 +242,19 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 		err = ValidateMandatoryProperties(e)
 		if err != nil {
-			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 
 		err = ValidateIntegrityConstraints(e)
 		if err != nil {
-			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 
 		err = s.dataStore.Insert(rp, e)
 		if err != nil {
-			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 	}

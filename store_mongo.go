@@ -4,7 +4,6 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
-	"reflect"
 	"strings"
 )
 
@@ -182,7 +181,7 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 		bsonMap["@iot_id"] = curr.GetId()
 		findMultiple = false
 	} else if IsSingularEntity(string(currEntity)) {
-		bsonMap["@iot_id"] = lastResult.(SensorThing).GetAssociatedEntityId(currEntity)
+		bsonMap["@iot_id"] = GetAssociatedEntityId(lastResult.(SensorThing), currEntity)
 		findMultiple = false
 	} else {
 		findMultiple = true
@@ -328,85 +327,117 @@ func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 }
 
 func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err error) {
+	var insertData interface{}
 
-	session := m.cloneSession()
-	defer session.Close()
-
-	elem := reflect.TypeOf(payload).Elem().Name()
-	switch elem {
-	case "ObservationEntity":
+	switch payload.GetType() {
+	case ENTITY_OBSERVATIONS:
 		e := payload.(*ObservationEntity)
-		e.Id = "abc123"
+		e.Id = GenerateEntityId()
 		if e.Datastream != nil {
 			if e.Datastream.Id == "" {
-				// Insert New DataStream in Datastream Collection
+				// TODO: Insert New DataStream in Datastream Collection
+				log.Println("TODO: Insert New DataStream in Datastream Collection")
 			}
 			e.IdDatastream = e.Datastream.Id
 		}
 
 		if e.FeatureOfInterest != nil {
 			if e.FeatureOfInterest.Id == "" {
-				// Insert New FeatureOfInterest in FeatureOfInterest Collection
+				// TODO: Insert New FeatureOfInterest in FeatureOfInterest Collection
+				log.Println("TODO: Insert New FeatureOfInterest in FeatureOfInterest Collection")
 			}
 			e.IdFeatureOfInterest = e.FeatureOfInterest.Id
 		}
+		insertData = e
 
-		c := session.DB(m.db).C(ResolveMongoCollectionName(ENTITY_OBSERVATIONS))
-		err = c.Insert(e)
-		if err != nil {
-			log.Println(err)
-			return
+	case ENTITY_THINGS:
+		e := payload.(*ThingEntity)
+		e.Id = GenerateEntityId()
+		e.IdLocations = []string{}
+		for _, v := range e.Locations {
+			locId := v.Id
+			if locId == "" {
+				locId = GenerateEntityId()
+				// TODO: Insert New Location
+				log.Println("TODO: Insert New Location")
+			}
+			e.IdLocations = append(e.IdLocations, locId)
 		}
 
-	case "ThingEntity":
-		// Historical Location
-		// Cannot create
+		for _, v := range e.Datastreams {
+			dsId := v.Id
+			if dsId == "" {
+				dsId = GenerateEntityId()
+				// TODO: Insert New Datastream
+				log.Println("TODO: Insert New Datastream")
+			} else {
+				// Unlink existing datastream.thing and relink to this one? Wut wut?
+			}
+		}
 
-		// Location
-		// things.iot_locations_id insert []
+		insertData = e
 
-		// Datastream
-		// datastream.iot_things_id = this.id
-
-	case "HistoricalLocationEntity":
+	case ENTITY_HISTORICALLOCATIONS:
 		// Shouldn't be allowed to insert
 
-	case "DatastreamEntity":
-		// ObservedProperty
-		// datastream.iot_observedproperty_id
-		// Sensor
-		// datastream.iot_sensor_id
+	case ENTITY_DATASTREAMS:
+		e := payload.(*DatastreamEntity)
+		e.Id = GenerateEntityId()
 
-		// Observation
-		// observation.iot_datastreams_id
+		if e.ObservedProperty != nil {
+			if e.ObservedProperty.Id == "" {
+				// TODO: Insert New ObservedProperty
+				log.Println("TODO: Insert New ObservedProperty")
+			}
+			e.IdObservedProperty = e.ObservedProperty.Id
+		}
 
-		// Thing
-		// datastream.iot_things_id
+		if e.Sensor != nil {
+			if e.Sensor.Id == "" {
+				// TODO: Insert New Sensor
+				log.Println("TODO: Insert New Sensor")
+			}
+			e.IdSensor = e.Sensor.Id
+		}
 
-	case "SensorEntity":
-		// Datastream
+		if e.Thing != nil {
+			if e.Thing.Id == "" {
+				// TODO: Insert New Thing
+				log.Println("TODO: Insert New Thing")
+			}
+			e.IdThing = e.Thing.Id
+		}
 
-	case "ObservedPropertyEntity":
-		// Datastream
+		insertData = e
 
-	case "FeatureOfInterest":
-		// Observation
-		/*
-		   Things
-		   HistoricalLocation
-		   Datastream
-		   Sensor
-		   ObservedProperty
+	case ENTITY_SENSORS:
+		e := payload.(*SensorEntity)
+		e.Id = GenerateEntityId()
 
+		insertData = e
 
-		*/
+	case ENTITY_OBSERVEDPROPERTIES:
+		e := payload.(*ObservedPropertyEntity)
+		e.Id = GenerateEntityId()
 
+		insertData = e
+
+	case ENTITY_FEATURESOFINTERESTS:
+		e := payload.(*FeatureOfInterestEntity)
+		e.Id = GenerateEntityId()
+
+		insertData = e
 	}
-	log.Println(elem)
 
-	// Things
-	// Location
-	// Datastream
+	session := m.cloneSession()
+	defer session.Close()
+
+	c := session.DB(m.db).C(ResolveMongoCollectionName(payload.GetType()))
+	err = c.Insert(insertData)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	return nil
 }

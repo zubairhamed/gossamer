@@ -1,9 +1,11 @@
 package gossamer
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
+	"github.com/satori/go.uuid"
 	"log"
+	"net/http"
 )
 
 func ResolveEntityLink(id string, ent EntityType) string {
@@ -19,142 +21,60 @@ func ResolveSelfLinkUrl(id string, ent EntityType) string {
 	return "http://" + GLOB_ENV_HOST + "/v1.0/" + ResolveEntityLink(id, ent)
 }
 
-func ValidateMandatoryProperties(entity SensorThing) error {
+func GetAssociatedEntityId(entity SensorThing, et EntityType) string {
 	switch entity.GetType() {
 	case ENTITY_THINGS:
-		e := (entity).(*ThingEntity)
-		if e.Description == "" {
-			return errors.New("Missing mandatory property for Thing entity: 'description'")
-		}
+		// e := (entity).(*ThingEntity)
 
 	case ENTITY_OBSERVATIONS:
-		e := (entity).(*ObservationEntity)
-		if e.PhenomenonTime == nil {
-			return errors.New("Missing mandatory property for Observation entity: 'phenomenonTime'")
-		}
-
-		if e.PhenomenonTime.IsZero() {
-			return errors.New("Missing mandatory property for Observation entity: 'phenomenonTime'")
-		}
-
-		if e.ResultTime == nil {
-			return errors.New("Missing mandatory property for Observation entity: 'resultTime'")
-		}
-		if e.ResultTime.IsZero() {
-			return errors.New("Missing mandatory property for Observation entity: 'resultTime'")
-		}
-
-		if e.Result == nil {
-			return errors.New("Missing mandatory property for Observation entity: 'result'")
-		}
+		// e := (entity).(*ObservationEntity)
 
 	case ENTITY_HISTORICALLOCATIONS:
-		e := (entity).(*HistoricalLocationEntity)
-		if e.Time.IsZero() {
-			return errors.New("Missing mandatory property for HistoricalLocation entity: 'time'")
-		}
+		// e := (entity).(*HistoricalLocationEntity)
 
 	case ENTITY_SENSORS:
-		e := (entity).(*SensorEntity)
-		if e.Description == "" {
-			return errors.New("Missing mandatory property for Sensor entity: 'description'")
-		}
-
-		if e.EncodingType == "" {
-			return errors.New("Missing mandatory property for Sensor entity: 'encodingType'")
-		}
-
-		if e.Metadata == "" {
-			return errors.New("Missing mandatory property for Sensor entity: 'metadata'")
-		}
+		// e := (entity).(*SensorEntity)
 
 	case ENTITY_LOCATIONS:
-		e := (entity).(*LocationEntity)
-		if e.Description == "" {
-			return errors.New("Missing mandatory property for Location entity: 'description'")
-		}
-
-		if e.EncodingType == "" {
-			return errors.New("Missing mandatory property for Location entity: 'encodingType'")
-		}
-
-		if e.Location == nil {
-			return errors.New("Missing mandatory property for Location entity: 'location'")
-		}
+		// e := (entity).(*LocationEntity)
 
 	case ENTITY_FEATURESOFINTERESTS:
-		e := (entity).(*FeatureOfInterestEntity)
-		if e.Description == "" {
-			return errors.New("Missing mandatory property for FeaturesOfInterest entity: 'description'")
-		}
-
-		if e.EncodingType == "" {
-			return errors.New("Missing mandatory property for FeaturesOfInterest entity: 'encodingType'")
-		}
-
-		if e.Feature == nil {
-			return errors.New("Missing mandatory property for FeaturesOfInterest entity: 'feature'")
-		}
+		// e := (entity).(*FeatureOfInterestEntity)
 
 	case ENTITY_DATASTREAMS:
 		e := (entity).(*DatastreamEntity)
-		if e.Description == "" {
-			return errors.New("Missing mandatory property for Datastream entity: 'description'")
-		}
+		switch {
+		case et == ENTITY_SENSOR || et == ENTITY_SENSORS:
+			return e.IdSensor
 
-		if e.UnitOfMeasurement == nil {
-			return errors.New("Missing mandatory property for Datastream entity: 'unitOfMeasurement'")
-		}
+		case et == ENTITY_THING || et == ENTITY_THINGS:
+			return e.IdThing
 
-		if e.ObservationType == "" {
-			return errors.New("Missing mandatory property for Datastream entity: 'observationType'")
+		case et == ENTITY_OBSERVEDPROPERTIES || et == ENTITY_OBSERVEDPROPERTY:
+			return e.IdObservedProperty
 		}
 
 	case ENTITY_OBSERVEDPROPERTIES:
-		e := (entity).(*ObservedPropertyEntity)
-		if e.Name == "" {
-			return errors.New("Missing mandatory property for ObservedProperty entity: 'name'")
-		}
-
-		if e.Definition == "" {
-			return errors.New("Missing mandatory property for ObservedProperty entity: 'definition'")
-		}
-
-		if e.Description == "" {
-			return errors.New("Missing mandatory property for ObservedProperty entity: 'description'")
-		}
+		// e := (entity).(*ObservedPropertyEntity)
 	}
-	return nil
-}
-
-func ValidateIntegrityConstraints(entity SensorThing) error {
-	switch entity.GetType() {
-	case ENTITY_OBSERVATIONS:
-		e := (entity).(*ObservationEntity)
-		if e.IdDatastream == "" && e.Datastream == nil {
-			return errors.New("Missing constrains for Observation Entity: 'Datastream'")
-		}
-
-	case ENTITY_DATASTREAMS:
-		e := (entity).(*DatastreamEntity)
-		if e.IdThing == "" && e.Thing == nil {
-			return errors.New("Missing constrains for Datastream Entity: 'Thing'")
-		}
-
-		if e.IdSensor == "" && e.Sensor == nil {
-			return errors.New("Missing constrains for Datastream Entity: 'Sensor'")
-		}
-
-		if e.IdObservedProperty == "" && e.ObservedProperty == nil {
-			return errors.New("Missing constrains for Datastream Entity: 'ObservedProperty'")
-		}
-	}
-	return nil
+	return ""
 }
 
 func SetAssociatedEntityId(entity SensorThing, et EntityType, id string) {
 	switch entity.GetType() {
 	case ENTITY_THINGS:
+		e := (entity).(*ThingEntity)
+		if et == ENTITY_LOCATIONS {
+			entity := NewLocationEntity()
+			entity.Id = id
+			e.Locations = []*LocationEntity{entity}
+		}
+
+		if et == ENTITY_DATASTREAMS {
+			entity := NewDatastreamEntity()
+			entity.Id = id
+			e.Datastreams = []*DatastreamEntity{entity}
+		}
 
 	case ENTITY_OBSERVATIONS:
 		e := (entity).(*ObservationEntity)
@@ -200,12 +120,12 @@ func DecodeJsonToEntityStruct(decoder *json.Decoder, et EntityType) (SensorThing
 	case ENTITY_THINGS:
 		var e ThingEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 
 	case ENTITY_OBSERVATIONS:
 		var e ObservationEntity
 		err = decoder.Decode(&e)
-		return e, err
+		return &e, err
 
 	case ENTITY_HISTORICALLOCATIONS:
 		return nil, errors.New("Adding Historical Locations not allowed")
@@ -237,3 +157,20 @@ func DecodeJsonToEntityStruct(decoder *json.Decoder, et EntityType) (SensorThing
 	}
 	return nil, errors.New("Unknown Entity Type")
 }
+
+func ThrowHttpBadRequest(msg string, w http.ResponseWriter) {
+	http.Error(w, msg, http.StatusBadRequest)
+}
+
+func ThrowHttpInternalServerError(msg string, w http.ResponseWriter) {
+	http.Error(w, msg, http.StatusInternalServerError)
+}
+
+func ThrowHttpMethodNotAllowed(msg string, w http.ResponseWriter) {
+	http.Error(w, msg, http.StatusMethodNotAllowed)
+}
+
+func GenerateEntityId() string {
+	return uuid.NewV4().String()
+}
+

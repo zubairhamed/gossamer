@@ -176,8 +176,6 @@ type Datastore interface {
 // Entities
 type SensorThing interface {
 	GetId() string
-	GetAssociatedEntityId(EntityType) string
-	// SetAssociatedEntityId(EntityType, string)
 	GetSelfLink() string
 	GetType() EntityType
 }
@@ -259,11 +257,11 @@ type Datastream interface {
 	// GetUnitOfMeasurement() // UnitOfMeasure !!
 
 	// The type of Observation (with unique result type), which is used by the service to encode observations.
-//	GetObservationType() // !!
+	//	GetObservationType() // !!
 
 	// The spatial bounding box of the spatial extent of all FeaturesOfInterest that belong to the
 	// Observations associated with this Datastream.
-//	GetObservedArea() // !!
+	//	GetObservedArea() // !!
 
 	// The temporal bounding box of the phenomenon times of all observations belonging to this Datastream.
 	// GetPhenomenonTime() time.Time

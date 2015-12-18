@@ -70,38 +70,19 @@ func NewFeatureOfInterestEntity() *FeatureOfInterestEntity {
 // that is capable of being identified and integrated into communication networks [ITU-T Y.2060].
 type ThingEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkLocations           string               `json:"Locations@iot.navigationLink,omitempty" bson:"-"`
-	NavLinkDatastreams         string               `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
-	NavLinkHistoricalLocations string               `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
-	Description                string               `json:"description,omitempty"`
-	Properties                 map[string]string    `json:"properties,omitempty"`
-	IdLocations                []string             `json:"-" bson:"@iot_locations_id"`
-	Locations                  []Location           `json:",omitempty" bson:"-"`
-	HistoricalLocations        []HistoricalLocation `json:",omitempty" bson:"-"`
-	Datastreams                []Datastream         `json:",omitempty" bson:"-"`
+	NavLinkLocations           string                      `json:"Locations@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkDatastreams         string                      `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkHistoricalLocations string                      `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
+	Description                string                      `json:"description,omitempty"`
+	Properties                 map[string]string           `json:"properties,omitempty"`
+	IdLocations                []string                    `json:"-" bson:"@iot_locations_id"`
+	Locations                  []*LocationEntity           `json:",omitempty" bson:"-"`
+	HistoricalLocations        []*HistoricalLocationEntity `json:",omitempty" bson:"-"`
+	Datastreams                []*DatastreamEntity         `json:",omitempty" bson:"-"`
 }
 
 func (e ThingEntity) GetType() EntityType {
 	return ENTITY_THINGS
-}
-
-func (e ThingEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e ThingEntity) SetAssociatedEntityId(et EntityType, id string) {
-	if et == ENTITY_LOCATIONS {
-		entity := &LocationEntity{}
-		entity.Id = id
-		e.Locations = []Location{ entity }
-	}
-
-	if et == ENTITY_DATASTREAMS {
-		entity := &DatastreamEntity{}
-		entity.Id = id
-		e.Datastreams = []Datastream{ entity }
-	}
-
 }
 
 // The Location entity locates the Thing or the Things it associated with. A Thing’s Location entity is
@@ -119,8 +100,8 @@ type LocationEntity struct {
 	Description                string               `json:"description,omitempty"`
 	EncodingType               EncodingType         `json:"encodingType,omitempty" bson:"encodingType"`
 	Location                   interface{}          `json:"location,omitempty" bson:"location"`
-	Things                     []Thing              `json:",omitempty" bson:"-"`
-	HistoricalLocations        []HistoricalLocation `json:",omitempty" bson:"-"`
+	Things                     []Thing              `json:"Things,omitempty" bson:"-"`
+	HistoricalLocations        []HistoricalLocation `json:"HistoricalLocations,omitempty" bson:"-"`
 }
 
 func (e LocationEntity) GetDescription() string {
@@ -135,38 +116,22 @@ func (e LocationEntity) GetType() EntityType {
 	return ENTITY_LOCATIONS
 }
 
-func (e LocationEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e LocationEntity) SetAssociatedEntityId(et EntityType, id string) {
-
-}
-
 // A Thing’s HistoricalLocation entity set provides the current (i.e., last known) and previous locations of the
 // Thing with their time.
 type HistoricalLocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkHistoricalLocations string `json:"HistoricalLocations@iot.navigationLink,omitempty"`
-	NavLinkThing               string `json:"Thing@iot.navigationLink,omitempty"`
-	Time                       time.Time
+	NavLinkHistoricalLocations string       `json:"HistoricalLocations@iot.navigationLink,omitempty"`
+	NavLinkThing               string       `json:"Thing@iot.navigationLink,omitempty"`
+	Time                       time.Time    `json:"time"`
 	EncodingType               EncodingType `json:"encodingType,omitempty"`
 	IdThing                    string       `json:"-" bson:"@iot_things_id"`
 	IdLocations                []string     `json:"-" bson:"@iot_locations_id"`
-	Thing                      Thing        `json:",omitempty"`
-	Locations                  []Location   `json:",omitempty"`
+	Thing                      Thing        `json:"Thing,omitempty"`
+	Locations                  []Location   `json:"Locations,omitempty"`
 }
 
 func (e HistoricalLocationEntity) GetType() EntityType {
 	return ENTITY_HISTORICALLOCATIONS
-}
-
-func (e HistoricalLocationEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e HistoricalLocationEntity) SetAssociatedEntityId(et EntityType, id string) {
-
 }
 
 // A Datastream groups a collection of Observations and the Observations in a Datastream measure the
@@ -185,53 +150,27 @@ type DatastreamEntity struct {
 	IdThing                 string                  `json:"-" bson:"@iot_things_id"`
 	IdObservedProperty      string                  `json:"-" bson:"@iot_observedproperties_id"`
 	IdSensor                string                  `json:"-" bson:"@iot_sensors_id"`
-	Thing                   *ThingEntity            `json:"Thing" bson:"-"`
-	ObservedProperty        *ObservedPropertyEntity `json:"ObservedProperty" bson:"-"`
-	Sensor                  *Sensor                 `json:"Sensor" bson:"-"`
+	Thing                   *ThingEntity            `json:"Thing,omitempty" bson:"-"`
+	ObservedProperty        *ObservedPropertyEntity `json:"ObservedProperty,omitempty" bson:"-"`
+	Sensor                  *SensorEntity           `json:"Sensor,omitempty" bson:"-"`
 }
 
 func (e DatastreamEntity) GetType() EntityType {
 	return ENTITY_DATASTREAMS
 }
 
-func (e DatastreamEntity) GetAssociatedEntityId(ent EntityType) string {
-	switch {
-	case ent == ENTITY_SENSOR || ent == ENTITY_SENSORS:
-		return e.IdSensor
-
-	case ent == ENTITY_THING || ent == ENTITY_THINGS:
-		return e.IdThing
-
-	case ent == ENTITY_OBSERVEDPROPERTIES || ent == ENTITY_OBSERVEDPROPERTY:
-		return e.IdObservedProperty
-	}
-	return ""
-}
-
-func (e DatastreamEntity) SetAssociatedEntityId(et EntityType, id string) {
-
-}
-
 // A Sensor is an instrument that observes a property or phenomenon with the goal of producing an estimate of the
 // value of the property.
 type SensorEntity struct {
 	SensorThingsEntity `bson:",inline"`
-	NavLinkDatastreams string       `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
-	Description        string       `json:"description,omitempty"`
-	EncodingType       EncodingType `json:"encodingType,omitempty"`
-	Metadata           string       `json:"metadata,omitempty"`
+	NavLinkDatastreams string            `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
+	Description        string            `json:"description,omitempty"`
+	EncodingType       EncodingType      `json:"encodingType,omitempty"`
+	Metadata           string            `json:"metadata,omitempty"`
 }
 
 func (e SensorEntity) GetType() EntityType {
 	return ENTITY_SENSORS
-}
-
-func (e SensorEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e SensorEntity) SetAssociatedEntityId(et EntityType, id string) {
-
 }
 
 // An ObservedProperty specifies the phenomenon of an Observation.
@@ -245,14 +184,6 @@ type ObservedPropertyEntity struct {
 
 func (e ObservedPropertyEntity) GetType() EntityType {
 	return ENTITY_OBSERVEDPROPERTIES
-}
-
-func (e ObservedPropertyEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e ObservedPropertyEntity) SetAssociatedEntityId(et EntityType, id string) {
-
 }
 
 // An Observation is act of measuring or otherwise determining the value of a property
@@ -273,22 +204,6 @@ func (e ObservationEntity) GetType() EntityType {
 	return ENTITY_OBSERVATIONS
 }
 
-func (e ObservationEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e *ObservationEntity) SetAssociatedEntityId(et EntityType, id string) {
-	if et == ENTITY_DATASTREAMS {
-		e.Datastream = NewDatastreamEntity()
-		e.Datastream.Id = id
-	}
-
-	if et == ENTITY_FEATURESOFINTERESTS {
-		e.FeatureOfInterest = NewFeatureOfInterestEntity()
-		e.FeatureOfInterest.Id = id
-	}
-}
-
 // An Observation results in a value being assigned to a phenomenon. The phenomenon is a property of a feature, the
 // latter being the FeatureOfInterest of the Observation [OGC and ISO 19156:2001]. In the context of the Internet of
 // Things, many Observations’ FeatureOfInterest can be the Location of the Thing. For example, the FeatureOfInterest
@@ -305,12 +220,4 @@ type FeatureOfInterestEntity struct {
 
 func (e FeatureOfInterestEntity) GetType() EntityType {
 	return ENTITY_FEATURESOFINTERESTS
-}
-
-func (e FeatureOfInterestEntity) GetAssociatedEntityId(ent EntityType) string {
-	return ""
-}
-
-func (e FeatureOfInterestEntity) SetAssociatedEntityId(et EntityType, id string) {
-
 }
