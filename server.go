@@ -214,7 +214,7 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST + err.Error(), w)
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
 	}
 
 	if err = ValidatePostRequestUrl(req); err != nil {

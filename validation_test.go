@@ -1,7 +1,9 @@
 package gossamer
+
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
 
 func TestValidateMandatoryPropertiesForThing(t *testing.T) {

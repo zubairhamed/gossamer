@@ -1,4 +1,5 @@
 package gossamer
+
 import "errors"
 
 func ValidateMandatoryProperties(entity SensorThing) error {
@@ -136,7 +137,7 @@ func ValidateIntegrityConstraints(entity SensorThing) error {
 
 // TODO: Refactor this into whitelists
 func ValidatePostRequestUrl(req Request) error {
-	rp :=  req.GetResourcePath()
+	rp := req.GetResourcePath()
 	last := rp.Last()
 	lastEntity := last.GetEntity()
 	cont := rp.Containing()
@@ -150,9 +151,9 @@ func ValidatePostRequestUrl(req Request) error {
 
 	contEntity := cont.GetEntity()
 
-	if 	contEntity == ENTITY_THINGS && lastEntity == ENTITY_LOCATIONS ||
-	contEntity == ENTITY_THINGS && lastEntity == ENTITY_DATASTREAMS ||
-	contEntity == ENTITY_DATASTREAMS && lastEntity == ENTITY_OBSERVATIONS {
+	if contEntity == ENTITY_THINGS && lastEntity == ENTITY_LOCATIONS ||
+		contEntity == ENTITY_THINGS && lastEntity == ENTITY_DATASTREAMS ||
+		contEntity == ENTITY_DATASTREAMS && lastEntity == ENTITY_OBSERVATIONS {
 
 		return nil
 	}

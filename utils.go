@@ -173,4 +173,3 @@ func ThrowHttpMethodNotAllowed(msg string, w http.ResponseWriter) {
 func GenerateEntityId() string {
 	return uuid.NewV4().String()
 }
-

@@ -163,10 +163,10 @@ func (e DatastreamEntity) GetType() EntityType {
 // value of the property.
 type SensorEntity struct {
 	SensorThingsEntity `bson:",inline"`
-	NavLinkDatastreams string            `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
-	Description        string            `json:"description,omitempty"`
-	EncodingType       EncodingType      `json:"encodingType,omitempty"`
-	Metadata           string            `json:"metadata,omitempty"`
+	NavLinkDatastreams string       `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
+	Description        string       `json:"description,omitempty"`
+	EncodingType       EncodingType `json:"encodingType,omitempty"`
+	Metadata           string       `json:"metadata,omitempty"`
 }
 
 func (e SensorEntity) GetType() EntityType {

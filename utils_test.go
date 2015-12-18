@@ -12,4 +12,3 @@ func TestResolveEntityLinkFunctions(t *testing.T) {
 func TestResolveSelfLinkUrlFunctions(t *testing.T) {
 	assert.Equal(t, "http://localhost:8000/v1.0/Things(12345)", ResolveSelfLinkUrl("12345", "Things"))
 }
-
