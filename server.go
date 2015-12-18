@@ -155,7 +155,7 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 
 	out, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
 	}
 	w.Write(out)
 }
@@ -163,13 +163,13 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
 	req, err := CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusBadRequest)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusBadRequest)
 	}
 
 	rp := req.GetResourcePath()
 	result, err := s.dataStore.Query(rp, req.GetQueryOptions())
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
 	}
 
 	var jsonOut interface{}
@@ -193,12 +193,12 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 
 	b, err := json.MarshalIndent(jsonOut, "", "  ")
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
 	}
 
 	_, err = w.Write(b)
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusInternalServerError)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -210,71 +210,39 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		http.Error(w, MSG_ERR_HANDLING_REQUEST + err.Error(), http.StatusBadRequest)
+		http.Error(w, MSG_ERR_HANDLING_REQUEST+err.Error(), http.StatusBadRequest)
 	}
 
 	decoder := json.NewDecoder(r.Body)
 
-	var payload interface{}
-	ent := req.GetResourcePath().Last().GetEntity()
+	rp := req.GetResourcePath()
+	ent := rp.Last().GetEntity()
+	cont := rp.Containing()
+
 	if !IsSingularEntity(string(ent)) {
-		switch ent {
-		case ENTITY_THINGS:
-			var e ThingEntity
-			err = decoder.Decode(&e)
-			payload = &e
-
-		case ENTITY_OBSERVATIONS:
-			var e ObservationEntity
-			err = decoder.Decode(&e)
-			payload = &e
-
-		case ENTITY_HISTORICALLOCATIONS:
-			http.Error(w, "Adding Historical Locations not allowed", http.StatusMethodNotAllowed)
-			return
-
-		case ENTITY_SENSORS:
-			var e SensorThingsEntity
-			err = decoder.Decode(&e)
-			payload = &e
-
-		case ENTITY_LOCATION:
-			var e LocationEntity
-			err = decoder.Decode(&e)
-			payload = &e
-
-		case ENTITY_FEATURESOFINTERESTS:
-			var e FeatureOfInterestEntity
-			err = decoder.Decode(&e)
-			payload = &e
-
-		case ENTITY_DATASTREAMS:
-			var e DatastreamEntity
-			err = decoder.Decode(&e)
-			payload = &e
-
-		case ENTITY_OBSERVEDPROPERTIES:
-			var e ObservedPropertyEntity
-			err = decoder.Decode(&e)
-			payload = &e
+		e, err := DecodeJsonToEntityStruct(decoder, ent);
+		if err != nil {
+			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusInternalServerError)
+		}
+		if cont != nil {
+			SetAssociatedEntityId(e, cont.GetEntity(), cont.GetId())
 		}
 
-		st := payload.(SensorThing)
 		rp := req.GetResourcePath()
 
-		err = ValidateMandatoryProperties(st)
+		err = ValidateMandatoryProperties(e)
 		if err != nil {
 			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		err = ValidateIntegrityConstraints(st)
+		err = ValidateIntegrityConstraints(e)
 		if err != nil {
 			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		err = s.dataStore.Insert(rp, st)
+		err = s.dataStore.Insert(rp, e)
 		if err != nil {
 			http.Error(w, MSG_ERR_INSERTING_ENTITY + err.Error(), http.StatusBadRequest)
 			return

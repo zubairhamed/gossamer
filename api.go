@@ -21,12 +21,16 @@ const (
 )
 
 type ResourcePath interface {
+	All() []ResourcePathItem
+	Current() ResourcePathItem
 	Next() ResourcePathItem
 	Prev() ResourcePathItem
-	Current() ResourcePathItem
 	First() ResourcePathItem
 	Last() ResourcePathItem
-	All() []ResourcePathItem
+
+	// Get the containing resource for the target resource
+	// e.g. returns
+	Containing() ResourcePathItem
 
 	IsLast() bool
 	IsFirst() bool
@@ -173,6 +177,7 @@ type Datastore interface {
 type SensorThing interface {
 	GetId() string
 	GetAssociatedEntityId(EntityType) string
+	// SetAssociatedEntityId(EntityType, string)
 	GetSelfLink() string
 	GetType() EntityType
 }
@@ -212,10 +217,10 @@ type Location interface {
 	SensorThing
 	GetDescription() string
 	GetEncodingType() LocationEncodingType
-	GetLocationType() // !! depending on GetEncodingType()
+	// GetLocationType() // !! depending on GetEncodingType()
 
-	GetThings() []Thing
-	GetHistoricalLocations() []HistoricalLocation
+	// GetThings() []Thing
+	// GetHistoricalLocations() []HistoricalLocation
 }
 
 // A Thing’s HistoricalLocation entity set provides the current (i.e., last known) and previous locations of the
@@ -245,31 +250,31 @@ const (
 type Datastream interface {
 	SensorThing
 
-	GetDescription() string
+	// GetDescription() string
 
 	// A JSON Object containing three key- value pairs. The name property presents the full name of the
 	// unitOfMeasurement; the symbol property shows the textual form of the unit symbol; and the definition
 	// contains the IRI defining the unitOfMeasurement.
 	// The values of these properties SHOULD follow the Unified Code for Unit of Measure (UCUM).
-	GetUnitOfMeasurement() // UnitOfMeasure !!
+	// GetUnitOfMeasurement() // UnitOfMeasure !!
 
 	// The type of Observation (with unique result type), which is used by the service to encode observations.
-	GetObservationType() // !!
+//	GetObservationType() // !!
 
 	// The spatial bounding box of the spatial extent of all FeaturesOfInterest that belong to the
 	// Observations associated with this Datastream.
-	GetObservedArea() // !!
+//	GetObservedArea() // !!
 
 	// The temporal bounding box of the phenomenon times of all observations belonging to this Datastream.
-	GetPhenomenonTime() time.Time
+	// GetPhenomenonTime() time.Time
 
 	// The temporal bounding box of the result times of all observations belonging to this Datastream.
-	GetResultTime() time.Time
+	// GetResultTime() time.Time
 
-	GetThing() Thing
-	GetSensor() Sensor
-	GetObservedProperty() ObservedProperty
-	GetObservations() []Observation
+	// GetThing() Thing
+	// GetSensor() Sensor
+	// GetObservedProperty() ObservedProperty
+	// GetObservations() []Observation
 }
 
 type SensorEncodingType string

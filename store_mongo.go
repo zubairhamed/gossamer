@@ -338,21 +338,17 @@ func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err err
 		e := payload.(*ObservationEntity)
 		e.Id = "abc123"
 		if e.Datastream != nil {
-			if e.Datastream.Id != "" {
-				e.IdDatastream = e.Datastream.Id
-			} else {
+			if e.Datastream.Id == "" {
 				// Insert New DataStream in Datastream Collection
-				// e.IdDatastream = e.Datastream.id
 			}
+			e.IdDatastream = e.Datastream.Id
 		}
 
 		if e.FeatureOfInterest != nil {
-			if e.FeatureOfInterest.Id != "" {
-				e.IdFeatureOfInterest = e.FeatureOfInterest.Id
-			} else {
+			if e.FeatureOfInterest.Id == "" {
 				// Insert New FeatureOfInterest in FeatureOfInterest Collection
-				// e.IdFeatureOfInterest = e.FeatureOfInterest.id
 			}
+			e.IdFeatureOfInterest = e.FeatureOfInterest.Id
 		}
 
 		c := session.DB(m.db).C(ResolveMongoCollectionName(ENTITY_OBSERVATIONS))
