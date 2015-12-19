@@ -182,7 +182,7 @@ func TestCrudSensingProfile(t *testing.T) {
 //	log.Println(duration.Seconds())
 
 	// Clear Collection
-	// DropCollection()
+	DropCollection()
 }
 
 func GetMapProperty(idx int, prop string, val map[string]interface{}) string {
