@@ -98,7 +98,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			}
 			return rs
 
-		case ENTITY_FEATURESOFINTERESTS:
+		case ENTITY_FEATURESOFINTEREST:
 			rs := []FeatureOfInterestEntity{}
 			var r FeatureOfInterestEntity
 			for iter.Next(&r) {
@@ -154,7 +154,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			m.postHandleObservation(&r, opts)
 			return r
 
-		case ent == ENTITY_FEATURESOFINTERESTS || ent == ENTITY_FEATURESOFINTEREST:
+		case ent == ENTITY_FEATURESOFINTEREST:
 			var r FeatureOfInterestEntity
 			query.One(&r)
 			m.postHandleFeatureOfInterest(&r, opts)
@@ -181,7 +181,7 @@ func (m *MongoStore) createQuery(c *mgo.Collection, rp ResourcePath, opts QueryO
 		bsonMap["@iot_id"] = curr.GetId()
 		findMultiple = false
 	} else if IsSingularEntity(string(currEntity)) {
-		bsonMap["@iot_id"] = lastResult.(SensorThing).GetAssociatedEntityId(currEntity)
+		bsonMap["@iot_id"] = GetAssociatedEntityId(lastResult.(SensorThing), currEntity)
 		findMultiple = false
 	} else {
 		findMultiple = true
@@ -286,6 +286,166 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 	return results, nil
 }
 
+func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
+	queryComplete := make(chan bool)
+	var results interface{}
+
+	go func() {
+		session := m.cloneSession()
+		defer session.Close()
+
+		opts, _ := CreateQueryOptions("")
+		for rp.HasNext() {
+			curr := rp.Next()
+			currEntity := curr.GetEntity()
+			c := session.DB(m.db).C(ResolveMongoCollectionName(currEntity))
+			query, findMultiple := m.createQuery(c, rp, opts, results)
+
+			resourceQueryComplete := make(chan bool)
+			go func() {
+				results = m.doQuery(query, currEntity, findMultiple, opts)
+				resourceQueryComplete <- true
+			}()
+			<-resourceQueryComplete
+
+			if rp.IsLast() {
+				break
+			}
+		}
+
+		// Generate IoT ID and Insert
+		err := m.doInsert(payload, results)
+		if err != nil {
+			log.Println(err)
+		}
+
+		queryComplete <- true
+	}()
+	<-queryComplete
+
+	return nil
+}
+
+func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err error) {
+	var insertData interface{}
+
+	switch payload.GetType() {
+	case ENTITY_LOCATIONS:
+		e := payload.(*LocationEntity)
+		e.Id = GenerateEntityId()
+		insertData = e
+
+	case ENTITY_OBSERVATIONS:
+		e := payload.(*ObservationEntity)
+		e.Id = GenerateEntityId()
+		if e.Datastream != nil {
+			if e.Datastream.Id == "" {
+				// TODO: Insert New DataStream in Datastream Collection
+				log.Println("TODO: Insert New DataStream in Datastream Collection")
+			}
+			e.IdDatastream = e.Datastream.Id
+		}
+
+		if e.FeatureOfInterest != nil {
+			if e.FeatureOfInterest.Id == "" {
+				// TODO: Insert New FeatureOfInterest in FeatureOfInterest Collection
+				log.Println("TODO: Insert New FeatureOfInterest in FeatureOfInterest Collection")
+			}
+			e.IdFeatureOfInterest = e.FeatureOfInterest.Id
+		}
+		insertData = e
+
+	case ENTITY_THINGS:
+		e := payload.(*ThingEntity)
+		e.Id = GenerateEntityId()
+		e.IdLocations = []string{}
+		for _, v := range e.Locations {
+			locId := v.Id
+			if locId == "" {
+				locId = GenerateEntityId()
+				// TODO: Insert New Location
+				log.Println("TODO: Insert New Location")
+			}
+			e.IdLocations = append(e.IdLocations, locId)
+		}
+
+		for _, v := range e.Datastreams {
+			dsId := v.Id
+			if dsId == "" {
+				dsId = GenerateEntityId()
+				// TODO: Insert New Datastream
+				log.Println("TODO: Insert New Datastream")
+			} else {
+				// Unlink existing datastream.thing and relink to this one? Wut wut?
+			}
+		}
+
+		insertData = e
+
+	case ENTITY_HISTORICALLOCATIONS:
+		// Shouldn't be allowed to insert
+
+	case ENTITY_DATASTREAMS:
+		e := payload.(*DatastreamEntity)
+		e.Id = GenerateEntityId()
+
+		if e.ObservedProperty != nil {
+			if e.ObservedProperty.Id == "" {
+				// TODO: Insert New ObservedProperty
+				log.Println("TODO: Insert New ObservedProperty")
+			}
+			e.IdObservedProperty = e.ObservedProperty.Id
+		}
+
+		if e.Sensor != nil {
+			if e.Sensor.Id == "" {
+				// TODO: Insert New Sensor
+				log.Println("TODO: Insert New Sensor")
+			}
+			e.IdSensor = e.Sensor.Id
+		}
+
+		if e.Thing != nil {
+			if e.Thing.Id == "" {
+				// TODO: Insert New Thing
+				log.Println("TODO: Insert New Thing")
+			}
+			e.IdThing = e.Thing.Id
+		}
+
+		insertData = e
+
+	case ENTITY_SENSORS:
+		e := payload.(*SensorEntity)
+		e.Id = GenerateEntityId()
+
+		insertData = e
+
+	case ENTITY_OBSERVEDPROPERTIES:
+		e := payload.(*ObservedPropertyEntity)
+		e.Id = GenerateEntityId()
+
+		insertData = e
+
+	case ENTITY_FEATURESOFINTEREST:
+		e := payload.(*FeatureOfInterestEntity)
+		e.Id = GenerateEntityId()
+
+		insertData = e
+	}
+
+	session := m.cloneSession()
+	defer session.Close()
+
+	c := session.DB(m.db).C(ResolveMongoCollectionName(payload.GetType()))
+	err = c.Insert(insertData)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	return nil
+}
+
 func (m *MongoStore) postHandleThing(e *ThingEntity, opts QueryOptions) {
 
 	if !opts.SelectSet() {
@@ -302,7 +462,6 @@ func (m *MongoStore) postHandleObservedProperty(e *ObservedPropertyEntity, opts 
 		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_OBSERVEDPROPERTIES)
 
 		e.NavLinkDatastreams = ResolveEntityLink(e.Id, ENTITY_OBSERVEDPROPERTIES) + "/Datastreams"
-
 	}
 }
 
@@ -345,9 +504,9 @@ func (m *MongoStore) postHandleObservation(e *ObservationEntity, opts QueryOptio
 
 func (m *MongoStore) postHandleFeatureOfInterest(e *FeatureOfInterestEntity, opts QueryOptions) {
 	if !opts.SelectSet() {
-		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTERESTS)
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTEREST)
 
-		e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTERESTS) + "/Observations"
+		e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTEREST) + "/Observations"
 	}
 }
 
@@ -380,8 +539,8 @@ func ResolveMongoCollectionName(ent EntityType) string {
 	case ent == ENTITY_OBSERVATION || ent == ENTITY_OBSERVATIONS:
 		return "observations"
 
-	case ent == ENTITY_FEATURESOFINTEREST || ent == ENTITY_FEATURESOFINTERESTS:
-		return "featureofinterests"
+	case ent == ENTITY_FEATURESOFINTEREST:
+		return "featuresofinterest"
 
 	case ent == ENTITY_HISTORICALLOCATION || ent == ENTITY_HISTORICALLOCATIONS:
 		return "historicallocations"

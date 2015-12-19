@@ -1,0 +1,12 @@
+400	Bad Request – Something in your request is not correct. It could be the content of the JSON or it could be the server endpoint is not expecting this content.
+401	Unauthorized – Bad API key
+404	Not Found – The resource you are looking for does not exist on the system.
+405	Method not allowed – You requested a method that has not been implemented on the server.
+406	Not Acceptable – You requested a format that isn’t JSON.
+409	Conflict – A resource constraint has been violated.
+410	Gone – The resource requested has been removed.
+429	Too Many Requests – Too much load right now. Try again later.
+500	Internal Server Error – We had a problem with our server. Try again later.
+503	Service Unavailable – We’re temporarially offline for maintanance. Please try again later.
+------------------------------------------------------------------------------------------------------
+

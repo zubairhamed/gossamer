@@ -1,7 +1,8 @@
 package gossamer
+
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestServer(t *testing.T) {
@@ -9,7 +10,7 @@ func TestServer(t *testing.T) {
 	assert.NotNil(t, server)
 }
 
-func TestDiscoverEntityTypeFunction(t *testing.T){
+func TestDiscoverEntityTypeFunction(t *testing.T) {
 	assert.Equal(t, ENTITY_THINGS, DiscoverEntityType("Things"))
 	assert.Equal(t, ENTITY_THING, DiscoverEntityType("Thing"))
 	assert.Equal(t, ENTITY_LOCATIONS, DiscoverEntityType("Locations"))
@@ -22,7 +23,6 @@ func TestDiscoverEntityTypeFunction(t *testing.T){
 	assert.Equal(t, ENTITY_OBSERVATION, DiscoverEntityType("Observation"))
 	assert.Equal(t, ENTITY_OBSERVEDPROPERTIES, DiscoverEntityType("ObservedProperties"))
 	assert.Equal(t, ENTITY_OBSERVEDPROPERTY, DiscoverEntityType("ObservedProperty"))
-	assert.Equal(t, ENTITY_FEATURESOFINTERESTS, DiscoverEntityType("FeaturesOfInterests"))
 	assert.Equal(t, ENTITY_FEATURESOFINTEREST, DiscoverEntityType("FeaturesOfInterest"))
 	assert.Equal(t, ENTITY_HISTORICALLOCATIONS, DiscoverEntityType("HistoricalLocations"))
 	assert.Equal(t, ENTITY_HISTORICALLOCATION, DiscoverEntityType("HistoricalLocation"))
@@ -62,10 +62,8 @@ func TestIsSingularEntityFunction(t *testing.T) {
 	assert.False(t, IsSingularEntity("Sensors"))
 	assert.True(t, IsSingularEntity("Observation"))
 	assert.False(t, IsSingularEntity("Observations"))
-	assert.True(t, IsSingularEntity("FeaturesOfInterest"))
-	assert.False(t, IsSingularEntity("FeaturesOfInterests"))
+	assert.False(t, IsSingularEntity("FeaturesOfInterest"))
 	assert.True(t, IsSingularEntity("HistoricalLocation"))
 	assert.False(t, IsSingularEntity("HistoricalLocations"))
 	assert.False(t, IsSingularEntity("UNKNOWN"))
 }
-

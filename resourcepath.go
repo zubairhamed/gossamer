@@ -39,6 +39,14 @@ func (r *SensorThingsResourcePath) Current() ResourcePathItem {
 	return r.At(r.currIndex)
 }
 
+func (r *SensorThingsResourcePath) Containing() ResourcePathItem {
+	l := len(r.items)
+	if l > 1 {
+		return r.At(l - 2)
+	}
+	return nil
+}
+
 func (r *SensorThingsResourcePath) First() ResourcePathItem {
 	r.currIndex = 0
 	return r.At(r.currIndex)
