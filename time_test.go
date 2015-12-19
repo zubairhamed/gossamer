@@ -44,6 +44,6 @@ func TestTimePeriod(t *testing.T) {
 }
 
 func TestTimeInstant(t *testing.T) {
-	ti := NewTimeInstant()
+	ti := NewTimeInstant(time.Now())
 	assert.NotNil(t, ti)
 }

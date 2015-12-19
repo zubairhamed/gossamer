@@ -65,7 +65,7 @@ func ValidateMandatoryProperties(entity SensorThing) error {
 			return errors.New("Missing mandatory property for Location entity: 'location'")
 		}
 
-	case ENTITY_FEATURESOFINTERESTS:
+	case ENTITY_FEATURESOFINTEREST:
 		e := (entity).(*FeatureOfInterestEntity)
 		if e.Description == "" {
 			return errors.New("Missing mandatory property for FeaturesOfInterest entity: 'description'")
@@ -150,10 +150,9 @@ func ValidatePostRequestUrl(req Request) error {
 	}
 
 	contEntity := cont.GetEntity()
-
 	if contEntity == ENTITY_THINGS && lastEntity == ENTITY_LOCATIONS ||
-		contEntity == ENTITY_THINGS && lastEntity == ENTITY_DATASTREAMS ||
-		contEntity == ENTITY_DATASTREAMS && lastEntity == ENTITY_OBSERVATIONS {
+	   contEntity == ENTITY_FEATURESOFINTEREST && lastEntity == ENTITY_DATASTREAMS ||
+	   contEntity == ENTITY_DATASTREAMS && lastEntity == ENTITY_OBSERVATIONS {
 
 		return nil
 	}

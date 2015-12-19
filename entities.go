@@ -101,7 +101,7 @@ type LocationEntity struct {
 	NavLinkHistoricalLocations string                      `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkThings              string                      `json:"Things@iot.navigationLink,omitempty" bson:"-"`
 	Description                string                      `json:"description,omitempty"`
-	EncodingType               EncodingType                `json:"encodingType,omitempty" bson:"encodingType"`
+	EncodingType               LocationEncodingType        `json:"encodingType,omitempty" bson:"encodingType"`
 	Location                   interface{}                 `json:"location,omitempty" bson:"location"`
 	Things                     []*ThingEntity              `json:"Things,omitempty" bson:"-"`
 	HistoricalLocations        []*HistoricalLocationEntity `json:"HistoricalLocations,omitempty" bson:"-"`
@@ -148,7 +148,7 @@ type DatastreamEntity struct {
 	PhenomenonTime          time.Time               `json:"phenomenonTime,omitempty"`
 	ResultTime              time.Time               `json:"resultTime,omitempty"`
 	UnitOfMeasurement       interface{}             `json:"unitOfMeasurement,omitempty" bson:"unitOfMeasurement"`
-	ObservationType         ObservationType         `json:"observationType,omitempty" bson:"observationType"`
+	ObservationType         DatastreamObservationType         `json:"observationType,omitempty" bson:"observationType"`
 	Description             string                  `json:"description,omitempty"`
 	IdThing                 string                  `json:"-" bson:"@iot_things_id"`
 	IdObservedProperty      string                  `json:"-" bson:"@iot_observedproperties_id"`
@@ -226,5 +226,5 @@ type FeatureOfInterestEntity struct {
 }
 
 func (e FeatureOfInterestEntity) GetType() EntityType {
-	return ENTITY_FEATURESOFINTERESTS
+	return ENTITY_FEATURESOFINTEREST
 }

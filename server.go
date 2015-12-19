@@ -65,9 +65,6 @@ func DiscoverEntityType(e string) EntityType {
 	case strings.HasPrefix(e, "ObservedProperty"):
 		return ENTITY_OBSERVEDPROPERTY
 
-	case strings.HasPrefix(e, "FeaturesOfInterests"):
-		return ENTITY_FEATURESOFINTERESTS
-
 	case strings.HasPrefix(e, "FeaturesOfInterest"):
 		return ENTITY_FEATURESOFINTEREST
 
@@ -97,8 +94,7 @@ func IsEntity(e string) bool {
 		strings.HasPrefix(e, "Observations") ||
 		strings.HasPrefix(e, "ObservedProperty") ||
 		strings.HasPrefix(e, "ObservedProperties") ||
-		strings.HasPrefix(e, "FeaturesOfInterest") ||
-		strings.HasPrefix(e, "FeaturesOfInterests") {
+		strings.HasPrefix(e, "FeaturesOfInterest") {
 		return true
 	}
 	return false
@@ -111,8 +107,7 @@ func IsSingularEntity(e string) bool {
 		(strings.HasPrefix(e, "Datastream") && !strings.HasPrefix(e, "Datastreams")) ||
 		(strings.HasPrefix(e, "Sensor") && !strings.HasPrefix(e, "Sensors")) ||
 		(strings.HasPrefix(e, "Observation") && !strings.HasPrefix(e, "Observations")) ||
-		(strings.HasPrefix(e, "ObservedProperty") && !strings.HasPrefix(e, "ObservedProperties")) ||
-		(strings.HasPrefix(e, "FeaturesOfInterest") && !strings.HasPrefix(e, "FeaturesOfInterests")) {
+		(strings.HasPrefix(e, "ObservedProperty") && !strings.HasPrefix(e, "ObservedProperties")) {
 		return true
 	}
 	return false
@@ -124,11 +119,11 @@ func (s *GossamerServer) Start() {
 	goji.Get("/v1.0", s.handleRootResource)
 	goji.Get("/v1.0/", s.handleRootResource)
 
-	goji.Get("/v1.0/*", s.handleGet)
-	goji.Post("/v1.0/*", s.handlePost)
-	goji.Put("/v1.0/*", s.handlePut)
-	goji.Delete("/v1.0/*", s.handleDelete)
-	goji.Patch("/v1.0/*", s.handlePatch)
+	goji.Get("/v1.0/*", s.HandleGet)
+	goji.Post("/v1.0/*", s.HandlePost)
+	goji.Put("/v1.0/*", s.HandlePut)
+	goji.Delete("/v1.0/*", s.HandleDelete)
+	goji.Patch("/v1.0/*", s.HandlePatch)
 
 	log.Println("Start Server")
 	goji.Serve()
@@ -161,7 +156,7 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 	w.Write(out)
 }
 
-func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandleGet(c web.C, w http.ResponseWriter, r *http.Request) {
 	req, err := CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
 		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
@@ -206,7 +201,7 @@ func (s *GossamerServer) handleGet(c web.C, w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Request) {
 	var err error
 	var req Request
 
@@ -232,7 +227,8 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		decoder := json.NewDecoder(r.Body)
 		e, err := DecodeJsonToEntityStruct(decoder, ent)
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			log.Println("A", err, ent)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY + err.Error(), w)
 			return
 		}
 
@@ -244,32 +240,35 @@ func (s *GossamerServer) handlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 		err = ValidateMandatoryProperties(e)
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			log.Println("B", err)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY + err.Error(), w)
 			return
 		}
 
 		err = ValidateIntegrityConstraints(e)
 		if err != nil {
+			log.Println("C")
 			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 
 		err = s.dataStore.Insert(rp, e)
 		if err != nil {
+			log.Println("D")
 			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 	}
 }
 
-func (s *GossamerServer) handlePut(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandlePut(c web.C, w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (s *GossamerServer) handleDelete(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandleDelete(c web.C, w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (s *GossamerServer) handlePatch(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandlePatch(c web.C, w http.ResponseWriter, r *http.Request) {
 
 }

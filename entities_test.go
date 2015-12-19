@@ -13,5 +13,5 @@ func TestEntities(t *testing.T) {
 	assert.Equal(t, ENTITY_SENSORS, SensorEntity{}.GetType())
 	assert.Equal(t, ENTITY_OBSERVEDPROPERTIES, ObservedPropertyEntity{}.GetType())
 	assert.Equal(t, ENTITY_OBSERVATIONS, ObservationEntity{}.GetType())
-	assert.Equal(t, ENTITY_FEATURESOFINTERESTS, FeatureOfInterestEntity{}.GetType())
+	assert.Equal(t, ENTITY_FEATURESOFINTEREST, FeatureOfInterestEntity{}.GetType())
 }

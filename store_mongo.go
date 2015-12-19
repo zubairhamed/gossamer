@@ -98,7 +98,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			}
 			return rs
 
-		case ENTITY_FEATURESOFINTERESTS:
+		case ENTITY_FEATURESOFINTEREST:
 			rs := []FeatureOfInterestEntity{}
 			var r FeatureOfInterestEntity
 			for iter.Next(&r) {
@@ -154,7 +154,7 @@ func (m *MongoStore) doQuery(query *mgo.Query, ent EntityType, findMultiple bool
 			m.postHandleObservation(&r, opts)
 			return r
 
-		case ent == ENTITY_FEATURESOFINTERESTS || ent == ENTITY_FEATURESOFINTEREST:
+		case ent == ENTITY_FEATURESOFINTEREST:
 			var r FeatureOfInterestEntity
 			query.One(&r)
 			m.postHandleFeatureOfInterest(&r, opts)
@@ -330,6 +330,11 @@ func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err err
 	var insertData interface{}
 
 	switch payload.GetType() {
+	case ENTITY_LOCATIONS:
+		e := payload.(*LocationEntity)
+		e.Id = GenerateEntityId()
+		insertData = e
+
 	case ENTITY_OBSERVATIONS:
 		e := payload.(*ObservationEntity)
 		e.Id = GenerateEntityId()
@@ -422,7 +427,7 @@ func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err err
 
 		insertData = e
 
-	case ENTITY_FEATURESOFINTERESTS:
+	case ENTITY_FEATURESOFINTEREST:
 		e := payload.(*FeatureOfInterestEntity)
 		e.Id = GenerateEntityId()
 
@@ -499,9 +504,9 @@ func (m *MongoStore) postHandleObservation(e *ObservationEntity, opts QueryOptio
 
 func (m *MongoStore) postHandleFeatureOfInterest(e *FeatureOfInterestEntity, opts QueryOptions) {
 	if !opts.SelectSet() {
-		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTERESTS)
+		e.SelfLink = ResolveSelfLinkUrl(e.Id, ENTITY_FEATURESOFINTEREST)
 
-		e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTERESTS) + "/Observations"
+		e.NavLinkObservations = ResolveEntityLink(e.Id, ENTITY_FEATURESOFINTEREST) + "/Observations"
 	}
 }
 
@@ -534,8 +539,8 @@ func ResolveMongoCollectionName(ent EntityType) string {
 	case ent == ENTITY_OBSERVATION || ent == ENTITY_OBSERVATIONS:
 		return "observations"
 
-	case ent == ENTITY_FEATURESOFINTEREST || ent == ENTITY_FEATURESOFINTERESTS:
-		return "featureofinterests"
+	case ent == ENTITY_FEATURESOFINTEREST:
+		return "featuresofinterest"
 
 	case ent == ENTITY_HISTORICALLOCATION || ent == ENTITY_HISTORICALLOCATIONS:
 		return "historicallocations"

@@ -76,8 +76,10 @@ func (t TimePeriod) IsZero() bool {
 
 type TimeInstant time.Time
 
-func NewTimeInstant() *TimeInstant {
-	return &TimeInstant{}
+func NewTimeInstant(t time.Time) *TimeInstant {
+	ti := TimeInstant(t)
+
+	return &ti
 }
 
 func (t TimeInstant) MarshalJSON() ([]byte, error) {

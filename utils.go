@@ -38,7 +38,7 @@ func GetAssociatedEntityId(entity SensorThing, et EntityType) string {
 	case ENTITY_LOCATIONS:
 		// e := (entity).(*LocationEntity)
 
-	case ENTITY_FEATURESOFINTERESTS:
+	case ENTITY_FEATURESOFINTEREST:
 		// e := (entity).(*FeatureOfInterestEntity)
 
 	case ENTITY_DATASTREAMS:
@@ -83,7 +83,7 @@ func SetAssociatedEntityId(entity SensorThing, et EntityType, id string) {
 			e.Datastream.Id = id
 		}
 
-		if et == ENTITY_FEATURESOFINTERESTS {
+		if et == ENTITY_FEATURESOFINTEREST {
 			e.FeatureOfInterest = NewFeatureOfInterestEntity()
 			e.FeatureOfInterest.Id = id
 		}
@@ -100,7 +100,7 @@ func SetAssociatedEntityId(entity SensorThing, et EntityType, id string) {
 		e := (entity).(*LocationEntity)
 		log.Println(e)
 
-	case ENTITY_FEATURESOFINTERESTS:
+	case ENTITY_FEATURESOFINTEREST:
 		e := (entity).(*FeatureOfInterestEntity)
 		log.Println(e)
 
@@ -148,12 +148,12 @@ func DecodeJsonToEntityStruct(decoder *json.Decoder, et EntityType) (SensorThing
 		err = decoder.Decode(&e)
 		return &e, err
 
-	case ENTITY_LOCATION:
+	case ENTITY_LOCATIONS:
 		var e LocationEntity
 		err = decoder.Decode(&e)
 		return &e, err
 
-	case ENTITY_FEATURESOFINTERESTS:
+	case ENTITY_FEATURESOFINTEREST:
 		var e FeatureOfInterestEntity
 		err = decoder.Decode(&e)
 		return &e, err

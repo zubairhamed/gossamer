@@ -23,7 +23,6 @@ func TestDiscoverEntityTypeFunction(t *testing.T) {
 	assert.Equal(t, ENTITY_OBSERVATION, DiscoverEntityType("Observation"))
 	assert.Equal(t, ENTITY_OBSERVEDPROPERTIES, DiscoverEntityType("ObservedProperties"))
 	assert.Equal(t, ENTITY_OBSERVEDPROPERTY, DiscoverEntityType("ObservedProperty"))
-	assert.Equal(t, ENTITY_FEATURESOFINTERESTS, DiscoverEntityType("FeaturesOfInterests"))
 	assert.Equal(t, ENTITY_FEATURESOFINTEREST, DiscoverEntityType("FeaturesOfInterest"))
 	assert.Equal(t, ENTITY_HISTORICALLOCATIONS, DiscoverEntityType("HistoricalLocations"))
 	assert.Equal(t, ENTITY_HISTORICALLOCATION, DiscoverEntityType("HistoricalLocation"))
