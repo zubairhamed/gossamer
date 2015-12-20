@@ -1,6 +1,7 @@
-package gossamer
+package server
 
 import (
+	. "github.com/zubairhamed/gossamer"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"

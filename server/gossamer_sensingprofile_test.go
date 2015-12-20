@@ -1,6 +1,6 @@
 // This tests against a Mongo persistence all the SensingProfile
 // tasks
-package gossamer_test
+package server_test
 
 import (
 	"bytes"
@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 	_ "time"
+	"github.com/zubairhamed/gossamer/server"
 )
 
 func NewMockResponseWriter() *MockResponseWriter {
@@ -63,13 +64,13 @@ func TestCrudSensingProfile(t *testing.T) {
 		"/ObservedProperties",
 	}
 
-	server := &gossamer.GossamerServer{}
-	server.UseStore(gossamer.NewMongoStore("localhost", "sensorthings"))
+	s := &server.GossamerServer{}
+	s.UseStore(server.NewMongoStore("localhost", "sensorthings"))
 
 	// ####### CHECK ZERO-ED COLLECTIONS #######
 	for _, v := range entityTypes {
 		req, w = NewMockHttp("GET", v, "")
-		server.HandleGet(c, w, req)
+		s.HandleGet(c, w, req)
 		ret = w.GetJSON()
 		l = len(ret["value"].([]interface{}))
 		assert.Equal(t, 0, l)
@@ -78,44 +79,44 @@ func TestCrudSensingProfile(t *testing.T) {
 	// ####### BASIC INSERT #######
 	//	Create Location
 	req, w = NewMockHttp("POST", "/Locations", NewDefaultLocation())
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/Locations", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 
 	//	Create Sensor
 	req, w = NewMockHttp("POST", "/Sensors", NewDefaultSensor())
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/Sensors", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 	sensorId := GetMapProperty(0, "@iot.id", ret)
 
 	//	Create ObservedProperty
 	req, w = NewMockHttp("POST", "/ObservedProperties", NewDefaultObservedProperty())
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/ObservedProperties", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 	observedPropertyId := GetMapProperty(0, "@iot.id", ret)
 
 	//	Create FeatureOfInterest
 	req, w = NewMockHttp("POST", "/FeaturesOfInterest", NewDefaultFeaturesOfInterest())
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/FeaturesOfInterest", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 	featureOfInterestId := GetMapProperty(0, "@iot.id", ret)
 
 	//	Create Thing
 	req, w = NewMockHttp("POST", "/Things", NewDefaultThing())
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/Things", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 	thingId := GetMapProperty(0, "@iot.id", ret)
@@ -131,9 +132,9 @@ func TestCrudSensingProfile(t *testing.T) {
 	ds.ObservedProperty.Id = observedPropertyId
 
 	req, w = NewMockHttp("POST", "/Datastreams", ds)
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/Datastreams", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 	datastreamId := GetMapProperty(0, "@iot.id", ret)
@@ -148,9 +149,9 @@ func TestCrudSensingProfile(t *testing.T) {
 	foi.Id = featureOfInterestId
 	obs.FeatureOfInterest = foi
 	req, w = NewMockHttp("POST", "/Observations", obs)
-	server.HandlePost(c, w, req)
+	s.HandlePost(c, w, req)
 	req, w = NewMockHttp("GET", "/Observations", "")
-	server.HandleGet(c, w, req)
+	s.HandleGet(c, w, req)
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 
@@ -165,7 +166,7 @@ func TestCrudSensingProfile(t *testing.T) {
 	// ####### DELETE #######
 	for _, v := range entityTypes {
 		req, w = NewMockHttp("GET", v, "")
-		server.HandleGet(c, w, req)
+		s.HandleGet(c, w, req)
 		ret = w.GetJSON()
 		l = len(ret["value"].([]interface{}))
 
@@ -173,7 +174,7 @@ func TestCrudSensingProfile(t *testing.T) {
 		for i < l {
 			id := GetMapProperty(i, "@iot.id", ret)
 			req, w = NewMockHttp("DELETE", v+"("+id+")", "")
-			server.HandleDelete(c, w, req)
+			s.HandleDelete(c, w, req)
 			i++
 		}
 	}
@@ -181,7 +182,7 @@ func TestCrudSensingProfile(t *testing.T) {
 	// ####### CHECK ZERO-ED COLLECTIONS #######
 	for _, v := range entityTypes {
 		req, w = NewMockHttp("GET", v, "")
-		server.HandleGet(c, w, req)
+		s.HandleGet(c, w, req)
 		ret = w.GetJSON()
 		l = len(ret["value"].([]interface{}))
 		assert.Equal(t, 0, l)
@@ -192,14 +193,14 @@ func TestCrudSensingProfile(t *testing.T) {
 	//	start := time.Now()
 	//	for i < 10000 {
 	//		req, w = NewMockHttp("POST", "/Things", NewDefaultThing())
-	//		server.HandlePost(c, w, req)
+	//		s.HandlePost(c, w, req)
 	//		i++
 	//	}
 	//	duration := time.Since(start)
 	//	log.Println(duration.Seconds())
 
 	// Clear Collection
-	DropCollection()
+	// DropCollection()
 }
 
 func GetMapProperty(idx int, prop string, val map[string]interface{}) string {
