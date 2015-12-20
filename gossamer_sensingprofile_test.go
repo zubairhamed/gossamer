@@ -51,46 +51,29 @@ func TestCrudSensingProfile(t *testing.T) {
 	var w *MockResponseWriter
 	var ret map[string]interface{}
 	var req *http.Request
+	var l int
 	c := web.C{}
+	var entityTypes []string = []string{
+		"/FeaturesOfInterest",
+		"/Locations",
+		"/Sensors",
+		"/Observations",
+		"/Datastreams",
+		"/Things",
+		"/ObservedProperties",
+	}
 
 	server := &gossamer.GossamerServer{}
 	server.UseStore(gossamer.NewMongoStore("localhost", "sensorthings"))
 
 	// ####### CHECK ZERO-ED COLLECTIONS #######
-	req, w = NewMockHttp("GET", "/FeaturesOfInterest", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
-
-	req, w = NewMockHttp("GET", "/Locations", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
-
-	req, w = NewMockHttp("GET", "/Sensors", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
-
-	req, w = NewMockHttp("GET", "/Observations", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
-
-	req, w = NewMockHttp("GET", "/Datastreams", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
-
-	req, w = NewMockHttp("GET", "/Things", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
-
-	req, w = NewMockHttp("GET", "/ObservedProperties", "")
-	server.HandleGet(c, w, req)
-	ret = w.GetJSON()
-	assert.Equal(t, 0, len(ret["value"].([]interface{})))
+	for _, v := range entityTypes {
+		req, w = NewMockHttp("GET", v, "")
+		server.HandleGet(c, w, req)
+		ret = w.GetJSON()
+		l = len(ret["value"].([]interface{}))
+		assert.Equal(t, 0, l)
+	}
 
 	// ####### BASIC INSERT #######
 	//	Create Location
@@ -180,8 +163,29 @@ func TestCrudSensingProfile(t *testing.T) {
 	// ####### ADVANCED QUERIES #######
 
 	// ####### DELETE #######
+	for _, v := range entityTypes {
+		req, w = NewMockHttp("GET", v, "")
+		server.HandleGet(c, w, req)
+		ret = w.GetJSON()
+		l = len(ret["value"].([]interface{}))
+
+		i := 0
+		for i < l {
+			id := GetMapProperty(i, "@iot.id", ret)
+			req, w = NewMockHttp("DELETE", v+"("+id+")", "")
+			server.HandleDelete(c, w, req)
+			i++
+		}
+	}
 
 	// ####### CHECK ZERO-ED COLLECTIONS #######
+	for _, v := range entityTypes {
+		req, w = NewMockHttp("GET", v, "")
+		server.HandleGet(c, w, req)
+		ret = w.GetJSON()
+		l = len(ret["value"].([]interface{}))
+		assert.Equal(t, 0, l)
+	}
 
 	// Performance test
 	//	i := 0
