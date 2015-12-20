@@ -141,22 +141,22 @@ func (e HistoricalLocationEntity) GetType() EntityType {
 // same ObservedProperty and are produced by the same Sensor.
 type DatastreamEntity struct {
 	SensorThingsEntity      `bson:",inline"`
-	NavLinkThing            string                  `json:"Thing@iot.navigationLink,omitempty" bson:"-"`
-	NavLinkSensor           string                  `json:"Sensor@iot.navigationLink,omitempty" bson:"-"`
-	NavLinkObservedProperty string                  `json:"ObservedProperty@iot.navigationLink,omitempty" bson:"-"`
-	NavLinkObservations     string                  `json:"Observations@iot.navigationLink,omitempty" bson:"-"`
-	PhenomenonTime          time.Time               `json:"phenomenonTime,omitempty"`
-	ResultTime              time.Time               `json:"resultTime,omitempty"`
-	UnitOfMeasurement       interface{}             `json:"unitOfMeasurement,omitempty" bson:"unitOfMeasurement"`
-	ObservationType         DatastreamObservationType         `json:"observationType,omitempty" bson:"observationType"`
-	Description             string                  `json:"description,omitempty"`
-	IdThing                 string                  `json:"-" bson:"@iot_things_id"`
-	IdObservedProperty      string                  `json:"-" bson:"@iot_observedproperties_id"`
-	IdSensor                string                  `json:"-" bson:"@iot_sensors_id"`
-	Thing                   *ThingEntity            `json:"Thing,omitempty" bson:"-"`
-	ObservedProperty        *ObservedPropertyEntity `json:"ObservedProperty,omitempty" bson:"-"`
-	Sensor                  *SensorEntity           `json:"Sensor,omitempty" bson:"-"`
-	Observations            []*ObservationEntity    `json:"Observations,omitempty" bson:"-"`
+	NavLinkThing            string                    `json:"Thing@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkSensor           string                    `json:"Sensor@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkObservedProperty string                    `json:"ObservedProperty@iot.navigationLink,omitempty" bson:"-"`
+	NavLinkObservations     string                    `json:"Observations@iot.navigationLink,omitempty" bson:"-"`
+	PhenomenonTime          time.Time                 `json:"phenomenonTime,omitempty"`
+	ResultTime              time.Time                 `json:"resultTime,omitempty"`
+	UnitOfMeasurement       interface{}               `json:"unitOfMeasurement,omitempty" bson:"unitOfMeasurement"`
+	ObservationType         DatastreamObservationType `json:"observationType,omitempty" bson:"observationType"`
+	Description             string                    `json:"description,omitempty"`
+	IdThing                 string                    `json:"-" bson:"@iot_things_id"`
+	IdObservedProperty      string                    `json:"-" bson:"@iot_observedproperties_id"`
+	IdSensor                string                    `json:"-" bson:"@iot_sensors_id"`
+	Thing                   *ThingEntity              `json:"Thing,omitempty" bson:"-"`
+	ObservedProperty        *ObservedPropertyEntity   `json:"ObservedProperty,omitempty" bson:"-"`
+	Sensor                  *SensorEntity             `json:"Sensor,omitempty" bson:"-"`
+	Observations            []*ObservationEntity      `json:"Observations,omitempty" bson:"-"`
 }
 
 func (e DatastreamEntity) GetType() EntityType {

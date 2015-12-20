@@ -63,7 +63,7 @@ const (
 	ENTITY_SENSORS             EntityType = "Sensors"
 	ENTITY_OBSERVATION         EntityType = "Observation"
 	ENTITY_OBSERVATIONS        EntityType = "Observations"
-	ENTITY_FEATURESOFINTEREST EntityType = "FeaturesOfInterest"
+	ENTITY_FEATURESOFINTEREST  EntityType = "FeaturesOfInterest"
 	ENTITY_HISTORICALLOCATION  EntityType = "HistoricalLocation"
 	ENTITY_HISTORICALLOCATIONS EntityType = "HistoricalLocations"
 	ENTITY_UNKNOWN             EntityType = "UNKNOWN"

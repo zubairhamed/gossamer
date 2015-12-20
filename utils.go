@@ -171,6 +171,10 @@ func DecodeJsonToEntityStruct(decoder *json.Decoder, et EntityType) (SensorThing
 	return nil, errors.New("Unknown Entity Type")
 }
 
+func ThrowHttpCreated(msg string, w http.ResponseWriter) {
+	http.Error(w, msg, http.StatusCreated)
+}
+
 func ThrowHttpBadRequest(msg string, w http.ResponseWriter) {
 	http.Error(w, msg, http.StatusBadRequest)
 }

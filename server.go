@@ -227,8 +227,7 @@ func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		decoder := json.NewDecoder(r.Body)
 		e, err := DecodeJsonToEntityStruct(decoder, ent)
 		if err != nil {
-			log.Println("A", err, ent)
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY + err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 
@@ -240,24 +239,23 @@ func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 		err = ValidateMandatoryProperties(e)
 		if err != nil {
-			log.Println("B", err)
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY + err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 
 		err = ValidateIntegrityConstraints(e)
 		if err != nil {
-			log.Println("C")
 			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
 
 		err = s.dataStore.Insert(rp, e)
 		if err != nil {
-			log.Println("D")
 			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
+		w.Header().Add("Location", "url-to-entity")
+		ThrowHttpCreated("Entity Created", w)
 	}
 }
 

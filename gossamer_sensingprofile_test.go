@@ -5,15 +5,15 @@ package gossamer_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/zenazn/goji/web"
-	"net/http"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"github.com/zenazn/goji/web"
 	"github.com/zubairhamed/gossamer"
 	"gopkg.in/mgo.v2"
 	"log"
-	_ "time"
+	"net/http"
+	"testing"
 	"time"
+	_ "time"
 )
 
 func NewMockResponseWriter() *MockResponseWriter {
@@ -56,7 +56,7 @@ func TestCrudSensingProfile(t *testing.T) {
 	server := &gossamer.GossamerServer{}
 	server.UseStore(gossamer.NewMongoStore("localhost", "sensorthings"))
 
-	// Assert zero-ed collections
+	// ####### CHECK ZERO-ED COLLECTIONS #######
 	req, w = NewMockHttp("GET", "/FeaturesOfInterest", "")
 	server.HandleGet(c, w, req)
 	ret = w.GetJSON()
@@ -92,6 +92,7 @@ func TestCrudSensingProfile(t *testing.T) {
 	ret = w.GetJSON()
 	assert.Equal(t, 0, len(ret["value"].([]interface{})))
 
+	// ####### BASIC INSERT #######
 	//	Create Location
 	req, w = NewMockHttp("POST", "/Locations", NewDefaultLocation())
 	server.HandlePost(c, w, req)
@@ -170,16 +171,28 @@ func TestCrudSensingProfile(t *testing.T) {
 	ret = w.GetJSON()
 	assert.Equal(t, 1, len(ret["value"].([]interface{})))
 
+	// ####### ASSOCIATIVE INSERTS #######
+
+	// ####### UPDATE #######
+
+	// ####### UPDATE (PATCH) #######
+
+	// ####### ADVANCED QUERIES #######
+
+	// ####### DELETE #######
+
+	// ####### CHECK ZERO-ED COLLECTIONS #######
+
 	// Performance test
-//	i := 0
-//	start := time.Now()
-//	for i < 10000 {
-//		req, w = NewMockHttp("POST", "/Things", NewDefaultThing())
-//		server.HandlePost(c, w, req)
-//		i++
-//	}
-//	duration := time.Since(start)
-//	log.Println(duration.Seconds())
+	//	i := 0
+	//	start := time.Now()
+	//	for i < 10000 {
+	//		req, w = NewMockHttp("POST", "/Things", NewDefaultThing())
+	//		server.HandlePost(c, w, req)
+	//		i++
+	//	}
+	//	duration := time.Since(start)
+	//	log.Println(duration.Seconds())
 
 	// Clear Collection
 	DropCollection()
@@ -211,7 +224,7 @@ func DropCollection() {
 func NewMockHttp(method string, u string, p interface{}) (*http.Request, *MockResponseWriter) {
 	b, _ := json.Marshal(p)
 	body := bytes.NewBuffer(b)
-	req, _ := http.NewRequest(method, "http://localhost:8000/v1.0" + u, body)
+	req, _ := http.NewRequest(method, "http://localhost:8000/v1.0"+u, body)
 
 	return req, NewMockResponseWriter()
 }
@@ -220,9 +233,9 @@ func NewDefaultLocation() *gossamer.LocationEntity {
 	e := gossamer.NewLocationEntity()
 	e.Description = "Description for Test Location"
 	e.EncodingType = gossamer.LOCATION_ENCTYPE_GEOJSON
-	e.Location = map[string] interface{}{
-		"type": "Point",
-		"coordinates": []interface{} {-117.123, 54.123},
+	e.Location = map[string]interface{}{
+		"type":        "Point",
+		"coordinates": []interface{}{-117.123, 54.123},
 	}
 	return e
 }
@@ -249,16 +262,16 @@ func NewDefaultFeaturesOfInterest() *gossamer.FeatureOfInterestEntity {
 	e.EncodingType = gossamer.ENCODINGTYPE_SENSORML
 	e.Feature = "FEATURE"
 	return e
-//		"feature": {
-//			"coordinates": [51.08386,-114.13036],
-//			"type": "Point"
-//		}
+	//		"feature": {
+	//			"coordinates": [51.08386,-114.13036],
+	//			"type": "Point"
+	//		}
 }
 
 func NewDefaultThing() *gossamer.ThingEntity {
 	e := gossamer.NewThingEntity()
 	e.Description = "Description for Thing Entity"
-	e.Properties = map[string]string {
+	e.Properties = map[string]string{
 		"property1": "value1",
 		"property2": "value2",
 		"property3": "value3",
@@ -274,14 +287,14 @@ func NewDefaultDatastream() *gossamer.DatastreamEntity {
 	e.Description = "Description for Datastream"
 
 	return e
-//		"unitOfMeasurement": {
-//			"symbol": "%",
-//			"name": "Percentage",
-//			"definition": "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html"
-//		},
-//		"Thing": {"@iot.id": 5394817},
-//		"ObservedProperty": {"@iot.id": 5394816},
-//		"Sensor": {"@iot.id": 5394815}
+	//		"unitOfMeasurement": {
+	//			"symbol": "%",
+	//			"name": "Percentage",
+	//			"definition": "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html"
+	//		},
+	//		"Thing": {"@iot.id": 5394817},
+	//		"ObservedProperty": {"@iot.id": 5394816},
+	//		"Sensor": {"@iot.id": 5394815}
 }
 
 func NewDefaultObservation() *gossamer.ObservationEntity {
@@ -291,5 +304,5 @@ func NewDefaultObservation() *gossamer.ObservationEntity {
 	e.Result = 123
 
 	return e
-//		"Datastream":{"@iot.id":100}
+	//		"Datastream":{"@iot.id":100}
 }
