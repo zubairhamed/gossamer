@@ -254,16 +254,40 @@ func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Requ
 			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
 			return
 		}
+
+		// TODO
 		w.Header().Add("Location", "url-to-entity")
 		ThrowHttpCreated("Entity Created", w)
 	}
 }
 
-func (s *GossamerServer) HandlePut(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandleDelete(c web.C, w http.ResponseWriter, r *http.Request) {
+	var err error
+	var req Request
 
+	req, err = CreateIncomingRequest(r.URL, HTTP)
+	if err != nil {
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+	}
+
+	if err = ValidateDeleteRequestUrl(req); err != nil {
+		ThrowHttpMethodNotAllowed(err.Error(), w)
+		return
+	}
+
+	rp := req.GetResourcePath()
+	last := rp.Last()
+	ent := last.GetEntity()
+	if !IsSingularEntity(string(ent)) {
+		err = s.dataStore.Delete(ent, last.GetId())
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_DELETING_ENTITY+err.Error(), w)
+			return
+		}
+	}
 }
 
-func (s *GossamerServer) HandleDelete(c web.C, w http.ResponseWriter, r *http.Request) {
+func (s *GossamerServer) HandlePut(c web.C, w http.ResponseWriter, r *http.Request) {
 
 }
 

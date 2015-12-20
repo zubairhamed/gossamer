@@ -326,6 +326,23 @@ func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 	return nil
 }
 
+func (m *MongoStore) Delete(ent EntityType, id string) (err error) {
+	opComplete := make(chan bool)
+
+	go func() {
+		session := m.cloneSession()
+		defer session.Close()
+
+		c := session.DB(m.db).C(ResolveMongoCollectionName(ent))
+		err = c.Remove(bson.M{"@iot_id": id})
+
+		opComplete <- true
+	}()
+	<-opComplete
+
+	return
+}
+
 func (m *MongoStore) doInsert(payload SensorThing, results interface{}) (err error) {
 	var insertData interface{}
 
