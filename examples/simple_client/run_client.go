@@ -17,8 +17,10 @@ func main() {
 	InsertLocation(c)
 	InsertObservedProperty(c)
 	InsertThing(c)
-	InsertObservedProperty(c)
 	InsertSensor(c)
+
+	o, e := c.GetObservation("b8c26429-4f53-4a02-93e3-29fef8bd4455")
+	log.Println(o, e)
 }
 
 func InsertObservation(c gossamer.Client) {
@@ -126,3 +128,4 @@ func InsertThing(c gossamer.Client) {
 	}
 	log.Println("Inserted New Thing")
 }
+

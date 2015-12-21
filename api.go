@@ -329,8 +329,21 @@ type FeatureOfInterest interface {
 
 // Client API
 type Client interface {
-	QueryAll(EntityType, QueryOptions) ([]SensorThing, error)
-	QueryOne(EntityType, QueryOptions) (SensorThing, error)
+	GetObservation(string) (Observation, error)
+	GetThing(string) (Thing, error)
+	GetObservedProperty(string) (ObservedProperty, error)
+	GetLocation(string) (Location, error)
+	GetDatastream(string) (Datastream, error)
+	GetSensor(string) (Sensor, error)
+	GetFeaturesOfInterest(string) (FeatureOfInterest, error)
+
+	FindObservations() ([]Observation, error)
+	FindThings() ([]Thing, error)
+	FindObservedProperties() ([]ObservedProperty, error)
+	FindLocations() ([]Location, error)
+	FindDatastreams() ([]Datastream, error)
+	FindSensors() ([]Sensor, error)
+	FindFeaturesOfInterest() ([]FeatureOfInterest, error)
 
 	InsertObservation(Observation) error
 	InsertThing(Thing) error
@@ -363,14 +376,6 @@ type Client interface {
 	PatchDatastream(Datastream) error
 	PatchSensor(Sensor) error
 	PatchFeaturesOfInterest(FeatureOfInterest) error
-
-	FindObservation(string) ([]Observation, error)
-	FindThing(string) ([]Thing, error)
-	FindObservedProperty(string) ([]ObservedProperty, error)
-	FindLocation(string) ([]Location, error)
-	FindDatastream(string) ([]Datastream, error)
-	FindSensor(string) ([]Sensor, error)
-	FindFeaturesOfInterest(string) ([]FeatureOfInterest, error)
 }
 
 type ClientQuery interface {
