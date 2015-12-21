@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/zenazn/goji/web"
 	"github.com/zubairhamed/gossamer"
+	"github.com/zubairhamed/gossamer/server"
 	"gopkg.in/mgo.v2"
 	"log"
 	"net/http"
 	"testing"
 	"time"
 	_ "time"
-	"github.com/zubairhamed/gossamer/server"
 )
 
 func NewMockResponseWriter() *MockResponseWriter {
