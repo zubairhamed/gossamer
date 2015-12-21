@@ -134,7 +134,6 @@ type HistoricalLocationEntity struct {
 	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink,omitempty"`
 	NavLinkThing               string            `json:"Thing@iot.navigationLink,omitempty"`
 	Time                       time.Time         `json:"time"`
-	EncodingType               EncodingType      `json:"encodingType,omitempty"`
 	IdThing                    string            `json:"-" bson:"@iot_things_id"`
 	IdLocations                []string          `json:"-" bson:"@iot_locations_id"`
 	Thing                      *ThingEntity      `json:"Thing,omitempty"`

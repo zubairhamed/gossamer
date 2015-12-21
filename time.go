@@ -48,13 +48,11 @@ func (t TimePeriod) MarshalJSON() ([]byte, error) {
 }
 
 func (t *TimePeriod) UnmarshalJSON(data []byte) error {
-	log.Println("UnmarshalJSON")
 	var err error
 	str := strings.Replace(string(data), "\"", "", -1)
 	split := strings.Split(str, "/")
 
 	if len(split) == 2 {
-		log.Println("len(split) == 2")
 		t.FromTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[0])
 		if err != nil {
 			return err

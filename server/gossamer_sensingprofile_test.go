@@ -248,7 +248,7 @@ func NewDefaultLocation() *gossamer.LocationEntity {
 func NewDefaultSensor() *gossamer.SensorEntity {
 	e := gossamer.NewSensorEntity()
 	e.Description = "Description for Sensor"
-	e.EncodingType = gossamer.ENCODINGTYPE_PDF
+	e.EncodingType = gossamer.SENSOR_ENCTYPE_PDF
 	e.Metadata = "Calibration date:  Jan 1, 2014"
 	return e
 }
@@ -264,7 +264,7 @@ func NewDefaultObservedProperty() *gossamer.ObservedPropertyEntity {
 func NewDefaultFeaturesOfInterest() *gossamer.FeatureOfInterestEntity {
 	e := gossamer.NewFeatureOfInterestEntity()
 	e.Description = "Description for Features of Interest"
-	e.EncodingType = gossamer.ENCODINGTYPE_SENSORML
+	e.EncodingType = gossamer.LOCATION_ENCTYPE_GEOJSON
 	e.Feature = "FEATURE"
 	return e
 	//		"feature": {

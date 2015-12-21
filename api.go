@@ -4,13 +4,6 @@ import (
 	"time"
 )
 
-type EncodingType string
-
-const (
-	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
-	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
-)
-
 type ObservationType string
 
 type ProtocolType int
