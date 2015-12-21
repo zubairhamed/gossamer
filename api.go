@@ -191,10 +191,6 @@ type Thing interface {
 
 	// An Object containing user-annotated properties as key-value pairs.
 	GetProperties() map[string]string
-
-	GetLocations() []Location
-	GetHistoricalLocations() []HistoricalLocation
-	GetDatastreams() []Datastream
 }
 
 type LocationEncodingType string
@@ -286,11 +282,10 @@ const (
 // value of the property.
 type Sensor interface {
 	SensorThing
-	GetDescription() string
-	GetEncodingType() // !!
-	GetMetadata()     // !!
 
-	GetDatastreams() []Datastream
+	GetDescription() string
+	GetEncodingType() SensorEncodingType
+	GetMetadata() interface{}
 }
 
 // An ObservedProperty specifies the phenomenon of an Observation.
@@ -298,10 +293,8 @@ type ObservedProperty interface {
 	SensorThing
 
 	GetName() string
-	GetDefinition() // !!
+	GetDefinition() string
 	GetDescription() string
-
-	GetDatastreams() []Datastream
 }
 
 // An Observation is act of measuring or otherwise determining the value of a property
@@ -309,25 +302,22 @@ type Observation interface {
 	SensorThing
 
 	// The time instant or period of when the Observation happens.
-	GetPhenomenonTime() time.Time
+	GetPhenomenonTime() *TimePeriod
 
 	// The time of the Observation's result was generated.
-	GetResultTime() time.Time
+	GetResultTime() *TimeInstant
 
 	// The estimated value of an ObservedProperty from the Observation.
 	GetResult() interface{}
 
 	// Describes the quality of the result.
-	GetResultQuality() // !!
+	GetResultQuality() interface{}
 
 	// The time period during which the result may be used.
-	GetValidTime() time.Time
+	GetValidTime() *TimePeriod
 
 	// Key-value pairs showing the environmental conditions during measurement.
-	GetParameters() map[string]string
-
-	GetFeatureOfInterest() FeatureOfInterest
-	GetDatastream() Datastream
+	GetParameters() map[string]interface{}
 }
 
 // An Observation results in a value being assigned to a phenomenon. The phenomenon is a property of a feature, the
@@ -341,9 +331,7 @@ type FeatureOfInterest interface {
 
 	GetDescription() string
 	GetEncodingType() LocationEncodingType
-	GetFeature() // !!
-
-	GetObservations() []Observation
+	GetFeature() interface{}
 }
 
 // Client API
@@ -351,13 +339,13 @@ type Client interface {
 	QueryAll(EntityType, QueryOptions) ([]SensorThing, error)
 	QueryOne(EntityType, QueryOptions) (SensorThing, error)
 
-	InsertObservation(*ObservationEntity) error
-	InsertThing(*ThingEntity) error
-	InsertObservedProperty(*ObservedPropertyEntity) error
-	InsertLocation(*LocationEntity) error
-	InsertDatastream(*DatastreamEntity) error
-	InsertSensor(*SensorEntity) error
-	InsertFeaturesOfInterest(*FeatureOfInterestEntity) error
+	InsertObservation(Observation) error
+	InsertThing(Thing) error
+	InsertObservedProperty(ObservedProperty) error
+	InsertLocation(Location) error
+	InsertDatastream(Datastream) error
+	InsertSensor(Sensor) error
+	InsertFeaturesOfInterest(FeatureOfInterest) error
 
 	DeleteObservation(string) error
 	DeleteThing(string) error
@@ -367,29 +355,29 @@ type Client interface {
 	DeleteSensor(string) error
 	DeleteFeaturesOfInterest(string) error
 
-	UpdateObservation(*ObservationEntity) error
-	UpdateThing(*ThingEntity) error
-	UpdateObservedProperty(*ObservedPropertyEntity) error
-	UpdateLocation(*LocationEntity) error
-	UpdateDatastream(*DatastreamEntity) error
-	UpdateSensor(*SensorEntity) error
-	UpdateFeaturesOfInterest(*FeatureOfInterestEntity) error
+	UpdateObservation(Observation) error
+	UpdateThing(Thing) error
+	UpdateObservedProperty(ObservedProperty) error
+	UpdateLocation(Location) error
+	UpdateDatastream(Datastream) error
+	UpdateSensor(Sensor) error
+	UpdateFeaturesOfInterest(FeatureOfInterest) error
 
-	PatchObservation(*ObservationEntity) error
-	PatchThing(*ThingEntity) error
-	PatchObservedProperty(*ObservedPropertyEntity) error
-	PatchLocation(*LocationEntity) error
-	PatchDatastream(*DatastreamEntity) error
-	PatchSensor(*SensorEntity) error
-	PatchFeaturesOfInterest(*FeatureOfInterestEntity) error
+	PatchObservation(Observation) error
+	PatchThing(Thing) error
+	PatchObservedProperty(ObservedProperty) error
+	PatchLocation(Location) error
+	PatchDatastream(Datastream) error
+	PatchSensor(Sensor) error
+	PatchFeaturesOfInterest(FeatureOfInterest) error
 
-	FindObservation(string) (*ObservationEntity, error)
-	FindThing(string) (*ThingEntity, error)
-	FindObservedProperty(string) (*ObservedPropertyEntity, error)
-	FindLocation(string) (*LocationEntity, error)
-	FindDatastream(string) (*DatastreamEntity, error)
-	FindSensor(string) (*SensorEntity, error)
-	FindFeaturesOfInterest(string) (*FeatureOfInterestEntity, error)
+	FindObservation(string) ([]Observation, error)
+	FindThing(string) ([]Thing, error)
+	FindObservedProperty(string) ([]ObservedProperty, error)
+	FindLocation(string) ([]Location, error)
+	FindDatastream(string) ([]Datastream, error)
+	FindSensor(string) ([]Sensor, error)
+	FindFeaturesOfInterest(string) ([]FeatureOfInterest, error)
 }
 
 type ClientQuery interface {

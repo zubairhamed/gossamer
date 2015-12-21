@@ -29,7 +29,7 @@ func (c *GossamerClient) QueryOne(EntityType, QueryOptions) (SensorThing, error)
 	return nil, nil
 }
 
-func (c *GossamerClient) InsertObservation(o *ObservationEntity) error {
+func (c *GossamerClient) doInsert(o interface{}, pathFragment string) error {
 	b, err := json.Marshal(o)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func (c *GossamerClient) InsertObservation(o *ObservationEntity) error {
 
 	r := bytes.NewReader(b)
 
-	resp, err := http.Post(c.url+"/v1.0/Observations", "application/json", r)
+	resp, err := http.Post(c.url+"/v1.0"+pathFragment, "application/json", r)
 
 	if err != nil {
 		return err
@@ -51,14 +51,32 @@ func (c *GossamerClient) InsertObservation(o *ObservationEntity) error {
 	return nil
 }
 
-func (c *GossamerClient) InsertThing(*ThingEntity) error {
-	return nil
+func (c *GossamerClient) InsertObservation(o Observation) error {
+	return c.doInsert(o, "/Observations")
 }
-func (c *GossamerClient) InsertObservedProperty(*ObservedPropertyEntity) error    { return nil }
-func (c *GossamerClient) InsertLocation(*LocationEntity) error                    { return nil }
-func (c *GossamerClient) InsertDatastream(*DatastreamEntity) error                { return nil }
-func (c *GossamerClient) InsertSensor(*SensorEntity) error                        { return nil }
-func (c *GossamerClient) InsertFeaturesOfInterest(*FeatureOfInterestEntity) error { return nil }
+
+func (c *GossamerClient) InsertThing(o Thing) error {
+	return c.doInsert(o, "/Things")
+}
+
+func (c *GossamerClient) InsertObservedProperty(o ObservedProperty) error {
+	return c.doInsert(o, "/ObservedProperties")
+}
+
+func (c *GossamerClient) InsertLocation(o Location) error {
+	return c.doInsert(o, "/Locations")
+}
+
+func (c *GossamerClient) InsertDatastream(o Datastream) error {
+	return c.doInsert(o, "/Datastreams")
+}
+func (c *GossamerClient) InsertSensor(o Sensor) error {
+	return c.doInsert(o, "/Sensors")
+}
+
+func (c *GossamerClient) InsertFeaturesOfInterest(o FeatureOfInterest) error {
+	return c.doInsert(o, "/FeaturesOfInterest")
+}
 
 func (c *GossamerClient) DeleteObservation(string) error        { return nil }
 func (c *GossamerClient) DeleteThing(string) error              { return nil }
@@ -68,31 +86,29 @@ func (c *GossamerClient) DeleteDatastream(string) error         { return nil }
 func (c *GossamerClient) DeleteSensor(string) error             { return nil }
 func (c *GossamerClient) DeleteFeaturesOfInterest(string) error { return nil }
 
-func (c *GossamerClient) UpdateObservation(*ObservationEntity) error              { return nil }
-func (c *GossamerClient) UpdateThing(*ThingEntity) error                          { return nil }
-func (c *GossamerClient) UpdateObservedProperty(*ObservedPropertyEntity) error    { return nil }
-func (c *GossamerClient) UpdateLocation(*LocationEntity) error                    { return nil }
-func (c *GossamerClient) UpdateDatastream(*DatastreamEntity) error                { return nil }
-func (c *GossamerClient) UpdateSensor(*SensorEntity) error                        { return nil }
-func (c *GossamerClient) UpdateFeaturesOfInterest(*FeatureOfInterestEntity) error { return nil }
+func (c *GossamerClient) UpdateObservation(o Observation) error              { return nil }
+func (c *GossamerClient) UpdateThing(o Thing) error                          { return nil }
+func (c *GossamerClient) UpdateObservedProperty(o ObservedProperty) error    { return nil }
+func (c *GossamerClient) UpdateLocation(o Location) error                    { return nil }
+func (c *GossamerClient) UpdateDatastream(o Datastream) error                { return nil }
+func (c *GossamerClient) UpdateSensor(o Sensor) error                        { return nil }
+func (c *GossamerClient) UpdateFeaturesOfInterest(o FeatureOfInterest) error { return nil }
 
-func (c *GossamerClient) PatchObservation(*ObservationEntity) error              { return nil }
-func (c *GossamerClient) PatchThing(*ThingEntity) error                          { return nil }
-func (c *GossamerClient) PatchObservedProperty(*ObservedPropertyEntity) error    { return nil }
-func (c *GossamerClient) PatchLocation(*LocationEntity) error                    { return nil }
-func (c *GossamerClient) PatchDatastream(*DatastreamEntity) error                { return nil }
-func (c *GossamerClient) PatchSensor(*SensorEntity) error                        { return nil }
-func (c *GossamerClient) PatchFeaturesOfInterest(*FeatureOfInterestEntity) error { return nil }
+func (c *GossamerClient) PatchObservation(o Observation) error              { return nil }
+func (c *GossamerClient) PatchThing(o Thing) error                          { return nil }
+func (c *GossamerClient) PatchObservedProperty(o ObservedProperty) error    { return nil }
+func (c *GossamerClient) PatchLocation(o Location) error                    { return nil }
+func (c *GossamerClient) PatchDatastream(o Datastream) error                { return nil }
+func (c *GossamerClient) PatchSensor(o Sensor) error                        { return nil }
+func (c *GossamerClient) PatchFeaturesOfInterest(o FeatureOfInterest) error { return nil }
 
-func (c *GossamerClient) FindObservation(string) (*ObservationEntity, error) { return nil, nil }
-func (c *GossamerClient) FindThing(string) (*ThingEntity, error)             { return nil, nil }
-func (c *GossamerClient) FindObservedProperty(string) (*ObservedPropertyEntity, error) {
-	return nil, nil
-}
-func (c *GossamerClient) FindLocation(string) (*LocationEntity, error)     { return nil, nil }
-func (c *GossamerClient) FindDatastream(string) (*DatastreamEntity, error) { return nil, nil }
-func (c *GossamerClient) FindSensor(string) (*SensorEntity, error)         { return nil, nil }
-func (c *GossamerClient) FindFeaturesOfInterest(string) (*FeatureOfInterestEntity, error) {
+func (c *GossamerClient) FindObservation(string) ([]Observation, error)           { return nil, nil }
+func (c *GossamerClient) FindThing(string) ([]Thing, error)                       { return nil, nil }
+func (c *GossamerClient) FindObservedProperty(string) ([]ObservedProperty, error) { return nil, nil }
+func (c *GossamerClient) FindLocation(string) ([]Location, error)                 { return nil, nil }
+func (c *GossamerClient) FindDatastream(string) ([]Datastream, error)             { return nil, nil }
+func (c *GossamerClient) FindSensor(string) ([]Sensor, error)                     { return nil, nil }
+func (c *GossamerClient) FindFeaturesOfInterest(string) ([]FeatureOfInterest, error) {
 	return nil, nil
 }
 

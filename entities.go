@@ -88,6 +88,14 @@ func (e ThingEntity) GetType() EntityType {
 	return ENTITY_THINGS
 }
 
+func (e ThingEntity) GetDescription() string {
+	return e.Description
+}
+
+func (e ThingEntity) GetProperties() map[string]string {
+	return e.Properties
+}
+
 // The Location entity locates the Thing or the Things it associated with. A Thing’s Location entity is
 // defined as the last known location of the Thing.
 // A Thing’s Location may be identical to the Thing’s Observations’ FeatureOfInterest. In the context of the IoT,
@@ -145,8 +153,8 @@ type DatastreamEntity struct {
 	NavLinkSensor           string                    `json:"Sensor@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkObservedProperty string                    `json:"ObservedProperty@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkObservations     string                    `json:"Observations@iot.navigationLink,omitempty" bson:"-"`
-	PhenomenonTime          time.Time                 `json:"phenomenonTime,omitempty"`
-	ResultTime              time.Time                 `json:"resultTime,omitempty"`
+	PhenomenonTime          *TimePeriod               `json:"phenomenonTime,omitempty"`
+	ResultTime              *TimePeriod               `json:"resultTime,omitempty"`
 	UnitOfMeasurement       interface{}               `json:"unitOfMeasurement,omitempty" bson:"unitOfMeasurement"`
 	ObservationType         DatastreamObservationType `json:"observationType,omitempty" bson:"observationType"`
 	Description             string                    `json:"description,omitempty"`
@@ -167,15 +175,27 @@ func (e DatastreamEntity) GetType() EntityType {
 // value of the property.
 type SensorEntity struct {
 	SensorThingsEntity `bson:",inline"`
-	NavLinkDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
-	Description        string        `json:"description,omitempty"`
-	EncodingType       EncodingType  `json:"encodingType,omitempty"`
-	Metadata           string        `json:"metadata,omitempty"`
-	Datastreams        []*Datastream `json:"Datastreams,omitempty" bson:"-"`
+	NavLinkDatastreams string             `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
+	Description        string             `json:"description,omitempty"`
+	EncodingType       SensorEncodingType `json:"encodingType,omitempty"`
+	Metadata           interface{}        `json:"metadata,omitempty"`
+	Datastreams        []*Datastream      `json:"Datastreams,omitempty" bson:"-"`
 }
 
 func (e SensorEntity) GetType() EntityType {
 	return ENTITY_SENSORS
+}
+
+func (e SensorEntity) GetDescription() string {
+	return e.Description
+}
+
+func (e SensorEntity) GetEncodingType() SensorEncodingType {
+	return e.EncodingType
+}
+
+func (e SensorEntity) GetMetadata() interface{} {
+	return e.Metadata
 }
 
 // An ObservedProperty specifies the phenomenon of an Observation.
@@ -192,14 +212,29 @@ func (e ObservedPropertyEntity) GetType() EntityType {
 	return ENTITY_OBSERVEDPROPERTIES
 }
 
+func (e ObservedPropertyEntity) GetName() string {
+	return e.Name
+}
+
+func (e ObservedPropertyEntity) GetDefinition() string {
+	return e.Definition
+}
+
+func (e ObservedPropertyEntity) GetDescription() string {
+	return e.Description
+}
+
 // An Observation is act of measuring or otherwise determining the value of a property
 type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
 	NavLinkFeatureOfInterest string                   `json:"FeatureOfInterest@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkDatastream        string                   `json:"Datastream@iot.navigationLink,omitempty" bson:"-"`
 	PhenomenonTime           *TimePeriod              `json:"phenomenonTime,omitempty"`
-	ResultTime               *TimeInstant             `json:"resultTime,omitempty"`
 	Result                   interface{}              `json:"result,omitempty" bson:"result"`
+	ResultTime               *TimeInstant             `json:"resultTime,omitempty"`
+	ResultQuality            interface{}              `json:"resultQuality,omitempty"`
+	ValidTime                *TimePeriod              `json:"validTime,omitempty"`
+	Parameters               map[string]interface{}   `json:"parameter,omptempty"`
 	IdDatastream             string                   `json:"-" bson:"@iot_datastreams_id"`
 	IdFeatureOfInterest      string                   `json:"-" bson:"@iot_featureofinterests_id"`
 	Datastream               *DatastreamEntity        `json:"Datastream,omitempty" bson:"-"`
@@ -208,6 +243,30 @@ type ObservationEntity struct {
 
 func (e ObservationEntity) GetType() EntityType {
 	return ENTITY_OBSERVATIONS
+}
+
+func (e ObservationEntity) GetPhenomenonTime() *TimePeriod {
+	return e.PhenomenonTime
+}
+
+func (e ObservationEntity) GetResultTime() *TimeInstant {
+	return e.ResultTime
+}
+
+func (e ObservationEntity) GetResult() interface{} {
+	return e.Result
+}
+
+func (e ObservationEntity) GetResultQuality() interface{} {
+	return e.ResultQuality
+}
+
+func (e ObservationEntity) GetValidTime() *TimePeriod {
+	return e.ValidTime
+}
+
+func (e ObservationEntity) GetParameters() map[string]interface{} {
+	return e.Parameters
 }
 
 // An Observation results in a value being assigned to a phenomenon. The phenomenon is a property of a feature, the
@@ -220,11 +279,23 @@ type FeatureOfInterestEntity struct {
 	SensorThingsEntity  `bson:",inline"`
 	NavLinkObservations string               `json:"Observations@iot.navigationLink,omitempty" bson:"-"`
 	Description         string               `json:"description,omitempty"`
-	EncodingType        EncodingType         `json:"encodingType,omitempty"`
+	EncodingType        LocationEncodingType `json:"encodingType,omitempty"`
 	Feature             interface{}          `json:"feature,omitempty" bson:"feature"`
 	Observations        []*ObservationEntity `json:"Observations,omitempty" bson:"-"`
 }
 
 func (e FeatureOfInterestEntity) GetType() EntityType {
 	return ENTITY_FEATURESOFINTEREST
+}
+
+func (e FeatureOfInterestEntity) GetDescription() string {
+	return e.Description
+}
+
+func (e FeatureOfInterestEntity) GetEncodingType() LocationEncodingType {
+	return e.EncodingType
+}
+
+func (e FeatureOfInterestEntity) GetFeature() interface{} {
+	return e.Feature
 }
