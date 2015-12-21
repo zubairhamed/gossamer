@@ -2,21 +2,14 @@ package client
 
 import (
 	"bytes"
-	"github.com/zubairhamed/gossamer"
-	"log"
-	"strings"
 	"encoding/json"
-	"net/http"
+	"errors"
+	. "github.com/zubairhamed/gossamer"
 	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
 )
-
-type Client interface {
-	QueryAll(gossamer.EntityType, gossamer.QueryOptions) ([]gossamer.SensorThing, error)
-	QueryOne(gossamer.EntityType, gossamer.QueryOptions) (gossamer.SensorThing, error)
-
-	InsertObservation(*gossamer.ObservationEntity) (error)
-}
-
 
 func NewClient(url string) Client {
 	return &GossamerClient{
@@ -25,42 +18,82 @@ func NewClient(url string) Client {
 }
 
 type GossamerClient struct {
-	url		string
+	url string
 }
 
-func (c *GossamerClient) QueryAll(gossamer.EntityType, gossamer.QueryOptions) ([]gossamer.SensorThing, error) {
+func (c *GossamerClient) QueryAll(EntityType, QueryOptions) ([]SensorThing, error) {
 	return nil, nil
 }
 
-func (c *GossamerClient) QueryOne(gossamer.EntityType, gossamer.QueryOptions) (gossamer.SensorThing, error) {
+func (c *GossamerClient) QueryOne(EntityType, QueryOptions) (SensorThing, error) {
 	return nil, nil
 }
 
-func (c *GossamerClient) InsertObservation(o *gossamer.ObservationEntity) (error) {
+func (c *GossamerClient) InsertObservation(o *ObservationEntity) error {
 	b, err := json.Marshal(o)
+	if err != nil {
+		return err
+	}
 
 	r := bytes.NewReader(b)
 
-	resp, err := http.Post(c.url + "/v1.0/Observations", "application/json", r)
-	contents, _ := ioutil.ReadAll(resp.Body)
-	log.Println(resp, err, contents)
+	resp, err := http.Post(c.url+"/v1.0/Observations", "application/json", r)
 
+	if err != nil {
+		return err
+	}
 
+	if resp.StatusCode != 201 {
+		contents, _ := ioutil.ReadAll(resp.Body)
+		return errors.New(string(contents))
+	}
 
 	return nil
 }
 
-type ClientQuery interface {
-	All() ([]gossamer.SensorThing, error)
-	One() (gossamer.SensorThing, error)
-	Filter() ClientQuery
-	Count(bool) ClientQuery
-	OrderBy(...string) ClientQuery
-	Skip(int) ClientQuery
-	Top(int) ClientQuery
-	Expand(...string) ClientQuery
-	Select(...string) ClientQuery
-	GetUrlString() string
+func (c *GossamerClient) InsertThing(*ThingEntity) error {
+	return nil
+}
+func (c *GossamerClient) InsertObservedProperty(*ObservedPropertyEntity) error    { return nil }
+func (c *GossamerClient) InsertLocation(*LocationEntity) error                    { return nil }
+func (c *GossamerClient) InsertDatastream(*DatastreamEntity) error                { return nil }
+func (c *GossamerClient) InsertSensor(*SensorEntity) error                        { return nil }
+func (c *GossamerClient) InsertFeaturesOfInterest(*FeatureOfInterestEntity) error { return nil }
+
+func (c *GossamerClient) DeleteObservation(string) error        { return nil }
+func (c *GossamerClient) DeleteThing(string) error              { return nil }
+func (c *GossamerClient) DeleteObservedProperty(string) error   { return nil }
+func (c *GossamerClient) DeleteLocation(string) error           { return nil }
+func (c *GossamerClient) DeleteDatastream(string) error         { return nil }
+func (c *GossamerClient) DeleteSensor(string) error             { return nil }
+func (c *GossamerClient) DeleteFeaturesOfInterest(string) error { return nil }
+
+func (c *GossamerClient) UpdateObservation(*ObservationEntity) error              { return nil }
+func (c *GossamerClient) UpdateThing(*ThingEntity) error                          { return nil }
+func (c *GossamerClient) UpdateObservedProperty(*ObservedPropertyEntity) error    { return nil }
+func (c *GossamerClient) UpdateLocation(*LocationEntity) error                    { return nil }
+func (c *GossamerClient) UpdateDatastream(*DatastreamEntity) error                { return nil }
+func (c *GossamerClient) UpdateSensor(*SensorEntity) error                        { return nil }
+func (c *GossamerClient) UpdateFeaturesOfInterest(*FeatureOfInterestEntity) error { return nil }
+
+func (c *GossamerClient) PatchObservation(*ObservationEntity) error              { return nil }
+func (c *GossamerClient) PatchThing(*ThingEntity) error                          { return nil }
+func (c *GossamerClient) PatchObservedProperty(*ObservedPropertyEntity) error    { return nil }
+func (c *GossamerClient) PatchLocation(*LocationEntity) error                    { return nil }
+func (c *GossamerClient) PatchDatastream(*DatastreamEntity) error                { return nil }
+func (c *GossamerClient) PatchSensor(*SensorEntity) error                        { return nil }
+func (c *GossamerClient) PatchFeaturesOfInterest(*FeatureOfInterestEntity) error { return nil }
+
+func (c *GossamerClient) FindObservation(string) (*ObservationEntity, error) { return nil, nil }
+func (c *GossamerClient) FindThing(string) (*ThingEntity, error)             { return nil, nil }
+func (c *GossamerClient) FindObservedProperty(string) (*ObservedPropertyEntity, error) {
+	return nil, nil
+}
+func (c *GossamerClient) FindLocation(string) (*LocationEntity, error)     { return nil, nil }
+func (c *GossamerClient) FindDatastream(string) (*DatastreamEntity, error) { return nil, nil }
+func (c *GossamerClient) FindSensor(string) (*SensorEntity, error)         { return nil, nil }
+func (c *GossamerClient) FindFeaturesOfInterest(string) (*FeatureOfInterestEntity, error) {
+	return nil, nil
 }
 
 type DefaultClientQuery struct {
@@ -73,11 +106,11 @@ type DefaultClientQuery struct {
 	optSkip      int
 }
 
-func (cq *DefaultClientQuery) All() ([]gossamer.SensorThing, error) {
+func (cq *DefaultClientQuery) All() ([]SensorThing, error) {
 	return nil, nil
 }
 
-func (cq *DefaultClientQuery) One() (gossamer.SensorThing, error) {
+func (cq *DefaultClientQuery) One() (SensorThing, error) {
 	log.Println(cq.GetUrlString())
 	return nil, nil
 }
@@ -152,52 +185,29 @@ func (cq *DefaultClientQuery) GetUrlString() string {
 	return buf.String()
 }
 
-type ClientDelete interface {
-}
-
 type DefaultClientDelete struct {
 	entityClient EntityClient
-}
-
-type ClientPatch interface {
 }
 
 type DefaultClientPatch struct {
 	entityClient EntityClient
 }
 
-type ClientUpdate interface {
-}
-
 type DefaultClientUpdate struct {
 	entityClient EntityClient
-}
-
-type ClientInsert interface {
-
 }
 
 type DefaultClientInsert struct {
 	entityClient EntityClient
 }
 
-type EntityClient interface {
-	GetType() gossamer.EntityType
-	GetId() string
-	Query() ClientQuery
-	Delete() ClientDelete
-	Patch() ClientPatch
-	Update() ClientUpdate
-	Insert() ClientInsert
-}
-
 type DefaultEntityClient struct {
-	client 	   Client
-	entityType gossamer.EntityType
+	client     Client
+	entityType EntityType
 	id         string
 }
 
-func (c *DefaultEntityClient) GetType() gossamer.EntityType {
+func (c *DefaultEntityClient) GetType() EntityType {
 	return c.entityType
 }
 

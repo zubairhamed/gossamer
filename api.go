@@ -345,3 +345,84 @@ type FeatureOfInterest interface {
 
 	GetObservations() []Observation
 }
+
+// Client API
+type Client interface {
+	QueryAll(EntityType, QueryOptions) ([]SensorThing, error)
+	QueryOne(EntityType, QueryOptions) (SensorThing, error)
+
+	InsertObservation(*ObservationEntity) error
+	InsertThing(*ThingEntity) error
+	InsertObservedProperty(*ObservedPropertyEntity) error
+	InsertLocation(*LocationEntity) error
+	InsertDatastream(*DatastreamEntity) error
+	InsertSensor(*SensorEntity) error
+	InsertFeaturesOfInterest(*FeatureOfInterestEntity) error
+
+	DeleteObservation(string) error
+	DeleteThing(string) error
+	DeleteObservedProperty(string) error
+	DeleteLocation(string) error
+	DeleteDatastream(string) error
+	DeleteSensor(string) error
+	DeleteFeaturesOfInterest(string) error
+
+	UpdateObservation(*ObservationEntity) error
+	UpdateThing(*ThingEntity) error
+	UpdateObservedProperty(*ObservedPropertyEntity) error
+	UpdateLocation(*LocationEntity) error
+	UpdateDatastream(*DatastreamEntity) error
+	UpdateSensor(*SensorEntity) error
+	UpdateFeaturesOfInterest(*FeatureOfInterestEntity) error
+
+	PatchObservation(*ObservationEntity) error
+	PatchThing(*ThingEntity) error
+	PatchObservedProperty(*ObservedPropertyEntity) error
+	PatchLocation(*LocationEntity) error
+	PatchDatastream(*DatastreamEntity) error
+	PatchSensor(*SensorEntity) error
+	PatchFeaturesOfInterest(*FeatureOfInterestEntity) error
+
+	FindObservation(string) (*ObservationEntity, error)
+	FindThing(string) (*ThingEntity, error)
+	FindObservedProperty(string) (*ObservedPropertyEntity, error)
+	FindLocation(string) (*LocationEntity, error)
+	FindDatastream(string) (*DatastreamEntity, error)
+	FindSensor(string) (*SensorEntity, error)
+	FindFeaturesOfInterest(string) (*FeatureOfInterestEntity, error)
+}
+
+type ClientQuery interface {
+	All() ([]SensorThing, error)
+	One() (SensorThing, error)
+	Filter() ClientQuery
+	Count(bool) ClientQuery
+	OrderBy(...string) ClientQuery
+	Skip(int) ClientQuery
+	Top(int) ClientQuery
+	Expand(...string) ClientQuery
+	Select(...string) ClientQuery
+	GetUrlString() string
+}
+
+type ClientDelete interface {
+}
+
+type ClientPatch interface {
+}
+
+type ClientUpdate interface {
+}
+
+type ClientInsert interface {
+}
+
+type EntityClient interface {
+	GetType() EntityType
+	GetId() string
+	Query() ClientQuery
+	Delete() ClientDelete
+	Patch() ClientPatch
+	Update() ClientUpdate
+	Insert() ClientInsert
+}
