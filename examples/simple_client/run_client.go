@@ -15,10 +15,9 @@ func main() {
 	obs.PhenomenonTime = gossamer.NewTimePeriod(time.Now(), time.Now())
 	obs.Result = "123"
 	obs.ResultTime = gossamer.NewTimeInstant(time.Now())
-
-	//	ds := &gossamer.DatastreamEntity{}
-	//	ds.Id = "Datastream-1"
-	//	obs.Datastream = ds
+	ds := &gossamer.DatastreamEntity{}
+	ds.Id = "Datastream-1"
+	obs.Datastream = ds
 
 	err := c.InsertObservation(obs)
 	if err != nil {
