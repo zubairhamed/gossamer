@@ -68,13 +68,53 @@ func (c *GossamerClient) InsertFeaturesOfInterest(o FeatureOfInterest) error {
 	return c.doInsert(o, "/FeaturesOfInterest")
 }
 
-func (c *GossamerClient) DeleteObservation(string) error        { return nil }
-func (c *GossamerClient) DeleteThing(string) error              { return nil }
-func (c *GossamerClient) DeleteObservedProperty(string) error   { return nil }
-func (c *GossamerClient) DeleteLocation(string) error           { return nil }
-func (c *GossamerClient) DeleteDatastream(string) error         { return nil }
-func (c *GossamerClient) DeleteSensor(string) error             { return nil }
-func (c *GossamerClient) DeleteFeaturesOfInterest(string) error { return nil }
+func (c *GossamerClient) doDelete(pathFragment string, id string) error {
+	u := c.url + "/v1.0" + pathFragment + "(" + id + ")"
+	req, err := http.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		contents, _ := ioutil.ReadAll(resp.Body)
+
+		return errors.New(string(contents))
+	}
+	return nil
+}
+
+func (c *GossamerClient) DeleteObservation(id string) error {
+	return c.doDelete("/Observations", id)
+}
+
+func (c *GossamerClient) DeleteThing(id string) error {
+	return c.doDelete("/Things", id)
+}
+
+func (c *GossamerClient) DeleteObservedProperty(id string) error {
+	return c.doDelete("/ObservedProperties", id)
+}
+
+func (c *GossamerClient) DeleteLocation(id string) error {
+	return c.doDelete("/Locations", id)
+}
+
+func (c *GossamerClient) DeleteDatastream(id string) error {
+	return c.doDelete("/Datastreams", id)
+}
+
+func (c *GossamerClient) DeleteSensor(id string) error {
+	return c.doDelete("/Sensors", id)
+}
+
+func (c *GossamerClient) DeleteFeaturesOfInterest(id string) error {
+	return c.doDelete("/FeaturesOfInterest", id)
+}
 
 func (c *GossamerClient) UpdateObservation(o Observation) error              { return nil }
 func (c *GossamerClient) UpdateThing(o Thing) error                          { return nil }
@@ -320,4 +360,3 @@ func (c *GossamerClient) FindFeaturesOfInterest() ([]FeatureOfInterest, error) {
 
 	return ret, err
 }
-

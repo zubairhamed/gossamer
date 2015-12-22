@@ -26,6 +26,14 @@ func main() {
 	FindObservedProperties(c)
 	FindThings(c)
 	FindSensors(c)
+
+	DeleteObservations(c)
+	DeleteDatastreams(c)
+	DeleteFeaturesOfInterest(c)
+	DeleteLocations(c)
+	DeleteObservedProperties(c)
+	DeleteThings(c)
+	DeleteSensors(c)
 }
 
 func InsertObservation(c gossamer.Client) {
@@ -249,6 +257,167 @@ func FindSensors(c gossamer.Client) {
 			log.Fatal(err)
 		} else {
 			log.Println("Got Sensor Entity ", o.GetId())
+		}
+	}
+}
+
+func DeleteObservations(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindObservations()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetObservation(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteObservation(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted Observation ", o.GetId())
+			}
+		}
+	}
+}
+
+func DeleteDatastreams(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindDatastreams()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetDatastream(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteDatastream(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted Datastream ", o.GetId())
+			}
+		}
+	}
+}
+
+func DeleteFeaturesOfInterest(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindFeaturesOfInterest()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetFeaturesOfInterest(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteFeaturesOfInterest(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted FeatureOfInterest ", o.GetId())
+			}
+		}
+	}
+}
+
+func DeleteLocations(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindLocations()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetLocation(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteLocation(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted Location ", o.GetId())
+			}
+		}
+	}
+}
+
+func DeleteObservedProperties(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindObservedProperties()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetObservedProperty(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteObservedProperty(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted ObservedProperty ", o.GetId())
+			}
+		}
+	}
+}
+
+func DeleteThings(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindThings()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetThing(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteThing(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted Thing ", o.GetId())
+			}
+		}
+	}
+}
+
+func DeleteSensors(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindSensors()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetSensor(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			// Delete Observation
+			e := c.DeleteSensor(o.GetId())
+			if e != nil {
+				log.Fatal(err)
+			} else {
+				log.Println("Deleted Sensor ", o.GetId())
+			}
 		}
 	}
 }
