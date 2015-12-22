@@ -94,7 +94,6 @@ func (c *GossamerClient) PatchDatastream(o Datastream) error                { re
 func (c *GossamerClient) PatchSensor(o Sensor) error                        { return nil }
 func (c *GossamerClient) PatchFeaturesOfInterest(o FeatureOfInterest) error { return nil }
 
-
 func (c *GossamerClient) doGet(pathFragment string, id string) ([]byte, error) {
 	resp, err := http.Get(c.url + "/v1.0" + pathFragment + "(" + id + ")")
 
@@ -122,7 +121,7 @@ func (c *GossamerClient) GetObservation(id string) (Observation, error) {
 	return o, err
 }
 
-func (c *GossamerClient) GetThing(id string) (Thing, error)                          {
+func (c *GossamerClient) GetThing(id string) (Thing, error) {
 	b, err := c.doGet("/Things", id)
 
 	var o ThingEntity
@@ -131,7 +130,7 @@ func (c *GossamerClient) GetThing(id string) (Thing, error)                     
 	return o, err
 }
 
-func (c *GossamerClient) GetObservedProperty(id string) (ObservedProperty, error)    {
+func (c *GossamerClient) GetObservedProperty(id string) (ObservedProperty, error) {
 	b, err := c.doGet("/ObservedProperties", id)
 
 	var o ObservedPropertyEntity
@@ -141,7 +140,7 @@ func (c *GossamerClient) GetObservedProperty(id string) (ObservedProperty, error
 
 }
 
-func (c *GossamerClient) GetLocation(id string) (Location, error)                    {
+func (c *GossamerClient) GetLocation(id string) (Location, error) {
 	b, err := c.doGet("/Locations", id)
 
 	var o LocationEntity
@@ -151,7 +150,7 @@ func (c *GossamerClient) GetLocation(id string) (Location, error)               
 
 }
 
-func (c *GossamerClient) GetDatastream(id string) (Datastream, error)                {
+func (c *GossamerClient) GetDatastream(id string) (Datastream, error) {
 	b, err := c.doGet("/Datastreams", id)
 
 	var o DatastreamEntity
@@ -161,7 +160,7 @@ func (c *GossamerClient) GetDatastream(id string) (Datastream, error)           
 
 }
 
-func (c *GossamerClient) GetSensor(id string) (Sensor, error)                        {
+func (c *GossamerClient) GetSensor(id string) (Sensor, error) {
 	b, err := c.doGet("/Sensors", id)
 
 	var o SensorEntity
@@ -180,13 +179,149 @@ func (c *GossamerClient) GetFeaturesOfInterest(id string) (FeatureOfInterest, er
 	return o, err
 }
 
-func (c *GossamerClient) FindObservations() ([]Observation, error)             { return nil, nil }
-func (c *GossamerClient) FindThings() ([]Thing, error)                         { return nil, nil }
-func (c *GossamerClient) FindObservedProperties() ([]ObservedProperty, error)  { return nil, nil }
-func (c *GossamerClient) FindLocations() ([]Location, error)                   { return nil, nil }
-func (c *GossamerClient) FindDatastreams() ([]Datastream, error)               { return nil, nil }
-func (c *GossamerClient) FindSensors() ([]Sensor, error)                       { return nil, nil }
-func (c *GossamerClient) FindFeaturesOfInterest() ([]FeatureOfInterest, error) { return nil, nil }
+func (c *GossamerClient) doFind(pathFragment string) ([]byte, error) {
+	resp, err := http.Get(c.url + "/v1.0" + pathFragment)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		contents, _ := ioutil.ReadAll(resp.Body)
+
+		return nil, errors.New(string(contents))
+	} else {
+		contents, _ := ioutil.ReadAll(resp.Body)
+
+		return contents, nil
+	}
+}
+
+func (c *GossamerClient) FindObservations() ([]Observation, error) {
+	b, err := c.doFind("/Observations")
+
+	var valueList struct {
+		Count int
+		Value []ObservationEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]Observation, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
+func (c *GossamerClient) FindThings() ([]Thing, error) {
+	b, err := c.doFind("/Things")
+
+	var valueList struct {
+		Count int
+		Value []ThingEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]Thing, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
+func (c *GossamerClient) FindObservedProperties() ([]ObservedProperty, error) {
+	b, err := c.doFind("/ObservedProperties")
+
+	var valueList struct {
+		Count int
+		Value []ObservedPropertyEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]ObservedProperty, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
+func (c *GossamerClient) FindLocations() ([]Location, error) {
+	b, err := c.doFind("/Locations")
+
+	var valueList struct {
+		Count int
+		Value []LocationEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]Location, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
+func (c *GossamerClient) FindDatastreams() ([]Datastream, error) {
+	b, err := c.doFind("/Datastreams")
+
+	var valueList struct {
+		Count int
+		Value []DatastreamEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]Datastream, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
+func (c *GossamerClient) FindSensors() ([]Sensor, error) {
+	b, err := c.doFind("/Sensors")
+
+	var valueList struct {
+		Count int
+		Value []SensorEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]Sensor, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
+func (c *GossamerClient) FindFeaturesOfInterest() ([]FeatureOfInterest, error) {
+	b, err := c.doFind("/FeaturesOfInterest")
+
+	var valueList struct {
+		Count int
+		Value []FeatureOfInterestEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]FeatureOfInterest, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
 
 type DefaultClientQuery struct {
 	entityClient EntityClient

@@ -13,14 +13,19 @@ func main() {
 	// Inserts
 	InsertObservation(c)
 	InsertDatastream(c)
-	InsertFeatureOfInterest(c)
+	InsertFeaturesOfInterest(c)
 	InsertLocation(c)
 	InsertObservedProperty(c)
 	InsertThing(c)
 	InsertSensor(c)
 
-	o, e := c.GetObservation("b8c26429-4f53-4a02-93e3-29fef8bd4455")
-	log.Println(o, e)
+	FindObservations(c)
+	FindDatastreams(c)
+	FindFeaturesOfInterest(c)
+	FindLocations(c)
+	FindObservedProperties(c)
+	FindThings(c)
+	FindSensors(c)
 }
 
 func InsertObservation(c gossamer.Client) {
@@ -66,7 +71,7 @@ func InsertDatastream(c gossamer.Client) {
 	log.Println("Inserted New Datastream")
 }
 
-func InsertFeatureOfInterest(c gossamer.Client) {
+func InsertFeaturesOfInterest(c gossamer.Client) {
 	e := gossamer.NewFeatureOfInterestEntity()
 	e.Description = "XXXX"
 	e.EncodingType = gossamer.LOCATION_ENCTYPE_GEOJSON
@@ -129,3 +134,121 @@ func InsertThing(c gossamer.Client) {
 	log.Println("Inserted New Thing")
 }
 
+func FindObservations(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindObservations()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetObservation(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got Observation Entity ", o.GetId())
+		}
+	}
+}
+
+func FindDatastreams(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindDatastreams()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetDatastream(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got Datastream Entity ", o.GetId())
+		}
+	}
+}
+
+func FindFeaturesOfInterest(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindFeaturesOfInterest()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetFeaturesOfInterest(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got FeaturesofInterest Entity ", o.GetId())
+		}
+	}
+}
+
+func FindLocations(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindLocations()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetLocation(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got Location Entity ", o.GetId())
+		}
+	}
+}
+
+func FindObservedProperties(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindObservedProperties()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetObservedProperty(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got Observed Property Entity ", o.GetId())
+		}
+	}
+}
+
+func FindThings(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindThings()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetThing(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got Things Entity ", o.GetId())
+		}
+	}
+}
+
+func FindSensors(c gossamer.Client) {
+	log.Println("====================")
+	ol, e := c.FindSensors()
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, v := range ol {
+		o, err := c.GetSensor(v.GetId())
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("Got Sensor Entity ", o.GetId())
+		}
+	}
+}
