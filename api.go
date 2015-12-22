@@ -377,38 +377,3 @@ type Client interface {
 	PatchSensor(Sensor) error
 	PatchFeaturesOfInterest(FeatureOfInterest) error
 }
-
-type ClientQuery interface {
-	All() ([]SensorThing, error)
-	One() (SensorThing, error)
-	Filter() ClientQuery
-	Count(bool) ClientQuery
-	OrderBy(...string) ClientQuery
-	Skip(int) ClientQuery
-	Top(int) ClientQuery
-	Expand(...string) ClientQuery
-	Select(...string) ClientQuery
-	GetUrlString() string
-}
-
-type ClientDelete interface {
-}
-
-type ClientPatch interface {
-}
-
-type ClientUpdate interface {
-}
-
-type ClientInsert interface {
-}
-
-type EntityClient interface {
-	GetType() EntityType
-	GetId() string
-	Query() ClientQuery
-	Delete() ClientDelete
-	Patch() ClientPatch
-	Update() ClientUpdate
-	Insert() ClientInsert
-}
