@@ -1,6 +1,8 @@
 package gossamer
 
-import "errors"
+import (
+	"errors"
+)
 
 func ValidateMandatoryProperties(entity SensorThing) error {
 	switch entity.GetType() {
@@ -33,6 +35,10 @@ func ValidateMandatoryProperties(entity SensorThing) error {
 
 	case ENTITY_HISTORICALLOCATIONS:
 		e := (entity).(*HistoricalLocationEntity)
+		if e.Time == nil {
+			return errors.New("Missing mandatory property for HistoricalLocation entity: 'time'")
+		}
+
 		if e.Time.IsZero() {
 			return errors.New("Missing mandatory property for HistoricalLocation entity: 'time'")
 		}
@@ -47,7 +53,7 @@ func ValidateMandatoryProperties(entity SensorThing) error {
 			return errors.New("Missing mandatory property for Sensor entity: 'encodingType'")
 		}
 
-		if e.Metadata == "" {
+		if e.Metadata == nil || e.Metadata == "" {
 			return errors.New("Missing mandatory property for Sensor entity: 'metadata'")
 		}
 

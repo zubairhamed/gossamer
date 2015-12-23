@@ -50,7 +50,7 @@ func TestValidateMandatoryPropertiesForHistoricalLocation(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "Missing mandatory property for HistoricalLocation entity: 'time'", err.Error())
 
-	historicalLocation.Time = time.Now()
+	historicalLocation.Time = NewTimeInstant(time.Now())
 	err = ValidateMandatoryProperties(historicalLocation)
 	assert.Nil(t, err)
 }
@@ -93,7 +93,6 @@ func TestValidateMandatoryPropertiesForSensor(t *testing.T) {
 
 	sensorEntity.EncodingType = "XXXXXXX"
 	err = ValidateMandatoryProperties(sensorEntity)
-	assert.NotNil(t, err)
 	assert.Equal(t, "Missing mandatory property for Sensor entity: 'metadata'", err.Error())
 
 	sensorEntity.Metadata = "XXXXXXX"

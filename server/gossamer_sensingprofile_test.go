@@ -66,15 +66,7 @@ func TestCrudSensingProfile(t *testing.T) {
 
 	s := &server.GossamerServer{}
 	s.UseStore(server.NewMongoStore("localhost", "sensorthings"))
-
-	// ####### CHECK ZERO-ED COLLECTIONS #######
-	for _, v := range entityTypes {
-		req, w = NewMockHttp("GET", v, "")
-		s.HandleGet(c, w, req)
-		ret = w.GetJSON()
-		l = len(ret["value"].([]interface{}))
-		assert.Equal(t, 0, l)
-	}
+	DropCollection()
 
 	// ####### BASIC INSERT #######
 	//	Create Location
@@ -200,7 +192,7 @@ func TestCrudSensingProfile(t *testing.T) {
 	//	log.Println(duration.Seconds())
 
 	// Clear Collection
-	// DropCollection()
+	DropCollection()
 }
 
 func GetMapProperty(idx int, prop string, val map[string]interface{}) string {
