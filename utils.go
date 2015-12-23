@@ -172,6 +172,10 @@ func DecodeJsonToEntityStruct(decoder *json.Decoder, et EntityType) (SensorThing
 	return nil, errors.New("Unknown Entity Type")
 }
 
+func ThrowHttpOk(msg string, w http.ResponseWriter) {
+	http.Error(w, msg, http.StatusOK)
+}
+
 func ThrowHttpCreated(msg string, w http.ResponseWriter) {
 	http.Error(w, msg, http.StatusCreated)
 }
@@ -333,6 +337,16 @@ func CloneObservationEntity(o Observation) *ObservationEntity {
 	n.ResultQuality = o.GetResultQuality()
 	n.ResultTime = o.GetResultTime()
 	n.ValidTime = o.GetValidTime()
+
+	return n
+}
+
+func CloneSensorEntity(o Sensor) *SensorEntity {
+	n := NewSensorEntity()
+	n.Id = o.GetId()
+	n.Description = o.GetDescription()
+	n.EncodingType = o.GetEncodingType()
+	n.Metadata = o.GetMetadata()
 
 	return n
 }

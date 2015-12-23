@@ -1,4 +1,4 @@
-package client
+package httpclient
 
 import (
 	"bytes"
@@ -139,6 +139,7 @@ func (c *GossamerClient) DeleteFeaturesOfInterest(id string) error {
 */
 
 func (c *GossamerClient) doUpdate(o interface{}, pathFragment string) error {
+	st := o.(SensorThing)
 	b, err := json.Marshal(o)
 	if err != nil {
 		return err
@@ -146,7 +147,7 @@ func (c *GossamerClient) doUpdate(o interface{}, pathFragment string) error {
 
 	r := bytes.NewReader(b)
 
-	u := c.url + "/v1.0" + pathFragment
+	u := c.url + "/v1.0" + pathFragment + "(" + st.GetId() + ")"
 	req, err := http.NewRequest("PUT", u, r)
 	req.Header.Set("Content-Type", "application/json")
 

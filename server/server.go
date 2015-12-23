@@ -199,7 +199,68 @@ func (s *GossamerServer) HandleDelete(c web.C, w http.ResponseWriter, r *http.Re
 }
 
 func (s *GossamerServer) HandlePut(c web.C, w http.ResponseWriter, r *http.Request) {
+	var err error
+	var req Request
 
+	if r.Header.Get("Content-Type") != "application/json" {
+		ThrowNotAcceptable("Format of request is not JSON", w)
+	}
+
+	req, err = CreateIncomingRequest(r.URL, HTTP)
+	if err != nil {
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
+	}
+
+	if err = ValidatePutRequestUrl(req); err != nil {
+		ThrowHttpMethodNotAllowed(err.Error(), w)
+		return
+	}
+
+	rp := req.GetResourcePath()
+	lastEnt := rp.Last()
+	ent := lastEnt.GetEntity()
+
+	if lastEnt.GetId() == "" {
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": Missing @iot.id", w)
+	}
+
+	cont := rp.Containing()
+
+	if !IsSingularEntity(string(ent)) {
+		decoder := json.NewDecoder(r.Body)
+		e, err := DecodeJsonToEntityStruct(decoder, ent)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		if cont != nil {
+			SetAssociatedEntityId(e, cont.GetEntity(), cont.GetId())
+		}
+
+		err = ValidateMandatoryProperties(e)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		err = ValidateIntegrityConstraints(e)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		log.Println("datastore.Update")
+		err = s.dataStore.Update(e)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		// TODO
+		w.Header().Add("Location", "url-to-entity")
+		ThrowHttpOk("Entity Updated", w)
+	}
 }
 
 func (s *GossamerServer) HandlePatch(c web.C, w http.ResponseWriter, r *http.Request) {

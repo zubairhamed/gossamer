@@ -287,6 +287,26 @@ func (m *MongoStore) Query(rp ResourcePath, opts QueryOptions) (interface{}, err
 	return results, nil
 }
 
+func (m *MongoStore) Update(payload SensorThing) (err error) {
+	opComplete := make(chan bool)
+	ent := payload.GetType()
+
+	go func() {
+		session := m.cloneSession()
+		defer session.Close()
+
+		log.Println("Update", payload)
+
+		c := session.DB(m.db).C(ResolveMongoCollectionName(ent))
+		err = c.Update(bson.M{"@iot_id": payload.GetId()}, payload)
+
+		opComplete <- true
+	}()
+	<-opComplete
+
+	return
+}
+
 func (m *MongoStore) Insert(rp ResourcePath, payload SensorThing) error {
 	queryComplete := make(chan bool)
 	var results interface{}

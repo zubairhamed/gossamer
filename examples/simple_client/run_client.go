@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/zubairhamed/gossamer"
-	"github.com/zubairhamed/gossamer/client"
+	client "github.com/zubairhamed/gossamer/httpclient"
 	"log"
 	"time"
 )
@@ -33,7 +33,7 @@ func main() {
 	QueryObservations(c)
 
 	log.Println("========== UPDATE ==========")
-	UpdateObservations(c)
+	// UpdateObservations(c)
 	UpdateDatastreams(c)
 	UpdateFeaturesOfInterest(c)
 	UpdateLocation(c)
@@ -450,12 +450,14 @@ func UpdateObservations(c gossamer.Client) {
 	if len(l) > 0 {
 		o = l[0].(gossamer.Observation)
 
-		n := gossamer.NewObservationEntity()
-		n.Id = o.GetId()
-		n.ResultQuality = "Patch this value only"
+		n := gossamer.CloneObservationEntity(o)
+		n.ResultQuality = "Value Updated"
 		n.ResultTime = gossamer.NewTimeInstant(time.Now())
 
-		c.UpdateObservation(n)
+		err = c.UpdateObservation(n)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -470,7 +472,26 @@ func UpdateFeaturesOfInterest(c gossamer.Client) {
 func UpdateLocation(c gossamer.Client)           {}
 func UpdateObservedProperties(c gossamer.Client) {}
 func UpdateThings(c gossamer.Client)             {}
-func UpdateSensors(c gossamer.Client)            {}
+
+func UpdateSensors(c gossamer.Client) {
+	l, err := c.QuerySensors().Top(1).All()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var o gossamer.Sensor
+	if len(l) > 0 {
+		o = l[0].(gossamer.Sensor)
+
+		n := gossamer.CloneSensorEntity(o)
+		n.Description = "Updated description"
+
+		err = c.UpdateSensor(n)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
 
 func PatchObservations(c gossamer.Client) {
 	l, err := c.QueryObservations().Top(1).All()
