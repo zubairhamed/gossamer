@@ -1,14 +1,13 @@
-package gossamer
+package server
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
+	. "github.com/zubairhamed/gossamer"
 	"log"
 	"net/http"
 	"reflect"
-	"strings"
 )
 
 func NewServer() Server {
@@ -26,94 +25,6 @@ func (s *GossamerServer) handleNotImplemented(c web.C, w http.ResponseWriter, r 
 func (s *GossamerServer) UseStore(ds Datastore) {
 	s.dataStore = ds
 }
-
-func DiscoverEntityType(e string) EntityType {
-	switch {
-	case strings.HasPrefix(e, "Things"):
-		return ENTITY_THINGS
-
-	case strings.HasPrefix(e, "Thing"):
-		return ENTITY_THING
-
-	case strings.HasPrefix(e, "Locations"):
-		return ENTITY_LOCATIONS
-
-	case strings.HasPrefix(e, "Location"):
-		return ENTITY_LOCATION
-
-	case strings.HasPrefix(e, "Datastreams"):
-		return ENTITY_DATASTREAMS
-
-	case strings.HasPrefix(e, "Datastream"):
-		return ENTITY_DATASTREAM
-
-	case strings.HasPrefix(e, "Sensors"):
-		return ENTITY_SENSORS
-
-	case strings.HasPrefix(e, "Sensor"):
-		return ENTITY_SENSOR
-
-	case strings.HasPrefix(e, "Observations"):
-		return ENTITY_OBSERVATIONS
-
-	case strings.HasPrefix(e, "Observation"):
-		return ENTITY_OBSERVATION
-
-	case strings.HasPrefix(e, "ObservedProperties"):
-		return ENTITY_OBSERVEDPROPERTIES
-
-	case strings.HasPrefix(e, "ObservedProperty"):
-		return ENTITY_OBSERVEDPROPERTY
-
-	case strings.HasPrefix(e, "FeaturesOfInterest"):
-		return ENTITY_FEATURESOFINTEREST
-
-	case strings.HasPrefix(e, "HistoricalLocations"):
-		return ENTITY_HISTORICALLOCATIONS
-
-	case strings.HasPrefix(e, "HistoricalLocation"):
-		return ENTITY_HISTORICALLOCATION
-
-	default:
-		return ENTITY_UNKNOWN
-	}
-}
-
-func IsEntity(e string) bool {
-	if strings.HasPrefix(e, "Thing") ||
-		strings.HasPrefix(e, "Things") ||
-		strings.HasPrefix(e, "Location") ||
-		strings.HasPrefix(e, "Locations") ||
-		strings.HasPrefix(e, "HistoricalLocation") ||
-		strings.HasPrefix(e, "HistoricalLocations") ||
-		strings.HasPrefix(e, "Datastream") ||
-		strings.HasPrefix(e, "Datastreams") ||
-		strings.HasPrefix(e, "Sensor") ||
-		strings.HasPrefix(e, "Sensors") ||
-		strings.HasPrefix(e, "Observation") ||
-		strings.HasPrefix(e, "Observations") ||
-		strings.HasPrefix(e, "ObservedProperty") ||
-		strings.HasPrefix(e, "ObservedProperties") ||
-		strings.HasPrefix(e, "FeaturesOfInterest") {
-		return true
-	}
-	return false
-}
-
-func IsSingularEntity(e string) bool {
-	if (strings.HasPrefix(e, "Location") && !strings.HasPrefix(e, "Locations")) ||
-		(strings.HasPrefix(e, "Thing") && !strings.HasPrefix(e, "Things")) ||
-		(strings.HasPrefix(e, "HistoricalLocation") && !strings.HasPrefix(e, "HistoricalLocations")) ||
-		(strings.HasPrefix(e, "Datastream") && !strings.HasPrefix(e, "Datastreams")) ||
-		(strings.HasPrefix(e, "Sensor") && !strings.HasPrefix(e, "Sensors")) ||
-		(strings.HasPrefix(e, "Observation") && !strings.HasPrefix(e, "Observations")) ||
-		(strings.HasPrefix(e, "ObservedProperty") && !strings.HasPrefix(e, "ObservedProperties")) {
-		return true
-	}
-	return false
-}
-
-var ERR_INVALID_ENTITY = errors.New("Invalid Entity")
 
 func (s *GossamerServer) Start() {
 	goji.Get("/v1.0", s.handleRootResource)
@@ -150,7 +61,7 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 
 	out, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 		return
 	}
 	w.Write(out)
@@ -159,13 +70,13 @@ func (s *GossamerServer) handleRootResource(c web.C, w http.ResponseWriter, r *h
 func (s *GossamerServer) HandleGet(c web.C, w http.ResponseWriter, r *http.Request) {
 	req, err := CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 	}
 
 	rp := req.GetResourcePath()
 	result, err := s.dataStore.Query(rp, req.GetQueryOptions())
 	if err != nil {
-		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 		return
 	}
 
@@ -190,13 +101,13 @@ func (s *GossamerServer) HandleGet(c web.C, w http.ResponseWriter, r *http.Reque
 
 	b, err := json.MarshalIndent(jsonOut, "", "  ")
 	if err != nil {
-		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 		return
 	}
 
 	_, err = w.Write(b)
 	if err != nil {
-		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpInternalServerError(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 		return
 	}
 }
@@ -211,7 +122,7 @@ func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 	}
 
 	if err = ValidatePostRequestUrl(req); err != nil {
@@ -227,7 +138,7 @@ func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Requ
 		decoder := json.NewDecoder(r.Body)
 		e, err := DecodeJsonToEntityStruct(decoder, ent)
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
 			return
 		}
 
@@ -239,19 +150,19 @@ func (s *GossamerServer) HandlePost(c web.C, w http.ResponseWriter, r *http.Requ
 
 		err = ValidateMandatoryProperties(e)
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
 			return
 		}
 
 		err = ValidateIntegrityConstraints(e)
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
 			return
 		}
 
 		err = s.dataStore.Insert(rp, e)
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
 			return
 		}
 
@@ -267,7 +178,7 @@ func (s *GossamerServer) HandleDelete(c web.C, w http.ResponseWriter, r *http.Re
 
 	req, err = CreateIncomingRequest(r.URL, HTTP)
 	if err != nil {
-		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+err.Error(), w)
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
 	}
 
 	if err = ValidateDeleteRequestUrl(req); err != nil {
@@ -281,7 +192,7 @@ func (s *GossamerServer) HandleDelete(c web.C, w http.ResponseWriter, r *http.Re
 	if !IsSingularEntity(string(ent)) {
 		err = s.dataStore.Delete(ent, last.GetId())
 		if err != nil {
-			ThrowHttpBadRequest(MSG_ERR_DELETING_ENTITY+err.Error(), w)
+			ThrowHttpBadRequest(MSG_ERR_DELETING_ENTITY+": "+err.Error(), w)
 			return
 		}
 	}

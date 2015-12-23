@@ -6,6 +6,7 @@ import (
 	"github.com/satori/go.uuid"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func ResolveEntityLink(id string, ent EntityType) string {
@@ -193,4 +194,151 @@ func ThrowNotAcceptable(msg string, w http.ResponseWriter) {
 
 func GenerateEntityId() string {
 	return uuid.NewV4().String()
+}
+
+func IsEntity(e string) bool {
+	if strings.HasPrefix(e, "Thing") ||
+		strings.HasPrefix(e, "Things") ||
+		strings.HasPrefix(e, "Location") ||
+		strings.HasPrefix(e, "Locations") ||
+		strings.HasPrefix(e, "HistoricalLocation") ||
+		strings.HasPrefix(e, "HistoricalLocations") ||
+		strings.HasPrefix(e, "Datastream") ||
+		strings.HasPrefix(e, "Datastreams") ||
+		strings.HasPrefix(e, "Sensor") ||
+		strings.HasPrefix(e, "Sensors") ||
+		strings.HasPrefix(e, "Observation") ||
+		strings.HasPrefix(e, "Observations") ||
+		strings.HasPrefix(e, "ObservedProperty") ||
+		strings.HasPrefix(e, "ObservedProperties") ||
+		strings.HasPrefix(e, "FeaturesOfInterest") {
+		return true
+	}
+	return false
+}
+
+func IsSingularEntity(e string) bool {
+	if (strings.HasPrefix(e, "Location") && !strings.HasPrefix(e, "Locations")) ||
+		(strings.HasPrefix(e, "Thing") && !strings.HasPrefix(e, "Things")) ||
+		(strings.HasPrefix(e, "HistoricalLocation") && !strings.HasPrefix(e, "HistoricalLocations")) ||
+		(strings.HasPrefix(e, "Datastream") && !strings.HasPrefix(e, "Datastreams")) ||
+		(strings.HasPrefix(e, "Sensor") && !strings.HasPrefix(e, "Sensors")) ||
+		(strings.HasPrefix(e, "Observation") && !strings.HasPrefix(e, "Observations")) ||
+		(strings.HasPrefix(e, "ObservedProperty") && !strings.HasPrefix(e, "ObservedProperties")) {
+		return true
+	}
+	return false
+}
+
+func DiscoverEntityType(e string) EntityType {
+	switch {
+	case strings.HasPrefix(e, "Things"):
+		return ENTITY_THINGS
+
+	case strings.HasPrefix(e, "Thing"):
+		return ENTITY_THING
+
+	case strings.HasPrefix(e, "Locations"):
+		return ENTITY_LOCATIONS
+
+	case strings.HasPrefix(e, "Location"):
+		return ENTITY_LOCATION
+
+	case strings.HasPrefix(e, "Datastreams"):
+		return ENTITY_DATASTREAMS
+
+	case strings.HasPrefix(e, "Datastream"):
+		return ENTITY_DATASTREAM
+
+	case strings.HasPrefix(e, "Sensors"):
+		return ENTITY_SENSORS
+
+	case strings.HasPrefix(e, "Sensor"):
+		return ENTITY_SENSOR
+
+	case strings.HasPrefix(e, "Observations"):
+		return ENTITY_OBSERVATIONS
+
+	case strings.HasPrefix(e, "Observation"):
+		return ENTITY_OBSERVATION
+
+	case strings.HasPrefix(e, "ObservedProperties"):
+		return ENTITY_OBSERVEDPROPERTIES
+
+	case strings.HasPrefix(e, "ObservedProperty"):
+		return ENTITY_OBSERVEDPROPERTY
+
+	case strings.HasPrefix(e, "FeaturesOfInterest"):
+		return ENTITY_FEATURESOFINTEREST
+
+	case strings.HasPrefix(e, "HistoricalLocations"):
+		return ENTITY_HISTORICALLOCATIONS
+
+	case strings.HasPrefix(e, "HistoricalLocation"):
+		return ENTITY_HISTORICALLOCATION
+
+	default:
+		return ENTITY_UNKNOWN
+	}
+}
+
+func NewThingEntity() *ThingEntity {
+	t := &ThingEntity{}
+
+	return t
+}
+
+func NewLocationEntity() *LocationEntity {
+	e := &LocationEntity{}
+
+	return e
+}
+
+func NewHistoricalLocationEntity() *HistoricalLocationEntity {
+	e := &HistoricalLocationEntity{}
+
+	return e
+}
+
+func NewDatastreamEntity() *DatastreamEntity {
+	e := &DatastreamEntity{}
+
+	return e
+}
+
+func NewSensorEntity() *SensorEntity {
+	e := &SensorEntity{}
+
+	return e
+}
+
+func NewObservedPropertyEntity() *ObservedPropertyEntity {
+	e := &ObservedPropertyEntity{}
+
+	return e
+}
+
+func NewObservationEntity() *ObservationEntity {
+	e := &ObservationEntity{}
+
+	return e
+}
+
+func CloneObservationEntity(o Observation) *ObservationEntity {
+	n := NewObservationEntity()
+	n.Id = o.GetId()
+	n.Parameters = o.GetParameters()
+	n.PhenomenonTime = o.GetPhenomenonTime()
+	n.Result = o.GetResult()
+	n.ResultQuality = o.GetResultQuality()
+	n.ResultTime = o.GetResultTime()
+	n.ValidTime = o.GetValidTime()
+
+	return n
+}
+
+func NewFeatureOfInterestEntity() *FeatureOfInterestEntity {
+	e := &FeatureOfInterestEntity{}
+
+	return e
 }

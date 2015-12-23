@@ -1,16 +1,5 @@
 package gossamer
 
-import (
-	"time"
-)
-
-type EncodingType string
-
-const (
-	ENCODINGTYPE_PDF      EncodingType = "application/pdf"
-	ENCODINGTYPE_SENSORML EncodingType = "http://www.opengis.net/doc/IS/SensorML/2.0"
-)
-
 type ObservationType string
 
 type ProtocolType int
@@ -191,10 +180,6 @@ type Thing interface {
 
 	// An Object containing user-annotated properties as key-value pairs.
 	GetProperties() map[string]string
-
-	GetLocations() []Location
-	GetHistoricalLocations() []HistoricalLocation
-	GetDatastreams() []Datastream
 }
 
 type LocationEncodingType string
@@ -227,10 +212,7 @@ type HistoricalLocation interface {
 	SensorThing
 
 	// The time when the Thing is known at the Location.
-	GetTime() time.Time
-
-	GetLocations() []Location
-	GetThing() Thing
+	GetTime() *TimeInstant
 }
 
 type DatastreamObservationType string
@@ -286,11 +268,10 @@ const (
 // value of the property.
 type Sensor interface {
 	SensorThing
-	GetDescription() string
-	GetEncodingType() // !!
-	GetMetadata()     // !!
 
-	GetDatastreams() []Datastream
+	GetDescription() string
+	GetEncodingType() SensorEncodingType
+	GetMetadata() interface{}
 }
 
 // An ObservedProperty specifies the phenomenon of an Observation.
@@ -298,10 +279,8 @@ type ObservedProperty interface {
 	SensorThing
 
 	GetName() string
-	GetDefinition() // !!
+	GetDefinition() string
 	GetDescription() string
-
-	GetDatastreams() []Datastream
 }
 
 // An Observation is act of measuring or otherwise determining the value of a property
@@ -309,25 +288,22 @@ type Observation interface {
 	SensorThing
 
 	// The time instant or period of when the Observation happens.
-	GetPhenomenonTime() time.Time
+	GetPhenomenonTime() *TimePeriod
 
 	// The time of the Observation's result was generated.
-	GetResultTime() time.Time
+	GetResultTime() *TimeInstant
 
 	// The estimated value of an ObservedProperty from the Observation.
 	GetResult() interface{}
 
 	// Describes the quality of the result.
-	GetResultQuality() // !!
+	GetResultQuality() interface{}
 
 	// The time period during which the result may be used.
-	GetValidTime() time.Time
+	GetValidTime() *TimePeriod
 
 	// Key-value pairs showing the environmental conditions during measurement.
-	GetParameters() map[string]string
-
-	GetFeatureOfInterest() FeatureOfInterest
-	GetDatastream() Datastream
+	GetParameters() map[string]interface{}
 }
 
 // An Observation results in a value being assigned to a phenomenon. The phenomenon is a property of a feature, the
@@ -341,7 +317,76 @@ type FeatureOfInterest interface {
 
 	GetDescription() string
 	GetEncodingType() LocationEncodingType
-	GetFeature() // !!
+	GetFeature() interface{}
+}
 
-	GetObservations() []Observation
+// Client API
+type Client interface {
+	QueryObservations() ClientQuery
+	QueryThings() ClientQuery
+	QueryObservedProperties() ClientQuery
+	QueryLocations() ClientQuery
+	QueryDatastreams() ClientQuery
+	QuerySensors() ClientQuery
+	QueryFeaturesOfInterest() ClientQuery
+	QueryHistoricalLocations() ClientQuery
+
+	GetObservation(string) (Observation, error)
+	GetThing(string) (Thing, error)
+	GetObservedProperty(string) (ObservedProperty, error)
+	GetLocation(string) (Location, error)
+	GetDatastream(string) (Datastream, error)
+	GetSensor(string) (Sensor, error)
+	GetFeaturesOfInterest(string) (FeatureOfInterest, error)
+	GetHistoricalLocation(string) (HistoricalLocation, error)
+
+	FindObservations() ([]Observation, error)
+	FindThings() ([]Thing, error)
+	FindObservedProperties() ([]ObservedProperty, error)
+	FindLocations() ([]Location, error)
+	FindDatastreams() ([]Datastream, error)
+	FindSensors() ([]Sensor, error)
+	FindFeaturesOfInterest() ([]FeatureOfInterest, error)
+	FindHistoricalLocations() ([]HistoricalLocation, error)
+
+	InsertObservation(Observation) error
+	InsertThing(Thing) error
+	InsertObservedProperty(ObservedProperty) error
+	InsertLocation(Location) error
+	InsertDatastream(Datastream) error
+	InsertSensor(Sensor) error
+	InsertFeaturesOfInterest(FeatureOfInterest) error
+
+	DeleteObservation(string) error
+	DeleteThing(string) error
+	DeleteObservedProperty(string) error
+	DeleteLocation(string) error
+	DeleteDatastream(string) error
+	DeleteSensor(string) error
+	DeleteFeaturesOfInterest(string) error
+
+	UpdateObservation(Observation) error
+	UpdateThing(Thing) error
+	UpdateObservedProperty(ObservedProperty) error
+	UpdateLocation(Location) error
+	UpdateDatastream(Datastream) error
+	UpdateSensor(Sensor) error
+	UpdateFeaturesOfInterest(FeatureOfInterest) error
+
+	PatchObservation(Observation) error
+	PatchThing(Thing) error
+	PatchObservedProperty(ObservedProperty) error
+	PatchLocation(Location) error
+	PatchDatastream(Datastream) error
+	PatchSensor(Sensor) error
+	PatchFeaturesOfInterest(FeatureOfInterest) error
+}
+
+type ClientQuery interface {
+	GetEntityType() EntityType
+
+	Top(int) ClientQuery
+
+	All() ([]SensorThing, error)
+	One(string) (SensorThing, error)
 }

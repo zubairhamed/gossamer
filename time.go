@@ -2,6 +2,7 @@ package gossamer
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
@@ -43,7 +44,6 @@ func (t TimePeriod) MarshalJSON() ([]byte, error) {
 		// Time Period
 		out = fmt.Sprintf("\"%s\"", t.FromTime.Format(STD_TIME_FORMAT_INSTANT))
 	}
-
 	return []byte(out), nil
 }
 
@@ -62,6 +62,7 @@ func (t *TimePeriod) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	} else {
+		log.Println("t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])")
 		t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])
 		if err != nil {
 			return err

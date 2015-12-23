@@ -1,7 +1,8 @@
-package gossamer
+package server
 
 import (
 	"github.com/stretchr/testify/assert"
+	. "github.com/zubairhamed/gossamer"
 	"testing"
 )
 
