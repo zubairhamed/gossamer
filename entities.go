@@ -1,9 +1,5 @@
 package gossamer
 
-import (
-	"time"
-)
-
 // Base SensorThings Entity
 type SensorThingsEntity struct {
 	Id       string `json:"@iot.id,omitempty" bson:"@iot_id"`
@@ -18,54 +14,6 @@ func (e SensorThingsEntity) GetId() string {
 // SensorThings property: selfLink
 func (e SensorThingsEntity) GetSelfLink() string {
 	return e.SelfLink
-}
-
-func NewThingEntity() *ThingEntity {
-	t := &ThingEntity{}
-
-	return t
-}
-
-func NewLocationEntity() *LocationEntity {
-	e := &LocationEntity{}
-
-	return e
-}
-
-func NewHistoricalLocationEntity() *HistoricalLocationEntity {
-	e := &HistoricalLocationEntity{}
-
-	return e
-}
-
-func NewDatastreamEntity() *DatastreamEntity {
-	e := &DatastreamEntity{}
-
-	return e
-}
-
-func NewSensorEntity() *SensorEntity {
-	e := &SensorEntity{}
-
-	return e
-}
-
-func NewObservedPropertyEntity() *ObservedPropertyEntity {
-	e := &ObservedPropertyEntity{}
-
-	return e
-}
-
-func NewObservationEntity() *ObservationEntity {
-	e := &ObservationEntity{}
-
-	return e
-}
-
-func NewFeatureOfInterestEntity() *FeatureOfInterestEntity {
-	e := &FeatureOfInterestEntity{}
-
-	return e
 }
 
 // The OGC SensorThings API follows the ITU-T definition, i.e., with regard to the Internet of Things,
@@ -131,18 +79,21 @@ func (e LocationEntity) GetType() EntityType {
 // Thing with their time.
 type HistoricalLocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
-	NavLinkHistoricalLocations string    `json:"HistoricalLocations@iot.navigationLink,omitempty"`
-	NavLinkThing               string    `json:"Thing@iot.navigationLink,omitempty"`
-	Time                       time.Time `json:"time"`
-
-	IdThing     string            `json:"-" bson:"@iot_things_id"`
-	IdLocations []string          `json:"-" bson:"@iot_locations_id"`
-	Thing       *ThingEntity      `json:"Thing,omitempty"`
-	Locations   []*LocationEntity `json:"Locations,omitempty"`
+	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink,omitempty"`
+	NavLinkThing               string            `json:"Thing@iot.navigationLink,omitempty"`
+	Time                       *TimeInstant      `json:"time"`
+	IdThing                    string            `json:"-" bson:"@iot_things_id"`
+	IdLocations                []string          `json:"-" bson:"@iot_locations_id"`
+	Thing                      *ThingEntity      `json:"Thing,omitempty"`
+	Locations                  []*LocationEntity `json:"Locations,omitempty"`
 }
 
 func (e HistoricalLocationEntity) GetType() EntityType {
 	return ENTITY_HISTORICALLOCATIONS
+}
+
+func (e HistoricalLocationEntity) GetTime() *TimeInstant {
+	return e.Time
 }
 
 // A Datastream groups a collection of Observations and the Observations in a Datastream measure the

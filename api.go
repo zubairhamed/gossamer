@@ -1,9 +1,5 @@
 package gossamer
 
-import (
-	"time"
-)
-
 type ObservationType string
 
 type ProtocolType int
@@ -216,10 +212,7 @@ type HistoricalLocation interface {
 	SensorThing
 
 	// The time when the Thing is known at the Location.
-	GetTime() time.Time
-
-	GetLocations() []Location
-	GetThing() Thing
+	GetTime() *TimeInstant
 }
 
 type DatastreamObservationType string
@@ -329,6 +322,15 @@ type FeatureOfInterest interface {
 
 // Client API
 type Client interface {
+	QueryObservations() ClientQuery
+	QueryThings() ClientQuery
+	QueryObservedProperties() ClientQuery
+	QueryLocations() ClientQuery
+	QueryDatastreams() ClientQuery
+	QuerySensors() ClientQuery
+	QueryFeaturesOfInterest() ClientQuery
+	QueryHistoricalLocations() ClientQuery
+
 	GetObservation(string) (Observation, error)
 	GetThing(string) (Thing, error)
 	GetObservedProperty(string) (ObservedProperty, error)
@@ -336,6 +338,7 @@ type Client interface {
 	GetDatastream(string) (Datastream, error)
 	GetSensor(string) (Sensor, error)
 	GetFeaturesOfInterest(string) (FeatureOfInterest, error)
+	GetHistoricalLocation(string) (HistoricalLocation, error)
 
 	FindObservations() ([]Observation, error)
 	FindThings() ([]Thing, error)
@@ -344,6 +347,7 @@ type Client interface {
 	FindDatastreams() ([]Datastream, error)
 	FindSensors() ([]Sensor, error)
 	FindFeaturesOfInterest() ([]FeatureOfInterest, error)
+	FindHistoricalLocations() ([]HistoricalLocation, error)
 
 	InsertObservation(Observation) error
 	InsertThing(Thing) error
@@ -376,4 +380,13 @@ type Client interface {
 	PatchDatastream(Datastream) error
 	PatchSensor(Sensor) error
 	PatchFeaturesOfInterest(FeatureOfInterest) error
+}
+
+type ClientQuery interface {
+	GetEntityType() EntityType
+
+	Top(int) ClientQuery
+
+	All() ([]SensorThing, error)
+	One(string) (SensorThing, error)
 }

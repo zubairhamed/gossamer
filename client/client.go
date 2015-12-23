@@ -116,21 +116,140 @@ func (c *GossamerClient) DeleteFeaturesOfInterest(id string) error {
 	return c.doDelete("/FeaturesOfInterest", id)
 }
 
-func (c *GossamerClient) UpdateObservation(o Observation) error              { return nil }
-func (c *GossamerClient) UpdateThing(o Thing) error                          { return nil }
-func (c *GossamerClient) UpdateObservedProperty(o ObservedProperty) error    { return nil }
-func (c *GossamerClient) UpdateLocation(o Location) error                    { return nil }
-func (c *GossamerClient) UpdateDatastream(o Datastream) error                { return nil }
-func (c *GossamerClient) UpdateSensor(o Sensor) error                        { return nil }
-func (c *GossamerClient) UpdateFeaturesOfInterest(o FeatureOfInterest) error { return nil }
+/*
+	b, err := json.Marshal(o)
+	if err != nil {
+		return err
+	}
 
-func (c *GossamerClient) PatchObservation(o Observation) error              { return nil }
-func (c *GossamerClient) PatchThing(o Thing) error                          { return nil }
-func (c *GossamerClient) PatchObservedProperty(o ObservedProperty) error    { return nil }
-func (c *GossamerClient) PatchLocation(o Location) error                    { return nil }
-func (c *GossamerClient) PatchDatastream(o Datastream) error                { return nil }
-func (c *GossamerClient) PatchSensor(o Sensor) error                        { return nil }
-func (c *GossamerClient) PatchFeaturesOfInterest(o FeatureOfInterest) error { return nil }
+	r := bytes.NewReader(b)
+
+	resp, err := http.Post(c.url+"/v1.0"+pathFragment, "application/json", r)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 201 {
+		contents, _ := ioutil.ReadAll(resp.Body)
+		return errors.New(string(contents))
+	}
+
+	return nil
+*/
+
+func (c *GossamerClient) doUpdate(o interface{}, pathFragment string) error {
+	b, err := json.Marshal(o)
+	if err != nil {
+		return err
+	}
+
+	r := bytes.NewReader(b)
+
+	u := c.url + "/v1.0" + pathFragment
+	req, err := http.NewRequest("PUT", u, r)
+	req.Header.Set("Content-Type", "application/json")
+
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		contents, _ := ioutil.ReadAll(resp.Body)
+
+		return errors.New(string(contents))
+	}
+	return nil
+}
+
+func (c *GossamerClient) UpdateObservation(o Observation) error {
+	return c.doUpdate(o, "/Observations")
+}
+func (c *GossamerClient) UpdateThing(o Thing) error {
+	return c.doUpdate(o, "/Observations")
+}
+
+func (c *GossamerClient) UpdateObservedProperty(o ObservedProperty) error {
+	return c.doUpdate(o, "/ObservedProperties")
+}
+
+func (c *GossamerClient) UpdateLocation(o Location) error {
+	return c.doUpdate(o, "/Locations")
+}
+
+func (c *GossamerClient) UpdateDatastream(o Datastream) error {
+	return c.doUpdate(o, "/Datastreams")
+}
+
+func (c *GossamerClient) UpdateSensor(o Sensor) error {
+	return c.doUpdate(o, "/Sensors")
+}
+
+func (c *GossamerClient) UpdateFeaturesOfInterest(o FeatureOfInterest) error {
+	return c.doUpdate(o, "/FeaturesOfInterest")
+}
+
+func (c *GossamerClient) doPatch(o interface{}, pathFragment string) error {
+	b, err := json.Marshal(o)
+	if err != nil {
+		return err
+	}
+
+	r := bytes.NewReader(b)
+
+	u := c.url + "/v1.0" + pathFragment
+	req, err := http.NewRequest("PATCH", u, r)
+	req.Header.Set("Content-Type", "application/json")
+
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		contents, _ := ioutil.ReadAll(resp.Body)
+
+		return errors.New(string(contents))
+	}
+	return nil
+}
+
+func (c *GossamerClient) PatchObservation(o Observation) error {
+	return c.doPatch(o, "/Observations")
+}
+
+func (c *GossamerClient) PatchThing(o Thing) error {
+	return c.doPatch(o, "/Things")
+}
+
+func (c *GossamerClient) PatchObservedProperty(o ObservedProperty) error {
+	return c.doPatch(o, "/ObservedProperties")
+}
+
+func (c *GossamerClient) PatchLocation(o Location) error {
+	return c.doPatch(o, "/Locations")
+}
+
+func (c *GossamerClient) PatchDatastream(o Datastream) error {
+	return c.doPatch(o, "/Datastreams")
+}
+
+func (c *GossamerClient) PatchSensor(o Sensor) error {
+	return c.doPatch(o, "/Sensors")
+}
+
+func (c *GossamerClient) PatchFeaturesOfInterest(o FeatureOfInterest) error {
+	return c.doPatch(o, "/FeaturesOfInterest")
+}
 
 func (c *GossamerClient) doGet(pathFragment string, id string) ([]byte, error) {
 	resp, err := http.Get(c.url + "/v1.0" + pathFragment + "(" + id + ")")
@@ -212,6 +331,15 @@ func (c *GossamerClient) GetFeaturesOfInterest(id string) (FeatureOfInterest, er
 	b, err := c.doGet("/FeaturesOfInterest", id)
 
 	var o FeatureOfInterestEntity
+	json.Unmarshal(b, &o)
+
+	return o, err
+}
+
+func (c *GossamerClient) GetHistoricalLocation(id string) (HistoricalLocation, error) {
+	b, err := c.doGet("/HistoricalLocations", id)
+
+	var o HistoricalLocationEntity
 	json.Unmarshal(b, &o)
 
 	return o, err
@@ -307,6 +435,24 @@ func (c *GossamerClient) FindLocations() ([]Location, error) {
 	return ret, err
 }
 
+func (c *GossamerClient) FindHistoricalLocations() ([]HistoricalLocation, error) {
+	b, err := c.doFind("/HistoricalLocations")
+
+	var valueList struct {
+		Count int
+		Value []HistoricalLocationEntity
+	}
+
+	json.Unmarshal(b, &valueList)
+
+	ret := make([]HistoricalLocation, len(valueList.Value))
+	for i, v := range valueList.Value {
+		ret[i] = v
+	}
+
+	return ret, err
+}
+
 func (c *GossamerClient) FindDatastreams() ([]Datastream, error) {
 	b, err := c.doFind("/Datastreams")
 
@@ -359,4 +505,182 @@ func (c *GossamerClient) FindFeaturesOfInterest() ([]FeatureOfInterest, error) {
 	}
 
 	return ret, err
+}
+
+func (c *GossamerClient) QueryObservations() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_OBSERVATIONS,
+	}
+}
+
+func (c *GossamerClient) QueryThings() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_THINGS,
+	}
+}
+
+func (c *GossamerClient) QueryObservedProperties() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_OBSERVEDPROPERTIES,
+	}
+
+}
+
+func (c *GossamerClient) QueryLocations() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_LOCATIONS,
+	}
+}
+
+func (c *GossamerClient) QueryDatastreams() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_DATASTREAMS,
+	}
+}
+
+func (c *GossamerClient) QuerySensors() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_SENSORS,
+	}
+}
+
+func (c *GossamerClient) QueryFeaturesOfInterest() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_FEATURESOFINTEREST,
+	}
+}
+
+func (c *GossamerClient) QueryHistoricalLocations() ClientQuery {
+	return &GossamerClientQuery{
+		client:     c,
+		entityType: ENTITY_HISTORICALLOCATIONS,
+	}
+}
+
+type GossamerClientQuery struct {
+	client     Client
+	entityType EntityType
+	topOption  int
+}
+
+func (c *GossamerClientQuery) GetEntityType() EntityType {
+	return c.entityType
+}
+
+func (c *GossamerClientQuery) Top(v int) ClientQuery {
+	c.topOption = v
+	return c
+}
+
+func (c *GossamerClientQuery) All() ([]SensorThing, error) {
+	switch c.entityType {
+	case ENTITY_DATASTREAMS:
+		o, err := c.client.FindDatastreams()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_LOCATIONS:
+		o, err := c.client.FindLocations()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_THINGS:
+		o, err := c.client.FindThings()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_OBSERVATIONS:
+		o, err := c.client.FindObservations()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_OBSERVEDPROPERTIES:
+		o, err := c.client.FindObservedProperties()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_SENSORS:
+		o, err := c.client.FindSensors()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_FEATURESOFINTEREST:
+		o, err := c.client.FindFeaturesOfInterest()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+
+	case ENTITY_HISTORICALLOCATIONS:
+		o, err := c.client.FindHistoricalLocations()
+		st := make([]SensorThing, len(o))
+		for i, v := range o {
+			st[i] = v
+		}
+		return st, err
+	}
+	return nil, errors.New("Unknown entity to query")
+}
+
+func (c *GossamerClientQuery) One(id string) (SensorThing, error) {
+	switch c.entityType {
+	case ENTITY_DATASTREAMS:
+		o, err := c.client.GetDatastream(id)
+		return o.(SensorThing), err
+
+	case ENTITY_LOCATIONS:
+		o, err := c.client.GetLocation(id)
+		return o.(SensorThing), err
+
+	case ENTITY_THINGS:
+		o, err := c.client.GetThing(id)
+		return o.(SensorThing), err
+
+	case ENTITY_OBSERVATIONS:
+		o, err := c.client.GetObservation(id)
+		return o.(SensorThing), err
+
+	case ENTITY_OBSERVEDPROPERTIES:
+		o, err := c.client.GetObservedProperty(id)
+		return o.(SensorThing), err
+
+	case ENTITY_SENSORS:
+		o, err := c.client.GetSensor(id)
+		return o.(SensorThing), err
+
+	case ENTITY_FEATURESOFINTEREST:
+		o, err := c.client.GetFeaturesOfInterest(id)
+		return o.(SensorThing), err
+
+	case ENTITY_HISTORICALLOCATIONS:
+		o, err := c.client.GetHistoricalLocation(id)
+		return o.(SensorThing), err
+	}
+	return nil, errors.New("Unknown entity to query")
 }

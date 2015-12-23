@@ -11,6 +11,7 @@ func main() {
 	c := client.NewClient("http://localhost:8000")
 
 	// Inserts
+	log.Println("========== INSERT ==========")
 	InsertObservation(c)
 	InsertDatastream(c)
 	InsertFeaturesOfInterest(c)
@@ -19,6 +20,7 @@ func main() {
 	InsertThing(c)
 	InsertSensor(c)
 
+	log.Println("========== FIND ==========")
 	FindObservations(c)
 	FindDatastreams(c)
 	FindFeaturesOfInterest(c)
@@ -27,6 +29,28 @@ func main() {
 	FindThings(c)
 	FindSensors(c)
 
+	log.Println("========== QUERY ==========")
+	QueryObservations(c)
+
+	log.Println("========== UPDATE ==========")
+	UpdateObservations(c)
+	UpdateDatastreams(c)
+	UpdateFeaturesOfInterest(c)
+	UpdateLocation(c)
+	UpdateObservedProperties(c)
+	UpdateThings(c)
+	UpdateSensors(c)
+
+	log.Println("========== PATCH ==========")
+	PatchObservations(c)
+	PatchDatastreams(c)
+	PatchFeaturesOfInterest(c)
+	PatchLocation(c)
+	PatchObservedProperties(c)
+	PatchThings(c)
+	PatchSensors(c)
+
+	log.Println("========== DELETE ==========")
 	DeleteObservations(c)
 	DeleteDatastreams(c)
 	DeleteFeaturesOfInterest(c)
@@ -143,7 +167,6 @@ func InsertThing(c gossamer.Client) {
 }
 
 func FindObservations(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindObservations()
 	if e != nil {
 		log.Fatal(e)
@@ -160,7 +183,6 @@ func FindObservations(c gossamer.Client) {
 }
 
 func FindDatastreams(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindDatastreams()
 	if e != nil {
 		log.Fatal(e)
@@ -177,7 +199,6 @@ func FindDatastreams(c gossamer.Client) {
 }
 
 func FindFeaturesOfInterest(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindFeaturesOfInterest()
 	if e != nil {
 		log.Fatal(e)
@@ -194,7 +215,6 @@ func FindFeaturesOfInterest(c gossamer.Client) {
 }
 
 func FindLocations(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindLocations()
 	if e != nil {
 		log.Fatal(e)
@@ -211,7 +231,6 @@ func FindLocations(c gossamer.Client) {
 }
 
 func FindObservedProperties(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindObservedProperties()
 	if e != nil {
 		log.Fatal(e)
@@ -228,7 +247,6 @@ func FindObservedProperties(c gossamer.Client) {
 }
 
 func FindThings(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindThings()
 	if e != nil {
 		log.Fatal(e)
@@ -245,7 +263,6 @@ func FindThings(c gossamer.Client) {
 }
 
 func FindSensors(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindSensors()
 	if e != nil {
 		log.Fatal(e)
@@ -261,8 +278,15 @@ func FindSensors(c gossamer.Client) {
 	}
 }
 
+func QueryObservations(c gossamer.Client) {
+	o, err := c.QueryObservations().All()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Query all Observations returned records # ", len(o))
+}
+
 func DeleteObservations(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindObservations()
 	if e != nil {
 		log.Fatal(e)
@@ -285,7 +309,6 @@ func DeleteObservations(c gossamer.Client) {
 }
 
 func DeleteDatastreams(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindDatastreams()
 	if e != nil {
 		log.Fatal(e)
@@ -308,7 +331,6 @@ func DeleteDatastreams(c gossamer.Client) {
 }
 
 func DeleteFeaturesOfInterest(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindFeaturesOfInterest()
 	if e != nil {
 		log.Fatal(e)
@@ -331,7 +353,6 @@ func DeleteFeaturesOfInterest(c gossamer.Client) {
 }
 
 func DeleteLocations(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindLocations()
 	if e != nil {
 		log.Fatal(e)
@@ -354,7 +375,6 @@ func DeleteLocations(c gossamer.Client) {
 }
 
 func DeleteObservedProperties(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindObservedProperties()
 	if e != nil {
 		log.Fatal(e)
@@ -377,7 +397,6 @@ func DeleteObservedProperties(c gossamer.Client) {
 }
 
 func DeleteThings(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindThings()
 	if e != nil {
 		log.Fatal(e)
@@ -400,7 +419,6 @@ func DeleteThings(c gossamer.Client) {
 }
 
 func DeleteSensors(c gossamer.Client) {
-	log.Println("====================")
 	ol, e := c.FindSensors()
 	if e != nil {
 		log.Fatal(e)
@@ -421,3 +439,60 @@ func DeleteSensors(c gossamer.Client) {
 		}
 	}
 }
+
+func UpdateObservations(c gossamer.Client) {
+	l, err := c.QueryObservations().Top(1).All()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var o gossamer.Observation
+	if len(l) > 0 {
+		o = l[0].(gossamer.Observation)
+
+		n := gossamer.NewObservationEntity()
+		n.Id = o.GetId()
+		n.ResultQuality = "Patch this value only"
+		n.ResultTime = gossamer.NewTimeInstant(time.Now())
+
+		c.UpdateObservation(n)
+	}
+}
+
+func UpdateDatastreams(c gossamer.Client) {
+
+}
+
+func UpdateFeaturesOfInterest(c gossamer.Client) {
+
+}
+
+func UpdateLocation(c gossamer.Client)           {}
+func UpdateObservedProperties(c gossamer.Client) {}
+func UpdateThings(c gossamer.Client)             {}
+func UpdateSensors(c gossamer.Client)            {}
+
+func PatchObservations(c gossamer.Client) {
+	l, err := c.QueryObservations().Top(1).All()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var o gossamer.Observation
+	if len(l) > 0 {
+		o = l[0].(gossamer.Observation)
+
+		n := gossamer.CloneObservationEntity(o)
+		n.ResultQuality = "Value was changed"
+		n.ResultTime = gossamer.NewTimeInstant(time.Now())
+
+		c.PatchObservation(n)
+	}
+}
+
+func PatchDatastreams(c gossamer.Client)        {}
+func PatchFeaturesOfInterest(c gossamer.Client) {}
+func PatchLocation(c gossamer.Client)           {}
+func PatchObservedProperties(c gossamer.Client) {}
+func PatchThings(c gossamer.Client)             {}
+func PatchSensors(c gossamer.Client)            {}

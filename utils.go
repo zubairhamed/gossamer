@@ -281,3 +281,64 @@ func DiscoverEntityType(e string) EntityType {
 		return ENTITY_UNKNOWN
 	}
 }
+
+func NewThingEntity() *ThingEntity {
+	t := &ThingEntity{}
+
+	return t
+}
+
+func NewLocationEntity() *LocationEntity {
+	e := &LocationEntity{}
+
+	return e
+}
+
+func NewHistoricalLocationEntity() *HistoricalLocationEntity {
+	e := &HistoricalLocationEntity{}
+
+	return e
+}
+
+func NewDatastreamEntity() *DatastreamEntity {
+	e := &DatastreamEntity{}
+
+	return e
+}
+
+func NewSensorEntity() *SensorEntity {
+	e := &SensorEntity{}
+
+	return e
+}
+
+func NewObservedPropertyEntity() *ObservedPropertyEntity {
+	e := &ObservedPropertyEntity{}
+
+	return e
+}
+
+func NewObservationEntity() *ObservationEntity {
+	e := &ObservationEntity{}
+
+	return e
+}
+
+func CloneObservationEntity(o Observation) *ObservationEntity {
+	n := NewObservationEntity()
+	n.Id = o.GetId()
+	n.Parameters = o.GetParameters()
+	n.PhenomenonTime = o.GetPhenomenonTime()
+	n.Result = o.GetResult()
+	n.ResultQuality = o.GetResultQuality()
+	n.ResultTime = o.GetResultTime()
+	n.ValidTime = o.GetValidTime()
+
+	return n
+}
+
+func NewFeatureOfInterestEntity() *FeatureOfInterestEntity {
+	e := &FeatureOfInterestEntity{}
+
+	return e
+}
