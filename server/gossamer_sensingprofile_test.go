@@ -154,6 +154,13 @@ func TestCrudSensingProfile(t *testing.T) {
 	// ####### UPDATE (PATCH) #######
 
 	// ####### ADVANCED QUERIES #######
+	for _, v := range entityTypes {
+		u := v + "?$top=1"
+		req, w = NewMockHttp("GET", u, "")
+		s.HandleGet(c, w, req)
+		ret = w.GetJSON()
+		assert.NotNil(t, ret)
+	}
 
 	// ####### DELETE #######
 	for _, v := range entityTypes {
@@ -179,20 +186,6 @@ func TestCrudSensingProfile(t *testing.T) {
 		l = len(ret["value"].([]interface{}))
 		assert.Equal(t, 0, l)
 	}
-
-	// Performance test
-	//	i := 0
-	//	start := time.Now()
-	//	for i < 10000 {
-	//		req, w = NewMockHttp("POST", "/Things", NewDefaultThing())
-	//		s.HandlePost(c, w, req)
-	//		i++
-	//	}
-	//	duration := time.Since(start)
-	//	log.Println(duration.Seconds())
-
-	// Clear Collection
-	DropCollection()
 }
 
 func GetMapProperty(idx int, prop string, val map[string]interface{}) string {
