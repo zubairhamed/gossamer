@@ -160,6 +160,14 @@ func TestCrudSensingProfile(t *testing.T) {
 		s.HandleGet(c, w, req)
 		ret = w.GetJSON()
 		assert.NotNil(t, ret)
+		assert.Equal(t, 1, len(ret["value"].([]interface{})))
+		id := ret["value"].([]interface{})[0].(map[string]interface{})["@iot.id"]
+
+		u = v + "(" + id.(string) + ")"
+		req, w = NewMockHttp("GET", u, "")
+		s.HandleGet(c, w, req)
+		ret = w.GetJSON()
+		assert.NotNil(t, ret)
 	}
 
 	// ####### DELETE #######
