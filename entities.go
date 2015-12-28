@@ -24,8 +24,8 @@ type ThingEntity struct {
 	NavLinkLocations           string                      `json:"Locations@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkDatastreams         string                      `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkHistoricalLocations string                      `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
-	Description                string                      `json:"description,omitempty"`
-	Properties                 map[string]string           `json:"properties,omitempty"`
+	Description                string                      `json:"description,omitempty" bson:"description,omitempty"`
+	Properties                 map[string]string           `json:"properties,omitempty" bson:"properties,omitempty"`
 	IdLocations                []string                    `json:"-" bson:"@iot_locations_id"`
 	Locations                  []*LocationEntity           `json:",omitempty" bson:"-"`
 	HistoricalLocations        []*HistoricalLocationEntity `json:",omitempty" bson:"-"`
@@ -56,9 +56,9 @@ type LocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
 	NavLinkHistoricalLocations string                      `json:"HistoricalLocations@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkThings              string                      `json:"Things@iot.navigationLink,omitempty" bson:"-"`
-	Description                string                      `json:"description,omitempty"`
-	EncodingType               LocationEncodingType        `json:"encodingType,omitempty" bson:"encodingType"`
-	Location                   interface{}                 `json:"location,omitempty" bson:"location"`
+	Description                string                      `json:"description,omitempty" bson:"description,omitempty"`
+	EncodingType               LocationEncodingType        `json:"encodingType,omitempty" bson:"encodingType,omitempty"`
+	Location                   interface{}                 `json:"location,omitempty" bson:"location,omitempty"`
 	Things                     []*ThingEntity              `json:"Things,omitempty" bson:"-"`
 	HistoricalLocations        []*HistoricalLocationEntity `json:"HistoricalLocations,omitempty" bson:"-"`
 }
@@ -81,11 +81,11 @@ type HistoricalLocationEntity struct {
 	SensorThingsEntity         `bson:",inline"`
 	NavLinkHistoricalLocations string            `json:"HistoricalLocations@iot.navigationLink,omitempty"`
 	NavLinkThing               string            `json:"Thing@iot.navigationLink,omitempty"`
-	Time                       *TimeInstant      `json:"time"`
+	Time                       *TimeInstant      `json:"time" bson:"time,omitempty"`
 	IdThing                    string            `json:"-" bson:"@iot_things_id"`
 	IdLocations                []string          `json:"-" bson:"@iot_locations_id"`
-	Thing                      *ThingEntity      `json:"Thing,omitempty"`
-	Locations                  []*LocationEntity `json:"Locations,omitempty"`
+	Thing                      *ThingEntity      `json:"Thing,omitempty" bson:"-"`
+	Locations                  []*LocationEntity `json:"Locations,omitempty" bson:"-"`
 }
 
 func (e HistoricalLocationEntity) GetType() EntityType {
@@ -104,11 +104,11 @@ type DatastreamEntity struct {
 	NavLinkSensor           string                    `json:"Sensor@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkObservedProperty string                    `json:"ObservedProperty@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkObservations     string                    `json:"Observations@iot.navigationLink,omitempty" bson:"-"`
-	PhenomenonTime          *TimePeriod               `json:"phenomenonTime,omitempty"`
-	ResultTime              *TimePeriod               `json:"resultTime,omitempty"`
-	UnitOfMeasurement       interface{}               `json:"unitOfMeasurement,omitempty" bson:"unitOfMeasurement"`
-	ObservationType         DatastreamObservationType `json:"observationType,omitempty" bson:"observationType"`
-	Description             string                    `json:"description,omitempty"`
+	PhenomenonTime          *TimePeriod               `json:"phenomenonTime,omitempty" bson:"phenomenonTime,omitempty"`
+	ResultTime              *TimePeriod               `json:"resultTime,omitempty" bson:"resultTime,omitempty"`
+	UnitOfMeasurement       interface{}               `json:"unitOfMeasurement,omitempty" bson:"unitOfMeasurement,omitempty"`
+	ObservationType         DatastreamObservationType `json:"observationType,omitempty" bson:"observationType,omitempty"`
+	Description             string                    `json:"description,omitempty" bson:"description,omitempty"`
 	IdThing                 string                    `json:"-" bson:"@iot_things_id"`
 	IdObservedProperty      string                    `json:"-" bson:"@iot_observedproperties_id"`
 	IdSensor                string                    `json:"-" bson:"@iot_sensors_id"`
@@ -127,9 +127,9 @@ func (e DatastreamEntity) GetType() EntityType {
 type SensorEntity struct {
 	SensorThingsEntity `bson:",inline"`
 	NavLinkDatastreams string             `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
-	Description        string             `json:"description,omitempty"`
-	EncodingType       SensorEncodingType `json:"encodingType,omitempty"`
-	Metadata           interface{}        `json:"metadata,omitempty"`
+	Description        string             `json:"description,omitempty" bson:"description,omitempty"`
+	EncodingType       SensorEncodingType `json:"encodingType,omitempty" bson:"encodingType,omitempty"`
+	Metadata           interface{}        `json:"metadata,omitempty" bson:"metadata,omitempty"`
 	Datastreams        []*Datastream      `json:"Datastreams,omitempty" bson:"-"`
 }
 
@@ -153,9 +153,9 @@ func (e SensorEntity) GetMetadata() interface{} {
 type ObservedPropertyEntity struct {
 	SensorThingsEntity `bson:",inline"`
 	NavLinkDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty" bson:"-"`
-	Description        string        `json:"description,omitempty"`
-	Name               string        `json:"name,omitempty"`
-	Definition         string        `json:"definition,omitempty"`
+	Description        string        `json:"description,omitempty" bson:"description,omitempty"`
+	Name               string        `json:"name,omitempty" bson:"name,omitempty"`
+	Definition         string        `json:"definition,omitempty" bson:"definition,omitempty"`
 	Datastreams        []*Datastream `json:"Datastreams,omitempty" bson:"-"`
 }
 
@@ -180,12 +180,12 @@ type ObservationEntity struct {
 	SensorThingsEntity       `bson:",inline"`
 	NavLinkFeatureOfInterest string                   `json:"FeatureOfInterest@iot.navigationLink,omitempty" bson:"-"`
 	NavLinkDatastream        string                   `json:"Datastream@iot.navigationLink,omitempty" bson:"-"`
-	PhenomenonTime           *TimePeriod              `json:"phenomenonTime,omitempty"`
-	Result                   interface{}              `json:"result,omitempty" bson:"result"`
-	ResultTime               *TimeInstant             `json:"resultTime,omitempty"`
-	ResultQuality            interface{}              `json:"resultQuality,omitempty"`
-	ValidTime                *TimePeriod              `json:"validTime,omitempty"`
-	Parameters               map[string]interface{}   `json:"parameter,omptempty"`
+	PhenomenonTime           *TimePeriod              `json:"phenomenonTime,omitempty" bson:"phenomenonTime,omitempty"`
+	Result                   interface{}              `json:"result,omitempty" bson:"result,omitempty"`
+	ResultTime               *TimeInstant             `json:"resultTime,omitempty" bson:"resultTime,omitempty"`
+	ResultQuality            interface{}              `json:"resultQuality,omitempty" bson:"resultQuality,omitempty"`
+	ValidTime                *TimePeriod              `json:"validTime,omitempty" bson:"validTime,omitempty"`
+	Parameters               map[string]interface{}   `json:"parameter,omptempty" bson:"parameters,omitempty"`
 	IdDatastream             string                   `json:"-" bson:"@iot_datastreams_id"`
 	IdFeatureOfInterest      string                   `json:"-" bson:"@iot_featureofinterests_id"`
 	Datastream               *DatastreamEntity        `json:"Datastream,omitempty" bson:"-"`
@@ -229,9 +229,9 @@ func (e ObservationEntity) GetParameters() map[string]interface{} {
 type FeatureOfInterestEntity struct {
 	SensorThingsEntity  `bson:",inline"`
 	NavLinkObservations string               `json:"Observations@iot.navigationLink,omitempty" bson:"-"`
-	Description         string               `json:"description,omitempty"`
-	EncodingType        LocationEncodingType `json:"encodingType,omitempty"`
-	Feature             interface{}          `json:"feature,omitempty" bson:"feature"`
+	Description         string               `json:"description,omitempty" bson:"description,omitempty"`
+	EncodingType        LocationEncodingType `json:"encodingType,omitempty" bson:"encodingType,omitempty"`
+	Feature             interface{}          `json:"feature,omitempty" bson:"feature,omitempty"`
 	Observations        []*ObservationEntity `json:"Observations,omitempty" bson:"-"`
 }
 

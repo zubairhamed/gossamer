@@ -7,7 +7,7 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	server := NewServer()
+	server := NewServer("localhost", 8088)
 	assert.NotNil(t, server)
 }
 

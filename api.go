@@ -159,6 +159,7 @@ type Datastore interface {
 	Insert(ResourcePath, SensorThing) error
 	Delete(EntityType, string) error
 	Update(SensorThing) error
+	Patch(SensorThing) error
 	Init()
 	Shutdown()
 }

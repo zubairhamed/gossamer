@@ -51,13 +51,13 @@ func main() {
 	PatchSensors(c)
 
 	log.Println("========== DELETE ==========")
-	DeleteObservations(c)
-	DeleteDatastreams(c)
-	DeleteFeaturesOfInterest(c)
-	DeleteLocations(c)
-	DeleteObservedProperties(c)
-	DeleteThings(c)
-	DeleteSensors(c)
+	//	DeleteObservations(c)
+	//	DeleteDatastreams(c)
+	//	DeleteFeaturesOfInterest(c)
+	//	DeleteLocations(c)
+	//	DeleteObservedProperties(c)
+	//	DeleteThings(c)
+	//	DeleteSensors(c)
 }
 
 func InsertObservation(c gossamer.Client) {
