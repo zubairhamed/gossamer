@@ -185,7 +185,7 @@ type ObservationEntity struct {
 	ResultTime               *TimeInstant             `json:"resultTime,omitempty" bson:"resultTime,omitempty"`
 	ResultQuality            interface{}              `json:"resultQuality,omitempty" bson:"resultQuality,omitempty"`
 	ValidTime                *TimePeriod              `json:"validTime,omitempty" bson:"validTime,omitempty"`
-	Parameters               map[string]interface{}   `json:"parameter,omptempty" bson:"parameters,omitempty"`
+	Parameters               map[string]interface{}   `json:"parameter,omittempty" bson:"parameters,omitempty"`
 	IdDatastream             string                   `json:"-" bson:"@iot_datastreams_id"`
 	IdFeatureOfInterest      string                   `json:"-" bson:"@iot_featureofinterests_id"`
 	Datastream               *DatastreamEntity        `json:"Datastream,omitempty" bson:"-"`

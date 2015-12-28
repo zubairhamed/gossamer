@@ -71,29 +71,6 @@ func (t *TimePeriod) SetBSON(raw bson.Raw) error {
 		}
 	}
 	return err
-
-	/*
-	var err error
-		str := strings.Replace(string(data), "\"", "", -1)
-		split := strings.Split(str, "/")
-
-		if len(split) == 2 {
-			t.FromTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[0])
-			if err != nil {
-				return err
-			}
-			t.ToTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[1])
-			if err != nil {
-				return err
-			}
-		} else {
-			t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	*/
 }
 
 func (t TimePeriod) MarshalJSON() ([]byte, error) {
@@ -142,6 +119,25 @@ func NewTimeInstant(t time.Time) *TimeInstant {
 	ti := TimeInstant(t)
 
 	return &ti
+}
+
+func (t TimeInstant) GetBSON() (interface{}, error) {
+	out := fmt.Sprintf("\"%s\"", time.Time(t).Format(STD_TIME_FORMAT_INSTANT))
+
+	return out, nil
+}
+
+func (t *TimeInstant) SetBSON(raw bson.Raw) error {
+	var str string
+	err := raw.Unmarshal(&str)
+	if err == nil {
+		tv, err := time.Parse(STD_TIME_FORMAT_INSTANT, strings.Replace(str, "\"", "", -1))
+		if err != nil {
+			return err
+		}
+		*t = TimeInstant(tv)
+	}
+	return err
 }
 
 func (t TimeInstant) MarshalJSON() ([]byte, error) {
