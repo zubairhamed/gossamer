@@ -292,8 +292,22 @@ func NewThingEntity() *ThingEntity {
 	return t
 }
 
+func NewThingEntityWithId(id string) *ThingEntity {
+	t := &ThingEntity{}
+	t.Id = id
+
+	return t
+}
+
 func NewLocationEntity() *LocationEntity {
 	e := &LocationEntity{}
+
+	return e
+}
+
+func NewLocationEntityWithId(id string) *LocationEntity {
+	e := &LocationEntity{}
+	e.Id = id
 
 	return e
 }
@@ -304,8 +318,22 @@ func NewHistoricalLocationEntity() *HistoricalLocationEntity {
 	return e
 }
 
+func NewHistoricalLocationEntityWithId(id string) *HistoricalLocationEntity {
+	e := &HistoricalLocationEntity{}
+	e.Id = id
+
+	return e
+}
+
 func NewDatastreamEntity() *DatastreamEntity {
 	e := &DatastreamEntity{}
+
+	return e
+}
+
+func NewDatastreamEntityWithId(id string) *DatastreamEntity {
+	e := &DatastreamEntity{}
+	e.Id = id
 
 	return e
 }
@@ -316,14 +344,35 @@ func NewSensorEntity() *SensorEntity {
 	return e
 }
 
+func NewSensorEntityWithId(id string) *SensorEntity {
+	e := &SensorEntity{}
+	e.Id = id
+
+	return e
+}
+
 func NewObservedPropertyEntity() *ObservedPropertyEntity {
 	e := &ObservedPropertyEntity{}
 
 	return e
 }
 
+func NewObservedPropertyEntityWithId(id string) *ObservedPropertyEntity {
+	e := &ObservedPropertyEntity{}
+	e.Id = id
+
+	return e
+}
+
 func NewObservationEntity() *ObservationEntity {
 	e := &ObservationEntity{}
+
+	return e
+}
+
+func NewObservationEntityWithId(id string) *ObservationEntity {
+	e := &ObservationEntity{}
+	e.Id = id
 
 	return e
 }
@@ -353,6 +402,13 @@ func CloneSensorEntity(o Sensor) *SensorEntity {
 
 func NewFeatureOfInterestEntity() *FeatureOfInterestEntity {
 	e := &FeatureOfInterestEntity{}
+
+	return e
+}
+
+func NewFeatureOfInterestEntityWithId(id string) *FeatureOfInterestEntity {
+	e := &FeatureOfInterestEntity{}
+	e.Id = id
 
 	return e
 }

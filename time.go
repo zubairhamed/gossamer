@@ -2,7 +2,7 @@ package gossamer
 
 import (
 	"fmt"
-	"log"
+	"gopkg.in/mgo.v2/bson"
 	"strings"
 	"time"
 )
@@ -34,6 +34,68 @@ func (t *TimePeriod) To() time.Time {
 	return t.ToTime
 }
 
+func (t TimePeriod) GetBSON() (interface{}, error) {
+	var out string
+
+	// Time Instant
+	if !t.FromTime.IsZero() && !t.ToTime.IsZero() {
+		out = fmt.Sprintf("\"%s/%s\"", t.FromTime.Format(STD_TIME_FORMAT_PERIOD), t.ToTime.Format(STD_TIME_FORMAT_PERIOD))
+	} else {
+		// Time Period
+		out = fmt.Sprintf("\"%s\"", t.FromTime.Format(STD_TIME_FORMAT_INSTANT))
+	}
+	return out, nil
+}
+
+func (t *TimePeriod) SetBSON(raw bson.Raw) error {
+	var str string
+	err := raw.Unmarshal(&str)
+	if err == nil {
+		str = strings.Replace(str, "\"", "", -1)
+		split := strings.Split(str, "/")
+
+		if len(split) == 2 {
+			t.FromTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[0])
+			if err != nil {
+				return err
+			}
+			t.ToTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[1])
+			if err != nil {
+				return err
+			}
+		} else {
+			t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return err
+
+	/*
+	var err error
+		str := strings.Replace(string(data), "\"", "", -1)
+		split := strings.Split(str, "/")
+
+		if len(split) == 2 {
+			t.FromTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[0])
+			if err != nil {
+				return err
+			}
+			t.ToTime, err = time.Parse(STD_TIME_FORMAT_PERIOD, split[1])
+			if err != nil {
+				return err
+			}
+		} else {
+			t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	*/
+}
+
 func (t TimePeriod) MarshalJSON() ([]byte, error) {
 	var out string
 
@@ -62,7 +124,6 @@ func (t *TimePeriod) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	} else {
-		log.Println("t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])")
 		t.FromTime, err = time.Parse(STD_TIME_FORMAT_INSTANT, split[0])
 		if err != nil {
 			return err

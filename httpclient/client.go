@@ -147,7 +147,7 @@ func (c *GossamerClient) doUpdate(o interface{}, pathFragment string) error {
 
 	r := bytes.NewReader(b)
 
-	u := c.url + "/v1.0" + pathFragment + "(" + st.GetId() + ")"
+	u := c.url + "/v1.0" + pathFragment + "(" + st.GetId()
 	req, err := http.NewRequest("PUT", u, r)
 	req.Header.Set("Content-Type", "application/json")
 

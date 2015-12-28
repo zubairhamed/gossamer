@@ -2,20 +2,28 @@ package server
 
 import (
 	"encoding/json"
+	"flag"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	. "github.com/zubairhamed/gossamer"
 	"log"
 	"net/http"
 	"reflect"
+	"strconv"
 )
 
-func NewServer() Server {
-	return &GossamerServer{}
+func NewServer(host string, port int) Server {
+	GLOB_ENV_HOST = host + ":" + strconv.Itoa(port)
+	return &GossamerServer{
+		host: host,
+		port: port,
+	}
 }
 
 type GossamerServer struct {
 	dataStore Datastore
+	host      string
+	port      int
 }
 
 func (s *GossamerServer) handleNotImplemented(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -36,7 +44,9 @@ func (s *GossamerServer) Start() {
 	goji.Delete("/v1.0/*", s.HandleDelete)
 	goji.Patch("/v1.0/*", s.HandlePatch)
 
-	log.Println("Start Server")
+	flag.Set("bind", ":"+strconv.Itoa(s.port))
+
+	log.Println("Start Server on port ", s.port)
 	goji.Serve()
 }
 
@@ -250,8 +260,7 @@ func (s *GossamerServer) HandlePut(c web.C, w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		log.Println("datastore.Update")
-		err = s.dataStore.Update(e)
+		err = s.dataStore.Patch(e)
 		if err != nil {
 			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
 			return
@@ -264,5 +273,65 @@ func (s *GossamerServer) HandlePut(c web.C, w http.ResponseWriter, r *http.Reque
 }
 
 func (s *GossamerServer) HandlePatch(c web.C, w http.ResponseWriter, r *http.Request) {
+	var err error
+	var req Request
 
+	if r.Header.Get("Content-Type") != "application/json" {
+		ThrowNotAcceptable("Format of request is not JSON", w)
+	}
+
+	req, err = CreateIncomingRequest(r.URL, HTTP)
+	if err != nil {
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": "+err.Error(), w)
+	}
+
+	if err = ValidatePutRequestUrl(req); err != nil {
+		ThrowHttpMethodNotAllowed(err.Error(), w)
+		return
+	}
+
+	rp := req.GetResourcePath()
+	lastEnt := rp.Last()
+	ent := lastEnt.GetEntity()
+
+	if lastEnt.GetId() == "" {
+		ThrowHttpBadRequest(MSG_ERR_HANDLING_REQUEST+": Missing @iot.id", w)
+	}
+
+	cont := rp.Containing()
+
+	if !IsSingularEntity(string(ent)) {
+		decoder := json.NewDecoder(r.Body)
+		e, err := DecodeJsonToEntityStruct(decoder, ent)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		if cont != nil {
+			SetAssociatedEntityId(e, cont.GetEntity(), cont.GetId())
+		}
+
+		err = ValidateMandatoryProperties(e)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		err = ValidateIntegrityConstraints(e)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		err = s.dataStore.Update(e)
+		if err != nil {
+			ThrowHttpBadRequest(MSG_ERR_INSERTING_ENTITY+": "+err.Error(), w)
+			return
+		}
+
+		// TODO
+		w.Header().Add("Location", "url-to-entity")
+		ThrowHttpOk("Entity Updated", w)
+	}
 }

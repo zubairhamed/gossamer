@@ -5,7 +5,8 @@ import (
 )
 
 func main() {
-	s := server.NewServer()
+
+	s := server.NewServer("localhost", 8000)
 	s.UseStore(server.NewMongoStore("localhost", "sensorthings"))
 	s.Start()
 }
