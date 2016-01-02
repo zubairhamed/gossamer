@@ -71,14 +71,14 @@ type GossamerRequest struct {
 	queryOptions QueryOptions
 }
 
-func (r *GossamerRequest) GetProtocol() ProtocolType {
+func (r GossamerRequest) GetProtocol() ProtocolType {
 	return r.protocol
 }
 
-func (r *GossamerRequest) GetQueryOptions() QueryOptions {
+func (r GossamerRequest) GetQueryOptions() QueryOptions {
 	return r.queryOptions
 }
 
-func (r *GossamerRequest) GetResourcePath() ResourcePath {
+func (r GossamerRequest) GetResourcePath() ResourcePath {
 	return r.resourcePath
 }

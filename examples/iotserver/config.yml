@@ -1,0 +1,11 @@
+name: Gossamer Server
+host: appserver
+port: 8989
+
+settings:
+  default-pagination-size: 50
+
+datasource-mongo:
+  host: pidesktop
+  database: sensorthings
+
