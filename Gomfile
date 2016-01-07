@@ -4,3 +4,5 @@ gom 'github.com/zenazn/goji'
 gom 'github.com/stretchr/testify/assert'
 gom 'github.com/axw/gocov/gocov'
 gom 'github.com/mattn/goveralls'
+gom 'gopkg.in/yaml.v2'
+
