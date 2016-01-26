@@ -1,0 +1,39 @@
+<dom-module id="things-list">
+    <style>
+
+    </style>
+    <template>
+        <iron-ajax  id="get_entity_data"
+                    url="/data/things.json"
+                    last-response="{{data}}"
+                    handleAs="json">
+        </iron-ajax>
+
+        <paper-listbox selected="0">
+        <template is="dom-repeat" items="{{data}}">
+            <paper-item on-tap="tapEntityItem" entity="{{entity}}" entityId="{{item.id}} customAttr="a">
+                <paper-item-body two-line>
+                    <div>{{item.name}}</div>
+                    <div>id: {{item.id}}</div>
+                </paper-item-body>
+                <paper-ripple></paper-ripple>
+            </paper-item>
+        </template>
+        </paper-listbox>
+
+    </template>
+    <script>
+        (function() {
+            'use strict';
+            Polymer({
+                is: 'things-list',
+                tapEntityItem: function(e) {
+                    console.log(e.currentTarget.entity);
+                },
+                ready: function() {
+                    this.$.get_entity_data.generateRequest();
+                }
+            });
+        })();
+    </script>
+</dom-module>

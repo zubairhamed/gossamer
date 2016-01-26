@@ -1,0 +1,15 @@
+[
+  {
+    "id": "thing1",
+    "name": "Thing 1"
+  },{
+    "id": "thing2",
+    "name": "Thing 2"
+  },{
+    "id": "thing3"  ,
+    "name": "Thing 3"
+  },{
+    "id": "thing4"  ,
+    "name": "Thing 4"
+  }
+]
