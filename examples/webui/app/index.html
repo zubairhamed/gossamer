@@ -52,141 +52,30 @@
 </head>
 
 <body unresolved>
-  <span id="browser-sync-binding"></span>
   <template is="dom-bind" id="app">
-
-    <paper-drawer-panel id="paperDrawerPanel">
-      <!-- Drawer Scroll Header Panel -->
-      <paper-scroll-header-panel drawer fixed>
-
-        <!-- Drawer Toolbar -->
-        <paper-toolbar id="drawerToolbar">
-          <span class="menu-name">Menu</span>
-        </paper-toolbar>
-
-        <!-- Drawer Content -->
-        <paper-menu>
-
-          <a data-route="things" href="{{baseUrl}}things">
-            <iron-icon icon="home"></iron-icon>
-            <span>Things</span>
-          </a>
-
-          <a data-route="obsprops" href="{{baseUrl}}obsprops">
-            <iron-icon icon="home"></iron-icon>
-            <span>Observed Properties</span>
-          </a>
-
-          <a data-route="locs" href="{{baseUrl}}locs">
-            <iron-icon icon="home"></iron-icon>
-            <span>Locations</span>
-          </a>
-
-          <a data-route="ds" href="{{baseUrl}}ds">
-            <iron-icon icon="home"></iron-icon>
-            <span>Datastreams</span>
-          </a>
-
-          <a data-route="sensors" href="{{baseUrl}}sensors">
-            <iron-icon icon="home"></iron-icon>
-            <span>Sensors</span>
-          </a>
-
-          <a data-route="obs" href="{{baseUrl}}obs">
-            <iron-icon icon="home"></iron-icon>
-            <span>Observations</span>
-          </a>
-
-          <a data-route="foi" href="{{baseUrl}}foi">
-            <iron-icon icon="home"></iron-icon>
-            <span>Features of Interest</span>
-          </a>
-
-          <a data-route="histoloc" href="{{baseUrl}}histolocs">
-            <iron-icon icon="home"></iron-icon>
-            <span>Historical Locations</span>
-          </a>
-
-        </paper-menu>
-      </paper-scroll-header-panel>
-
-      <!-- Main Area -->
-      <paper-scroll-header-panel main id="headerPanelMain" condenses keep-condensed-header>
-
-        <!-- Main Toolbar -->
-        <paper-toolbar id="mainToolbar" class="tall">
-          <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
-
-          <span class="space"></span>
-
-          <!-- Toolbar icons -->
-          <a data-route="search" href="{{baseUrl}}search">
-            <iron-icon icon="search"></iron-icon>
-          </a>
-
-          <!-- Application name -->
-          <div class="middle middle-container">
-            <div class="app-name">Gossamer WebAdmin</div>
-          </div>
-
-          <!-- Application sub title -->
-          <div class="bottom bottom-container">
-            <div class="bottom-title">build 0.1a</div>
-          </div>
-        </paper-toolbar>
-
-        <!-- Main Content -->
-        <div class="content">
-          <iron-pages attr-for-selected="data-route" selected="{{route}}">
-
-
-            <section data-route="things">
-              <paper-material elevation="1">
-                <div class="layout horizontal">
-                  <div style="width: 200px; margin-right: 15px;">
-                    <div>
-                      <things-list pageSize="10"></things-list>
-                    </div>
-                  </div>
-                  <div class="flex">
-                    <entity-details />
-                  </div>
-                </div>
-              </paper-material>
-            </section>
-
-          </iron-pages>
-        </div>
-      </paper-scroll-header-panel>
-    </paper-drawer-panel>
-
-    <paper-toast id="toast">
-      <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
-    </paper-toast>
-
-    <!-- Uncomment next block to enable Service Worker support (1/2) -->
-    <!--
-    <paper-toast id="caching-complete"
-                 duration="6000"
-                 text="Caching complete! This app will work offline.">
-    </paper-toast>
-
-    <platinum-sw-register auto-register
-                          clients-claim
-                          skip-waiting
-                          base-uri="bower_components/platinum-sw/bootstrap"
-                          on-service-worker-installed="displayInstalledToast">
-      <platinum-sw-cache default-cache-strategy="fastest"
-                         cache-config-file="cache-config.json">
-      </platinum-sw-cache>
-    </platinum-sw-register>
-    -->
-
+    <style is="custom-style">
+    .flex-vertical {
+      @apply(--layout-vertical);
+      height: 220px;
+    }
+    .flexchild-vertical {
+      @apply(--layout-flex);
+    }
+    </style>
+    <div class="container flex-vertical">
+      <div>
+        <div>title</div>
+        <div>subtitle</div>
+      </div>
+      <div>
+        buttonmenu
+      </div>
+      <div class="flexchild-vertical">
+        content
+      </div>
+    </div>
   </template>
-
-  <!-- build:js scripts/app.js -->
   <script src="scripts/app.js"></script>
-  <!-- endbuild-->
 </body>
 
 </html>
