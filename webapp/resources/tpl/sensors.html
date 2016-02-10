@@ -1,0 +1,28 @@
+#{ define "page_sensors" }#
+<!doctype html>
+<html lang="en" ng-app="gossamerApp">
+<head>
+    <title>Gossamer :: Sensors</title>
+    #{ template "head" }#
+    <script src="js/app/ctrl-sensors.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">Gossamer WebUI :: #{ .Title }# </a>
+    </div>
+</div>
+
+<div id="layout" class="content pure-g" ng-controller="EntityController">
+    #{ template "nav" }#
+
+    #{ template "entity_list"}#
+
+    <div id="main" class="pure-u-1">
+        #{ template "entity_content" }#
+    </div>
+</div>
+</body>
+</html>
+#{ end }#

@@ -46,7 +46,7 @@ type AppConfig struct {
 	Port int    `yaml:"port"`
 
 	MongoDatabase struct {
-		Host     string `yaml:"host"`
-		Database string `yaml:"database"`
-	} `yaml:"datasource-mongo"`
+			 Host     string `yaml:"host"`
+			 Database string `yaml:"database"`
+		 } `yaml:"datasource-mongo"`
 }
