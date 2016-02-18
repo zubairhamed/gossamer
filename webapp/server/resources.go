@@ -581,28 +581,28 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"resources/css/pure-0.6.0-min.css": resourcesCssPure060MinCss,
-	"resources/css/style.css": resourcesCssStyleCss,
-	"resources/js/angular.1.5.0.min.js": resourcesJsAngular150MinJs,
-	"resources/js/app/ctrl-datastreams.js": resourcesJsAppCtrlDatastreamsJs,
+	"resources/css/pure-0.6.0-min.css":            resourcesCssPure060MinCss,
+	"resources/css/style.css":                     resourcesCssStyleCss,
+	"resources/js/angular.1.5.0.min.js":           resourcesJsAngular150MinJs,
+	"resources/js/app/ctrl-datastreams.js":        resourcesJsAppCtrlDatastreamsJs,
 	"resources/js/app/ctrl-featuresofinterest.js": resourcesJsAppCtrlFeaturesofinterestJs,
-	"resources/js/app/ctrl-locations.js": resourcesJsAppCtrlLocationsJs,
-	"resources/js/app/ctrl-observations.js": resourcesJsAppCtrlObservationsJs,
+	"resources/js/app/ctrl-locations.js":          resourcesJsAppCtrlLocationsJs,
+	"resources/js/app/ctrl-observations.js":       resourcesJsAppCtrlObservationsJs,
 	"resources/js/app/ctrl-observedproperties.js": resourcesJsAppCtrlObservedpropertiesJs,
-	"resources/js/app/ctrl-sensors.js": resourcesJsAppCtrlSensorsJs,
-	"resources/js/app/ctrl-things.js": resourcesJsAppCtrlThingsJs,
-	"resources/tpl/datastreams.html": resourcesTplDatastreamsHtml,
-	"resources/tpl/entity_content.html": resourcesTplEntity_contentHtml,
-	"resources/tpl/entity_list.html": resourcesTplEntity_listHtml,
-	"resources/tpl/featuresofinterest.html": resourcesTplFeaturesofinterestHtml,
-	"resources/tpl/head.html": resourcesTplHeadHtml,
-	"resources/tpl/index.html": resourcesTplIndexHtml,
-	"resources/tpl/locations.html": resourcesTplLocationsHtml,
-	"resources/tpl/menu.html": resourcesTplMenuHtml,
-	"resources/tpl/observations.html": resourcesTplObservationsHtml,
-	"resources/tpl/observedproperties.html": resourcesTplObservedpropertiesHtml,
-	"resources/tpl/sensors.html": resourcesTplSensorsHtml,
-	"resources/tpl/things.html": resourcesTplThingsHtml,
+	"resources/js/app/ctrl-sensors.js":            resourcesJsAppCtrlSensorsJs,
+	"resources/js/app/ctrl-things.js":             resourcesJsAppCtrlThingsJs,
+	"resources/tpl/datastreams.html":              resourcesTplDatastreamsHtml,
+	"resources/tpl/entity_content.html":           resourcesTplEntity_contentHtml,
+	"resources/tpl/entity_list.html":              resourcesTplEntity_listHtml,
+	"resources/tpl/featuresofinterest.html":       resourcesTplFeaturesofinterestHtml,
+	"resources/tpl/head.html":                     resourcesTplHeadHtml,
+	"resources/tpl/index.html":                    resourcesTplIndexHtml,
+	"resources/tpl/locations.html":                resourcesTplLocationsHtml,
+	"resources/tpl/menu.html":                     resourcesTplMenuHtml,
+	"resources/tpl/observations.html":             resourcesTplObservationsHtml,
+	"resources/tpl/observedproperties.html":       resourcesTplObservedpropertiesHtml,
+	"resources/tpl/sensors.html":                  resourcesTplSensorsHtml,
+	"resources/tpl/things.html":                   resourcesTplThingsHtml,
 }
 
 // AssetDir returns the file names below a certain
@@ -644,37 +644,38 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"resources": &bintree{nil, map[string]*bintree{
 		"css": &bintree{nil, map[string]*bintree{
 			"pure-0.6.0-min.css": &bintree{resourcesCssPure060MinCss, map[string]*bintree{}},
-			"style.css": &bintree{resourcesCssStyleCss, map[string]*bintree{}},
+			"style.css":          &bintree{resourcesCssStyleCss, map[string]*bintree{}},
 		}},
 		"js": &bintree{nil, map[string]*bintree{
 			"angular.1.5.0.min.js": &bintree{resourcesJsAngular150MinJs, map[string]*bintree{}},
 			"app": &bintree{nil, map[string]*bintree{
-				"ctrl-datastreams.js": &bintree{resourcesJsAppCtrlDatastreamsJs, map[string]*bintree{}},
+				"ctrl-datastreams.js":        &bintree{resourcesJsAppCtrlDatastreamsJs, map[string]*bintree{}},
 				"ctrl-featuresofinterest.js": &bintree{resourcesJsAppCtrlFeaturesofinterestJs, map[string]*bintree{}},
-				"ctrl-locations.js": &bintree{resourcesJsAppCtrlLocationsJs, map[string]*bintree{}},
-				"ctrl-observations.js": &bintree{resourcesJsAppCtrlObservationsJs, map[string]*bintree{}},
+				"ctrl-locations.js":          &bintree{resourcesJsAppCtrlLocationsJs, map[string]*bintree{}},
+				"ctrl-observations.js":       &bintree{resourcesJsAppCtrlObservationsJs, map[string]*bintree{}},
 				"ctrl-observedproperties.js": &bintree{resourcesJsAppCtrlObservedpropertiesJs, map[string]*bintree{}},
-				"ctrl-sensors.js": &bintree{resourcesJsAppCtrlSensorsJs, map[string]*bintree{}},
-				"ctrl-things.js": &bintree{resourcesJsAppCtrlThingsJs, map[string]*bintree{}},
+				"ctrl-sensors.js":            &bintree{resourcesJsAppCtrlSensorsJs, map[string]*bintree{}},
+				"ctrl-things.js":             &bintree{resourcesJsAppCtrlThingsJs, map[string]*bintree{}},
 			}},
 		}},
 		"tpl": &bintree{nil, map[string]*bintree{
-			"datastreams.html": &bintree{resourcesTplDatastreamsHtml, map[string]*bintree{}},
-			"entity_content.html": &bintree{resourcesTplEntity_contentHtml, map[string]*bintree{}},
-			"entity_list.html": &bintree{resourcesTplEntity_listHtml, map[string]*bintree{}},
+			"datastreams.html":        &bintree{resourcesTplDatastreamsHtml, map[string]*bintree{}},
+			"entity_content.html":     &bintree{resourcesTplEntity_contentHtml, map[string]*bintree{}},
+			"entity_list.html":        &bintree{resourcesTplEntity_listHtml, map[string]*bintree{}},
 			"featuresofinterest.html": &bintree{resourcesTplFeaturesofinterestHtml, map[string]*bintree{}},
-			"head.html": &bintree{resourcesTplHeadHtml, map[string]*bintree{}},
-			"index.html": &bintree{resourcesTplIndexHtml, map[string]*bintree{}},
-			"locations.html": &bintree{resourcesTplLocationsHtml, map[string]*bintree{}},
-			"menu.html": &bintree{resourcesTplMenuHtml, map[string]*bintree{}},
-			"observations.html": &bintree{resourcesTplObservationsHtml, map[string]*bintree{}},
+			"head.html":               &bintree{resourcesTplHeadHtml, map[string]*bintree{}},
+			"index.html":              &bintree{resourcesTplIndexHtml, map[string]*bintree{}},
+			"locations.html":          &bintree{resourcesTplLocationsHtml, map[string]*bintree{}},
+			"menu.html":               &bintree{resourcesTplMenuHtml, map[string]*bintree{}},
+			"observations.html":       &bintree{resourcesTplObservationsHtml, map[string]*bintree{}},
 			"observedproperties.html": &bintree{resourcesTplObservedpropertiesHtml, map[string]*bintree{}},
-			"sensors.html": &bintree{resourcesTplSensorsHtml, map[string]*bintree{}},
-			"things.html": &bintree{resourcesTplThingsHtml, map[string]*bintree{}},
+			"sensors.html":            &bintree{resourcesTplSensorsHtml, map[string]*bintree{}},
+			"things.html":             &bintree{resourcesTplThingsHtml, map[string]*bintree{}},
 		}},
 	}},
 }}
@@ -725,4 +726,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

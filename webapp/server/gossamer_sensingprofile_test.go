@@ -8,13 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/zenazn/goji/web"
 	"github.com/zubairhamed/gossamer"
-	"github.com/zubairhamed/gossamer/server"
+	"github.com/zubairhamed/gossamer/webapp/server"
 	"gopkg.in/mgo.v2"
 	"log"
 	"net/http"
 	"testing"
 	"time"
 	_ "time"
+	"github.com/zubairhamed/gossamer/store"
 )
 
 func NewMockResponseWriter() *MockResponseWriter {
@@ -65,7 +66,7 @@ func TestCrudSensingProfile(t *testing.T) {
 	}
 
 	s := &server.GossamerServer{}
-	s.UseStore(server.NewMongoStore("localhost", "sensorthings"))
+	s.UseStore(store.NewMongoStore("localhost", "sensorthings"))
 	DropCollection()
 
 	// ####### BASIC INSERT #######

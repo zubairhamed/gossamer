@@ -1,18 +1,18 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	. "github.com/zubairhamed/gossamer"
+	"html/template"
 	"log"
 	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
-	"html/template"
-	"bytes"
 )
 
 func NewServer(host string, port int) Server {
@@ -21,7 +21,7 @@ func NewServer(host string, port int) Server {
 	tpl := CreateTemplateCache()
 
 	return &GossamerServer{
-		tpl: tpl,
+		tpl:  tpl,
 		host: host,
 		port: port,
 	}
@@ -30,8 +30,7 @@ func NewServer(host string, port int) Server {
 func CreateTemplateCache() *template.Template {
 	tplBuf := bytes.NewBuffer([]byte{})
 
-
-	var tpls = []string {
+	var tpls = []string{
 		"head",
 		"menu",
 		"entity_list",
@@ -59,7 +58,7 @@ func CreateTemplateCache() *template.Template {
 }
 
 type GossamerServer struct {
-	tpl *template.Template
+	tpl       *template.Template
 	dataStore Datastore
 	host      string
 	port      int
@@ -393,7 +392,7 @@ func (s *GossamerServer) HandleWebUiIndex(c web.C, w http.ResponseWriter, r *htt
 }
 
 func (s *GossamerServer) HandleWebUiThings(c web.C, w http.ResponseWriter, r *http.Request) {
-	err := s.tpl.ExecuteTemplate(w, "page_things", map[string]string {
+	err := s.tpl.ExecuteTemplate(w, "page_things", map[string]string{
 		"Title": "Things",
 	})
 	if err != nil {
@@ -402,43 +401,43 @@ func (s *GossamerServer) HandleWebUiThings(c web.C, w http.ResponseWriter, r *ht
 }
 
 func (s *GossamerServer) HandleWebUiSensors(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_sensors", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_sensors", map[string]string{
 		"Title": "Sensors",
 	})
 }
 
 func (s *GossamerServer) HandleWebUiObservations(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_observations", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_observations", map[string]string{
 		"Title": "Observations",
 	})
 }
 
 func (s *GossamerServer) HandleWebUiObservedProperties(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_obsprops", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_obsprops", map[string]string{
 		"Title": "Observed Properties",
 	})
 }
 
 func (s *GossamerServer) HandleWebUiLocations(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_locs", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_locs", map[string]string{
 		"Title": "Locations",
 	})
 }
 
 func (s *GossamerServer) HandleWebUiDatastreams(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_ds", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_ds", map[string]string{
 		"Title": "Datastreams",
 	})
 }
 
 func (s *GossamerServer) HandleWebUiFeaturesOfInterest(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_foi", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_foi", map[string]string{
 		"Title": "Features of Interest",
 	})
 }
 
 func (s *GossamerServer) HandleWebUiHistoricLocations(c web.C, w http.ResponseWriter, r *http.Request) {
-	s.tpl.ExecuteTemplate(w, "page_histolocs", map[string]string {
+	s.tpl.ExecuteTemplate(w, "page_histolocs", map[string]string{
 		"Title": "Historic Locations",
 	})
 }
@@ -474,5 +473,5 @@ func AssetContent(path string) ([]byte, error) {
 }
 
 type PageModel struct {
-	Title 	string
+	Title string
 }

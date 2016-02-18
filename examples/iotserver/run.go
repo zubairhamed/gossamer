@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/zubairhamed/gossamer/store"
 	"github.com/zubairhamed/gossamer/webapp/server"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
-	"github.com/zubairhamed/gossamer/store"
 )
 
 func main() {

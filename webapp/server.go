@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/zubairhamed/gossamer/store"
 	"github.com/zubairhamed/gossamer/webapp/server"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
-	"github.com/zubairhamed/gossamer/store"
 )
 
 func main() {
@@ -46,7 +46,7 @@ type AppConfig struct {
 	Port int    `yaml:"port"`
 
 	MongoDatabase struct {
-			 Host     string `yaml:"host"`
-			 Database string `yaml:"database"`
-		 } `yaml:"datasource-mongo"`
+		Host     string `yaml:"host"`
+		Database string `yaml:"database"`
+	} `yaml:"datasource-mongo"`
 }
